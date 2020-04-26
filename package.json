@@ -1,0 +1,61 @@
+{
+  "name": "unimported",
+  "version": "1.0.0",
+  "description": "Scans your nodejs project folder and shows obsolete files and modules",
+  "main": "./dist/unimported.js",
+  "bin": "./bin/unimported.js",
+  "source": "./src/index.ts",
+  "license": "MIT",
+  "author": "Stephan Meijer <stephan@meijer.ws>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smeijer/unimported.git"
+  },
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "lint": "tsc --noEmit && eslint 'src/**/*.ts' --quiet --fix",
+    "prepublish": "npm run build",
+    "run": "npm run build && node ./dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "src",
+    "dist",
+    "bin"
+  ],
+  "keywords": [
+    "unrequired",
+    "redundant",
+    "obsolete",
+    "unimported",
+    "unreferenced"
+  ],
+  "dependencies": {
+    "@typescript-eslint/parser": "^2.29.0",
+    "@typescript-eslint/typescript-estree": "^2.29.0",
+    "chalk": "^4.0.0",
+    "eslint": "^6.8.0",
+    "glob": "^7.1.6",
+    "ora": "^4.0.4",
+    "resolve": "^1.17.0",
+    "term-size": "^2.2.0",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/node": "^13.13.2",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.1.7",
+    "nodemon": "^2.0.3",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
+}
