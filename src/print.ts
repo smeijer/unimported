@@ -46,7 +46,9 @@ export function formatMetaTable(
   const divider = chalk.grey('─'.repeat(columns));
 
   const lines = [
-    `${space} ${caption}`,
+    `${space} ${caption}               ${chalk.grey(
+      'unimported v' + context.version,
+    )}`,
     divider,
     ...records.reduce<string[]>((acc, [label, value]) => {
       acc.push(label ? `${space} ${label.padEnd(width, ' ')} : ${value}` : '');

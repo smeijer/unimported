@@ -6,8 +6,10 @@ import { printResults } from './print';
 import * as meta from './meta';
 import { traverse } from './traverse';
 import chalk from 'chalk';
+import { readJson } from './fs';
 
 export interface Context {
+  version: string;
   cwd: string;
   entry: string[];
   aliases: { [key: string]: string[] };
@@ -18,6 +20,7 @@ export interface Context {
 }
 
 const spinner = ora('initializing').start();
+
 async function main() {
   const cwd = process.cwd();
 
@@ -27,7 +30,10 @@ async function main() {
     meta.getProjectType(cwd),
   ]);
 
+  const packageJson = await readJson('../package.json', __dirname);
+
   const context: Context = {
+    version: packageJson.version,
     cwd,
     aliases,
     dependencies,
@@ -51,6 +57,7 @@ async function main() {
   if (context.type === 'meteor') {
     context.ignore.push('public/**', 'private/**', 'tests/**');
   }
+
   // traverse all source files and get import data
   context.entry = await meta.getEntry(cwd, context);
   spinner.text = `resolving imports`;
