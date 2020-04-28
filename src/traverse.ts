@@ -8,7 +8,7 @@ import {
 import * as fs from './fs';
 import Traverser from 'eslint/lib/shared/traverser';
 import {
-  CallExpression,
+  Identifier,
   Literal,
 } from '@typescript-eslint/typescript-estree/dist/ts-estree/ts-estree';
 import resolve from 'resolve';
@@ -149,32 +149,42 @@ async function parse(path: string, context: Context): Promise<FileStats> {
       let target;
 
       switch (node.type) {
+        // import x from './x';
         case AST_NODE_TYPES.ImportDeclaration:
           if (!node.source || !(node.source as Literal).value) {
             break;
           }
           target = (node.source as Literal).value as string;
           break;
+
+        // export { x } from './x';
         case AST_NODE_TYPES.ExportNamedDeclaration:
           if (!node.source || !(node.source as Literal).value) {
             break;
           }
           target = (node.source as Literal).value as string;
           break;
+
+        // export * from './x';
         case AST_NODE_TYPES.ExportAllDeclaration:
           if (!node.source) {
             break;
           }
+
           target = (node.source as Literal).value as string;
           break;
-        case AST_NODE_TYPES.VariableDeclaration:
-          const init = node.declarations[0].init as CallExpression;
-          const callee = (init?.callee || {}) as any;
-          if (callee.type !== 'Import' && callee.name !== 'require') {
+
+        // import('.x') || require('./x') || await import('.x') || await require('./x')
+        case AST_NODE_TYPES.CallExpression: {
+          if (
+            node.callee.type !== 'Import' &&
+            (node.callee as Identifier)?.name !== 'require'
+          ) {
             break;
           }
-          target = (init.arguments[0] as Literal).value as string;
+          target = (node.arguments[0] as Literal).value;
           break;
+        }
       }
 
       if (target) {
