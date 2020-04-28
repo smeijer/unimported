@@ -51,6 +51,28 @@ export async function getDependencies(
   return packageJson.dependencies || {};
 }
 
+async function resolvePath(
+  path: string,
+  context: Context,
+): Promise<string | null> {
+  if (await fs.exists(join(context.cwd, path))) {
+    return join(context.cwd, path);
+  }
+
+  for (const ext of context.extensions) {
+    const absolutePath = join(context.cwd, `${path}${ext}`);
+    if (await fs.exists(absolutePath)) {
+      return absolutePath;
+    }
+  }
+
+  return null;
+}
+
+function isString(value): value is string {
+  return typeof value === 'string';
+}
+
 export async function getEntry(
   projectPath: string,
   context: Context,
@@ -65,30 +87,24 @@ export async function getEntry(
     }
 
     return [
-      packageJson.meteor.mainModule.client,
-      packageJson.meteor.mainModule.server,
-    ]
-      .filter(Boolean)
-      .map((x) => join(projectPath, x));
+      await resolvePath(packageJson.meteor.mainModule.client, context),
+      await resolvePath(packageJson.meteor.mainModule.server, context),
+    ].filter(isString);
   }
 
-  const commonOptions = ['src/index', 'src/main', 'index', 'main']
+  const options = ['src/index', 'src/main', 'index', 'main']
     .map((x) => context.extensions.map((ext) => `${x}${ext}`))
     .reduce((acc, next) => {
       acc.push(...next);
       return acc;
-    }, [])
-    .map((x) => join(projectPath, x));
+    }, []);
 
-  const options = [
-    join(projectPath, `${packageJson.source}`),
-    ...commonOptions,
-    join(projectPath, `${packageJson.main}`),
-  ];
+  const { source, main } = packageJson;
 
-  for (const option of options) {
-    if (await fs.exists(option)) {
-      return [option];
+  for (const option of [source, ...options, main]) {
+    const resolved = await resolvePath(option, context);
+    if (resolved) {
+      return [resolved];
     }
   }
 
