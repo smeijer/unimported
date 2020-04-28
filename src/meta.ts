@@ -2,6 +2,7 @@ import * as fs from './fs';
 import { join } from 'path';
 import { ensureArray } from './ensureArray';
 import { Context } from './index';
+import { resolveImport } from './traverse';
 
 export async function getProjectType(
   projectPath: string,
@@ -59,24 +60,6 @@ export async function getDependencies(
   return packageJson.dependencies || {};
 }
 
-async function resolvePath(
-  path: string,
-  context: Context,
-): Promise<string | null> {
-  if (await fs.exists(join(context.cwd, path))) {
-    return join(context.cwd, path);
-  }
-
-  for (const ext of context.extensions) {
-    const absolutePath = join(context.cwd, `${path}${ext}`);
-    if (await fs.exists(absolutePath)) {
-      return absolutePath;
-    }
-  }
-
-  return null;
-}
-
 function isString(value): value is string {
   return typeof value === 'string';
 }
@@ -94,26 +77,40 @@ export async function getEntry(
       );
     }
 
+    const client = await resolveImport(
+      packageJson.meteor.mainModule.client,
+      projectPath,
+      context,
+    );
+    const server = await resolveImport(
+      packageJson.meteor.mainModule.server,
+      projectPath,
+      context,
+    );
+
     return [
-      await resolvePath(packageJson.meteor.mainModule.client, context),
-      await resolvePath(packageJson.meteor.mainModule.server, context),
+      client.type !== 'unresolved' && client.path,
+      server.type !== 'unresolved' && server.path,
     ].filter(isString);
   }
 
-  const options = ['src/index', 'src/main', 'index', 'main']
-    .map((x) => context.extensions.map((ext) => `${x}${ext}`))
-    .reduce((acc, next) => {
-      acc.push(...next);
-      return acc;
-    }, []);
-
   const { source, main } = packageJson;
+  const options = [
+    source,
+    './src/index',
+    './src/main',
+    './index',
+    './main',
+    main,
+  ];
 
-  for (const option of [source, ...options, main]) {
-    const resolved = await resolvePath(option, context);
-    if (resolved) {
-      return [resolved];
-    }
+  const resolved = await Promise.all(
+    options.map((x) => resolveImport(`${x}`, projectPath, context)),
+  );
+
+  const entry = resolved.find((x) => x.type === 'source_file');
+  if (entry) {
+    return [entry.path];
   }
 
   throw new Error('could not find entry point');

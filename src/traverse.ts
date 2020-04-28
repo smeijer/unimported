@@ -60,7 +60,7 @@ export type ResolvedResult =
       path: string;
     };
 
-function resolveImport(
+export function resolveImport(
   path: string,
   cwd: string,
   context: Context,
@@ -104,6 +104,21 @@ function resolveImport(
     }
   }
 
+  // last attempt, try prefix the path with ./, `import 'index' to `import './index'`
+  // can be useful for the entry files
+  try {
+    return {
+      type: 'source_file',
+      path: resolve
+        .sync(`./${path}`, {
+          basedir: cwd,
+          extensions: context.extensions,
+        })
+        .replace(/\\/g, '/'),
+    };
+  } catch (e) {}
+
+  // if nothing else works out :(
   return {
     type: 'unresolved',
     path: path,
