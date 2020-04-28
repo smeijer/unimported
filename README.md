@@ -124,6 +124,26 @@ In case `unimported` is running in a `Meteor` project, the following paths are b
 packages
 ```
 
+## Gotchas
+
+At this moment, we don't support the `export default from './x'` export syntax. Parsing files that contain those exports, will result in an error with a message like `'\';\' expected`.
+
+If you make use of that part of the [export default from proposal](https://github.com/tc39/proposal-export-default-from#exporting-a-default-as-default), you can consider a find/replace before running `unimported`.
+
+Please search for:
+
+```shell
+export default from
+```
+
+and replace it with
+
+```shell
+export { default } from
+```
+
+It ain't pretty, but it should work.
+
 ## See Also
 
 - [unrequired](npmjs.com/unrequired)
