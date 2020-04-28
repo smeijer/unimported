@@ -42,9 +42,15 @@ async function main() {
     '**/*.stories.{js,jsx,ts,tsx}',
     '**/*.tests.{js,jsx,ts,tsx}',
     '**/*.spec.{js,jsx,ts,tsx}',
+    '**/tests/**',
+    '**/__tests__/**',
+    '**/*.d.ts',
     context.type === 'meteor' && 'packages/**',
   ].filter(Boolean) as string[];
 
+  if (context.type === 'meteor') {
+    context.ignore.push('public/**', 'private/**', 'tests/**');
+  }
   // traverse all source files and get import data
   context.entry = await meta.getEntry(cwd, context);
   spinner.text = `resolving imports`;
