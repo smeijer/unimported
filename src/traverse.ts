@@ -12,6 +12,7 @@ import {
   Literal,
 } from '@typescript-eslint/typescript-estree/dist/ts-estree/ts-estree';
 import resolve from 'resolve';
+import chalk from 'chalk';
 
 export interface FileStats {
   path: string;
@@ -223,8 +224,15 @@ export async function traverse(
     return result;
   }
 
-  const parseResult = await parse(path, context);
-  result.files.set(path, parseResult);
+  let parseResult;
+  try {
+    parseResult = await parse(path, context);
+    result.files.set(path, parseResult);
+  } catch (e) {
+    console.log(chalk.redBright(`\nFailed parsing ${path}`));
+    console.log(e);
+    process.exit(1);
+  }
 
   for (const file of parseResult.imports) {
     switch (file.type) {
