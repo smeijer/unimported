@@ -47,9 +47,9 @@ export async function list(
     : pattern;
 
   return globAsync(fullPattern, {
-    ...globOptions,
     cwd,
     realpath: true,
+    ...globOptions,
   });
 
   // new Promise((resolve, reject) => glob(fullPattern, {

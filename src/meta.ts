@@ -17,32 +17,38 @@ export async function getProjectType(
 export async function getAliases(
   projectPath: string,
 ): Promise<Context['aliases']> {
-  const tsconfig = await fs.readJson('tsconfig.json', projectPath);
+  const [packageJson, tsconfig] = await Promise.all([
+    fs.readJson('package.json', projectPath),
+    fs.readJson('tsconfig.json', projectPath),
+  ]);
 
-  if (!tsconfig) {
-    // add support for (meteor) root slash import
-    return {
-      '/': [`${projectPath}/`],
-    };
-  }
-
-  const aliases = tsconfig.compilerOptions?.paths || {};
-  const root = join(projectPath, tsconfig.compilerOptions?.rootDir || '.');
-
-  // normalize the aliases. The keys maintain trailing '/' to ease path comparison,
-  // in: { '@components/*': ['src/components/*'] }
-  // out: { '@components/': ['src/components/'] }
-  for (const key of Object.keys(aliases)) {
-    const alias = key.replace(/\*$/, '');
-    aliases[alias] = ensureArray(aliases[key]).map((x) =>
-      join(root, x.replace(/\*$/, '')),
-    );
-    delete aliases[key];
-  }
+  const aliases = {};
 
   // add support for (meteor) root slash import
-  if (!aliases['/']) {
-    aliases['/'] = [`${projectPath}/`];
+  aliases['/'] = [`${projectPath}/`];
+
+  // add support for mono-repos
+  if (packageJson?.repository?.directory) {
+    const root = join(projectPath, '../');
+    const packages = await fs.list('*/', root, { realpath: false });
+    for (const alias of packages) {
+      aliases[alias] = [join(root, alias)];
+    }
+  }
+
+  // add support for typescript path aliases
+  if (tsconfig?.compilerOptions?.paths) {
+    const root = join(projectPath, tsconfig.compilerOptions.rootDir || '.');
+
+    // normalize the aliases. The keys maintain trailing '/' to ease path comparison,
+    // in: { '@components/*': ['src/components/*'] }
+    // out: { '@components/': ['src/components/'] }
+    for (const key of Object.keys(tsconfig.compilerOptions.paths)) {
+      const alias = key.replace(/\*$/, '');
+      aliases[alias] = ensureArray(
+        tsconfig.compilerOptions.paths[key],
+      ).map((x) => join(root, x.replace(/\*$/, '')));
+    }
   }
 
   return aliases;
