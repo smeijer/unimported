@@ -35,15 +35,18 @@
     "@typescript-eslint/typescript-estree": "^2.29.0",
     "chalk": "^4.0.0",
     "eslint": "^6.8.0",
+    "flow-remove-types": "^2.123.0",
     "glob": "^7.1.6",
     "ora": "^4.0.4",
     "resolve": "^1.17.0",
     "term-size": "^2.2.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
     "@types/node": "^13.13.2",
+    "@types/yargs": "^15.0.4",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",

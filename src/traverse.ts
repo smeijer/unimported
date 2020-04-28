@@ -13,6 +13,7 @@ import {
 } from '@typescript-eslint/typescript-estree/dist/ts-estree/ts-estree';
 import resolve from 'resolve';
 import chalk from 'chalk';
+import removeFlowTypes from 'flow-remove-types';
 
 export interface FileStats {
   path: string;
@@ -140,7 +141,13 @@ async function parse(path: string, context: Context): Promise<FileStats> {
   // this jsx check isn't bullet proof, but I have no idea how we can deal with
   // this better. The parser will fail on generics like <T> in jsx files, if we
   // don't specify those as being jsx.
-  const ast = parseEstree(await fs.readText(path), {
+  let code = await fs.readText(path);
+
+  // removeFlowTypes checks for pragma's, use app arguments to override and
+  // strip flow annotations from all files, regardless if it contains the pragma
+  code = removeFlowTypes(code, { all: context.flow });
+
+  const ast = parseEstree(code, {
     comment: false,
     jsx: stats.extname !== '.ts',
   });
