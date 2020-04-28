@@ -84,9 +84,11 @@ function resolveImport(
     };
   } catch (e) {}
 
-  for (const alias of Object.keys(context.aliases).filter((alias) =>
+  const aliases = Object.keys(context.aliases).filter((alias) =>
     path.startsWith(alias),
-  )) {
+  );
+
+  for (const alias of aliases) {
     for (const alt of context.aliases[alias]) {
       try {
         return {

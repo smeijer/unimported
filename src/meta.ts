@@ -19,7 +19,10 @@ export async function getAliases(
   const tsconfig = await fs.readJson('tsconfig.json', projectPath);
 
   if (!tsconfig) {
-    return {};
+    // add support for (meteor) root slash import
+    return {
+      '/': [`${projectPath}/`],
+    };
   }
 
   const aliases = tsconfig.compilerOptions?.paths || {};
@@ -34,6 +37,11 @@ export async function getAliases(
       join(root, x.replace(/\*$/, '')),
     );
     delete aliases[key];
+  }
+
+  // add support for (meteor) root slash import
+  if (!aliases['/']) {
+    aliases['/'] = [`${projectPath}/`];
   }
 
   return aliases;
