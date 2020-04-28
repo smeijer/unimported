@@ -161,6 +161,12 @@ async function parse(path: string, context: Context): Promise<FileStats> {
           }
           target = (node.source as Literal).value as string;
           break;
+        case AST_NODE_TYPES.ExportAllDeclaration:
+          if (!node.source) {
+            break;
+          }
+          target = (node.source as Literal).value as string;
+          break;
         case AST_NODE_TYPES.VariableDeclaration:
           const init = node.declarations[0].init as CallExpression;
           const callee = (init?.callee || {}) as any;
