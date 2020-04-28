@@ -50,6 +50,7 @@ async function main(args: Partial<Context>) {
       '**/node_modules/**',
       '**/*.stories.{js,jsx,ts,tsx}',
       '**/*.tests.{js,jsx,ts,tsx}',
+      '**/*.test.{js,jsx,ts,tsx}',
       '**/*.spec.{js,jsx,ts,tsx}',
       '**/tests/**',
       '**/__tests__/**',
