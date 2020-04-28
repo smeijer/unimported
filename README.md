@@ -2,7 +2,7 @@
 
 **Find unused source files in javascript / typescript projects.**
 
-![screenshot of unimported results](./docs/screenshot.png)
+![screenshot of unimported results](./docs/screenshot-react.png)
 
 While adding new code to our projects, we might forget to remove the old code. Linters warn us for unused code in a module, but they fail to report unused files.
 
