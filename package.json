@@ -16,7 +16,9 @@
     "lint": "tsc --noEmit && eslint 'src/**/*.ts' --quiet --fix",
     "prepublish": "npm run build",
     "run": "npm run build && node ./dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ci:lint": "eslint -c ./.eslintrc.js",
+    "ci:tsc": "tsc --noEmit --project ./tsconfig.json"
   },
   "files": [
     "src",
