@@ -146,5 +146,5 @@ It ain't pretty, but it should work.
 
 ## See Also
 
-- [unrequired](npmjs.com/unrequired)
+- [unrequired](https://npmjs.com/unrequired)
 - [trucker](https://npmjs.com/trucker)
