@@ -20,9 +20,9 @@ export async function processResults(
   traverseResult: TraverseResult,
   context: Context,
 ): Promise<ProcessedResult> {
-  const ignoreUnresolvedIdx = index(context.config.ignore_unresolved);
-  const ignoreUnusedIdx = index(context.config.ignore_unused);
-  const ignoreUnimportedIdx = index(context.config.ignore_unimported);
+  const ignoreUnresolvedIdx = index(context.config.ignoreUnresolved);
+  const ignoreUnusedIdx = index(context.config.ignoreUnused);
+  const ignoreUnimportedIdx = index(context.config.ignoreUnimported);
 
   const unresolved = Array.from(traverseResult.unresolved).filter(
     (x) => !ignoreUnresolvedIdx[x],

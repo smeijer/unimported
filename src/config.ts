@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { ProcessedResult } from './process';
 import { readJson, writeJson } from './fs';
 import { Context } from './index';
@@ -6,9 +5,9 @@ import { Context } from './index';
 export interface UnimportedConfig {
   flow?: boolean;
   ignorePatterns?: string[];
-  ignore_unresolved: string[];
-  ignore_unimported: string[];
-  ignore_unused: string[];
+  ignoreUnresolved: string[];
+  ignoreUnimported: string[];
+  ignoreUnused: string[];
 }
 
 export async function getConfig(): Promise<UnimportedConfig> {
@@ -17,9 +16,9 @@ export async function getConfig(): Promise<UnimportedConfig> {
 
   return Object.assign<UnimportedConfig, Partial<UnimportedConfig>>(
     {
-      ignore_unresolved: [],
-      ignore_unimported: [],
-      ignore_unused: [],
+      ignoreUnresolved: [],
+      ignoreUnimported: [],
+      ignoreUnused: [],
     },
     json,
   );
@@ -45,9 +44,9 @@ export async function updateAllowLists(
 ) {
   await writeConfig(
     {
-      ignore_unresolved: sort(files.unresolved),
-      ignore_unused: sort(files.unused),
-      ignore_unimported: sort(files.unimported),
+      ignoreUnresolved: sort(files.unresolved),
+      ignoreUnused: sort(files.unused),
+      ignoreUnimported: sort(files.unimported),
     },
     context,
   );
