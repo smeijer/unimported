@@ -18,6 +18,51 @@ Run the following command in the root of your project (next to `package.json`) T
 npx unimported
 ```
 
+## Options
+
+Output all options in your terminal:
+
+```shell
+npx unimported --help
+```
+
+### Init
+
+This option will write the default ignore patterns to the `.unimportedrc.json` settings files. This will enable you to easily adjust them to your needs.
+
+```shell
+npx unimported --init
+```
+
+### Update
+
+Update, will write the current results to the ignore lists in `.unimportedrc.json`. You want to use this option **after running and verifying** a full scan. Ignore lists are used to ignore certain false positives that could not be resolved properly. This is especially useful when running `unimported` on a regular basis, or for example as part of a CI pipeline.
+
+```shell
+npx unimported --update
+```
+
+### Flow Type
+
+If your project is using flow type for typing, you might need this flag.
+
+```shell
+npx unimported --flow
+```
+
+### Example Config File
+
+Save the file as `.unimportedrc.json` in the root of your project (next to `package.json`)
+
+```json
+{
+  "ignoreUnresolved": ["some-npm-dependency"],
+  "ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
+  "ignoreUnused": ["bcrypt", "create-emotion"],
+  "ignorePatterns": ["**/node_modules/**", "private/**"]
+}
+```
+
 ## Report
 
 The report will look something like [below](#example). When a particular check didn't have any positive results, it's section will be excluded from the output.
@@ -30,17 +75,23 @@ Summary displays a quick overview of the results, showing the entry points that 
 
 These import statements could not be resolved. This can either be a reference to a local file. Or to a `node_module`. In case of a node module, it can be that nothing is wrong. Maybe you're importing only types from a `DefinitelyTyped` package. But as `unimported` only compares against `dependencies`, it can also be that you've added your module to the `devDependencies`, and that's a problem.
 
+To ignore specific results, add them to `.unimportedrc.json#ignoreUnresolved`.
+
 ### unused dependencies
 
 Some dependencies that are declared in your package.json, were not imported by your code. It should be possible to remove those packages from your project.
 
 But, please double check. Maybe you need to move some dependencies to `devDependencies`, or maybe it's a peer-dependency from another package. These are hints that something might be wrong. It's no guarantee.
 
+To ignore specific results, add them to `.unimportedrc.json#ignoreUnused`.
+
 ### unimported files
 
 The files listed under `unimported files`, are the files that exist in your code base, but are not part of your final bundle. It should be safe to delete those files.
 
 For your convenience, some files are not shown, as we treat those as 'dev only' files which you might need. More about that [below](#how);
+
+To ignore specific results, add them to `.unimportedrc.json#ignoreUnimported`.
 
 ### example
 
