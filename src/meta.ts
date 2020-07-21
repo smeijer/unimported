@@ -1,7 +1,7 @@
 import * as fs from './fs';
 import { join } from 'path';
 import { ensureArray } from './ensureArray';
-import { Context } from './index';
+import {Context, PackageJson, TsConfig} from './index';
 import { resolveImport } from './traverse';
 
 export async function getProjectType(
@@ -18,8 +18,8 @@ export async function getAliases(
   projectPath: string,
 ): Promise<Context['aliases']> {
   const [packageJson, tsconfig] = await Promise.all([
-    fs.readJson('package.json', projectPath),
-    fs.readJson('tsconfig.json', projectPath),
+    fs.readJson<PackageJson>('package.json', projectPath),
+    fs.readJson<TsConfig>('tsconfig.json', projectPath),
   ]);
 
   const aliases = {};
@@ -57,7 +57,7 @@ export async function getAliases(
 export async function getDependencies(
   projectPath: string,
 ): Promise<Context['dependencies']> {
-  const packageJson = await fs.readJson('package.json', projectPath);
+  const packageJson = await fs.readJson<PackageJson>('package.json', projectPath);
 
   if (!packageJson) {
     return {};
@@ -74,7 +74,11 @@ export async function getEntry(
   projectPath: string,
   context: Context,
 ): Promise<string[]> {
-  const packageJson = await fs.readJson('package.json', projectPath);
+  const packageJson = await fs.readJson<PackageJson>('package.json', projectPath);
+
+  if (!packageJson) {
+    throw new Error('could not load package.json');
+  }
 
   if (context.type === 'meteor') {
     if (!packageJson.meteor?.mainModule) {

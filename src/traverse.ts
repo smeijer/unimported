@@ -135,9 +135,6 @@ async function parse(path: string, context: Context): Promise<FileStats> {
     imports: [],
   };
 
-  const files: string[] = [];
-  const unresolved: string[] = [];
-
   // this jsx check isn't bullet proof, but I have no idea how we can deal with
   // this better. The parser will fail on generics like <T> in jsx files, if we
   // don't specify those as being jsx.

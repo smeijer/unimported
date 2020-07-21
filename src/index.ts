@@ -8,6 +8,30 @@ import { traverse } from './traverse';
 import chalk from 'chalk';
 import { readJson } from './fs';
 import yargs, { Arguments } from 'yargs';
+import {CompilerOptions} from "typescript";
+
+export interface TsConfig { compilerOptions: CompilerOptions }
+
+export interface PackageJson {
+   name: string;
+   version: string;
+   main?: string;
+   source?: string;
+   dependencies?: { [name: string]: string};
+   optionalDependencies?: { [name: string]: string};
+   devDependencies?: { [name: string]: string};
+   bundleDependencies?: { [name: string]: string};
+   peerDependencies?: { [name: string]: string};
+   meteor?: {
+    mainModule?: {
+      client: string;
+      server: string;
+    }
+  }
+  repository?: {
+     directory: string;
+  }
+}
 
 export interface Context {
   version: string;
@@ -32,7 +56,11 @@ async function main(args: Partial<Context>) {
       meta.getProjectType(cwd),
     ]);
 
-    const packageJson = await readJson('../package.json', __dirname);
+    const packageJson = await readJson<PackageJson>('../package.json', __dirname);
+
+    if (!packageJson) {
+      throw new Error('Failed to load package.json');
+    }
 
     const context: Context = {
       version: packageJson.version,
