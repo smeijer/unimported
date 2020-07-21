@@ -30,6 +30,10 @@ function sort(arr) {
   return sorted;
 }
 
+function merge(left, right) {
+  return sort(Array.from(new Set([...left, ...right])));
+}
+
 export async function writeConfig(
   config: Partial<UnimportedConfig>,
   context: Context,
@@ -42,11 +46,13 @@ export async function updateAllowLists(
   files: ProcessedResult,
   context: Context,
 ) {
+  const cfg = context.config;
+
   await writeConfig(
     {
-      ignoreUnresolved: sort(files.unresolved),
-      ignoreUnused: sort(files.unused),
-      ignoreUnimported: sort(files.unimported),
+      ignoreUnresolved: merge(cfg.ignoreUnresolved, files.unresolved),
+      ignoreUnused: merge(cfg.ignoreUnused, files.unused),
+      ignoreUnimported: merge(cfg.ignoreUnimported, files.unimported),
     },
     context,
   );
