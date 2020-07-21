@@ -56,10 +56,12 @@ Save the file as `.unimportedrc.json` in the root of your project (next to `pack
 
 ```json
 {
+  "entry": ["src/main.ts"],
+  "extensions": [".ts", ".js"],
+  "ignorePatterns": ["**/node_modules/**", "private/**"],
   "ignoreUnresolved": ["some-npm-dependency"],
   "ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
-  "ignoreUnused": ["bcrypt", "create-emotion"],
-  "ignorePatterns": ["**/node_modules/**", "private/**"]
+  "ignoreUnused": ["bcrypt", "create-emotion"]
 }
 ```
 
@@ -147,6 +149,8 @@ For all other project types, the entry point is looked up in the following order
 
 The last option is most likely never what you want, as the main field often points to a `dist` folder. Analyzing a bundled asset, is likely to result in false positives.
 
+To specify custom entry points, add them to `.unimportedrc.json#entry`.
+
 **extensions**
 
 The resolver scans for files with the following extensions, in this specific order:
@@ -157,6 +161,8 @@ The resolver scans for files with the following extensions, in this specific ord
 1. `.tsx`
 
 All other files are ignored.
+
+To specify custom extensions, add your own list to .unimportedrc.json#extensions`. Note that`unimported` won't merge settings! The custom list needs to be the full list of extension that you want to support.
 
 **ignored**
 
@@ -172,8 +178,13 @@ Also ignored are files with paths matching the following patterns:
 In case `unimported` is running in a `Meteor` project, the following paths are being ignored as well:
 
 ```
-packages
+packages/**
+public/**
+private/**
+tests/**
 ```
+
+To specify custom ignore paths, add your own patterns to `.unimportedrc.json#ignorePatterns`. Note that `unimported` won't merge settings! The custom list needs to be the full list of patterns that you want to ignore.
 
 ## Gotchas
 

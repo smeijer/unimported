@@ -87,7 +87,7 @@ async function main(args: CliArguments) {
       dependencies,
       peerDependencies,
       type,
-      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      extensions: config.extensions || ['.js', '.jsx', '.ts', '.tsx'],
       ignore: [],
       entry: [],
       config,
@@ -117,7 +117,7 @@ async function main(args: CliArguments) {
     }
 
     // traverse all source files and get import data
-    context.entry = await meta.getEntry(cwd, context);
+    context.entry = config.entry || (await meta.getEntry(cwd, context));
     spinner.text = `resolving imports`;
     const traverseResult = await traverse(context.entry, context);
     traverseResult.files = new Map([...traverseResult.files].sort());

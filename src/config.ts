@@ -4,6 +4,8 @@ import { Context } from './index';
 
 export interface UnimportedConfig {
   flow?: boolean;
+  entry?: string[];
+  extensions?: string[];
   ignorePatterns?: string[];
   ignoreUnresolved: string[];
   ignoreUnimported: string[];
