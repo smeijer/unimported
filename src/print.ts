@@ -105,4 +105,10 @@ export function printResults(result: ProcessedResult, context: Context): void {
       ),
     );
   }
+
+  console.log(
+    `\n       Inspect the results and run ${chalk.greenBright(
+      'npx unimported -u',
+    )} to update ignore lists`,
+  );
 }
