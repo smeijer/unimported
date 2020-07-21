@@ -62,6 +62,7 @@ async function main(args: CliArguments) {
 
   try {
     const config = await getConfig();
+    args.flow = config.flow ?? args.flow;
 
     const [aliases, dependencies, peerDependencies, type] = await Promise.all([
       meta.getAliases(cwd),

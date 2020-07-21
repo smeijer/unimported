@@ -4,6 +4,7 @@ import { readJson, writeJson } from './fs';
 import { Context } from './index';
 
 export interface UnimportedConfig {
+  flow?: boolean;
   ignorePatterns?: string[];
   ignore_unresolved: string[];
   ignore_unimported: string[];
