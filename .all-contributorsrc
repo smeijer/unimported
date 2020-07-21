@@ -21,7 +21,17 @@
         "infra",
         "maintenance"
       ]
+    },
+    {
+      "login": "punit2502",
+      "name": "Punit Makwana",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/16760252?v=4",
+      "profile": "https://in.linkedin.com/in/punit-makwana/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
