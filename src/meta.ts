@@ -1,7 +1,7 @@
 import * as fs from './fs';
 import { join } from 'path';
 import { ensureArray } from './ensureArray';
-import {Context, PackageJson, TsConfig} from './index';
+import { Context, PackageJson, TsConfig } from './index';
 import { resolveImport } from './traverse';
 
 export async function getProjectType(
@@ -57,13 +57,41 @@ export async function getAliases(
 export async function getDependencies(
   projectPath: string,
 ): Promise<Context['dependencies']> {
-  const packageJson = await fs.readJson<PackageJson>('package.json', projectPath);
+  const packageJson = await fs.readJson<PackageJson>(
+    'package.json',
+    projectPath,
+  );
 
   if (!packageJson) {
     return {};
   }
 
   return packageJson.dependencies || {};
+}
+
+export async function getPeerDependencies(
+  projectPath: string,
+): Promise<Context['peerDependencies']> {
+  const packageJson = await fs.readJson<PackageJson>(
+    'package.json',
+    projectPath,
+  );
+
+  if (!packageJson) {
+    return {};
+  }
+
+  const peerDependencies = {};
+
+  for (const dep of Object.keys(packageJson.dependencies || {})) {
+    const json = await fs.readJson<PackageJson>(
+      join('node_modules', dep, 'package.json'),
+      projectPath,
+    );
+    Object.assign(peerDependencies, json?.peerDependencies);
+  }
+
+  return peerDependencies;
 }
 
 function isString(value): value is string {
@@ -74,7 +102,10 @@ export async function getEntry(
   projectPath: string,
   context: Context,
 ): Promise<string[]> {
-  const packageJson = await fs.readJson<PackageJson>('package.json', projectPath);
+  const packageJson = await fs.readJson<PackageJson>(
+    'package.json',
+    projectPath,
+  );
 
   if (!packageJson) {
     throw new Error('could not load package.json');

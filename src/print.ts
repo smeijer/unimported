@@ -68,7 +68,7 @@ export function printResults(
   const unresolved = Array.from(traverseResult.unresolved);
 
   const unused = Object.keys(context.dependencies).filter(
-    (x) => !traverseResult.modules.has(x),
+    (x) => !traverseResult.modules.has(x) && !context.peerDependencies[x],
   );
 
   const unimported = files

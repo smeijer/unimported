@@ -8,29 +8,31 @@ import { traverse } from './traverse';
 import chalk from 'chalk';
 import { readJson } from './fs';
 import yargs, { Arguments } from 'yargs';
-import {CompilerOptions} from "typescript";
+import { CompilerOptions } from 'typescript';
 
-export interface TsConfig { compilerOptions: CompilerOptions }
+export interface TsConfig {
+  compilerOptions: CompilerOptions;
+}
 
 export interface PackageJson {
-   name: string;
-   version: string;
-   main?: string;
-   source?: string;
-   dependencies?: { [name: string]: string};
-   optionalDependencies?: { [name: string]: string};
-   devDependencies?: { [name: string]: string};
-   bundleDependencies?: { [name: string]: string};
-   peerDependencies?: { [name: string]: string};
-   meteor?: {
+  name: string;
+  version: string;
+  main?: string;
+  source?: string;
+  dependencies?: { [name: string]: string };
+  optionalDependencies?: { [name: string]: string };
+  devDependencies?: { [name: string]: string };
+  bundleDependencies?: { [name: string]: string };
+  peerDependencies?: { [name: string]: string };
+  meteor?: {
     mainModule?: {
       client: string;
       server: string;
-    }
-  }
+    };
+  };
   repository?: {
-     directory: string;
-  }
+    directory: string;
+  };
 }
 
 export interface Context {
@@ -41,6 +43,7 @@ export interface Context {
   ignore: string[];
   extensions: string[];
   dependencies: { [key: string]: string };
+  peerDependencies: { [key: string]: string };
   type: 'meteor' | 'node';
   flow?: boolean;
 }
@@ -50,13 +53,17 @@ async function main(args: Partial<Context>) {
   const cwd = process.cwd();
 
   try {
-    const [aliases, dependencies, type] = await Promise.all([
+    const [aliases, dependencies, peerDependencies, type] = await Promise.all([
       meta.getAliases(cwd),
       meta.getDependencies(cwd),
+      meta.getPeerDependencies(cwd),
       meta.getProjectType(cwd),
     ]);
 
-    const packageJson = await readJson<PackageJson>('../package.json', __dirname);
+    const packageJson = await readJson<PackageJson>(
+      '../package.json',
+      __dirname,
+    );
 
     if (!packageJson) {
       throw new Error('Failed to load package.json');
@@ -67,6 +74,7 @@ async function main(args: Partial<Context>) {
       cwd,
       aliases,
       dependencies,
+      peerDependencies,
       type,
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       ignore: [],
