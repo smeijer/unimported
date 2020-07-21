@@ -9,6 +9,8 @@ import chalk from 'chalk';
 import { readJson } from './fs';
 import yargs, { Arguments } from 'yargs';
 import { CompilerOptions } from 'typescript';
+import { processResults } from './process';
+import { getConfig, UnimportedConfig, updateAllowLists } from './config';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -46,13 +48,16 @@ export interface Context {
   peerDependencies: { [key: string]: string };
   type: 'meteor' | 'node';
   flow?: boolean;
+  config: UnimportedConfig;
 }
 
-async function main(args: Partial<Context>) {
+async function main(args: CliArguments) {
   const spinner = ora('initializing').start();
   const cwd = process.cwd();
 
   try {
+    const config = await getConfig();
+
     const [aliases, dependencies, peerDependencies, type] = await Promise.all([
       meta.getAliases(cwd),
       meta.getDependencies(cwd),
@@ -79,6 +84,7 @@ async function main(args: Partial<Context>) {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       ignore: [],
       entry: [],
+      config,
       ...args,
     };
 
@@ -113,19 +119,34 @@ async function main(args: Partial<Context>) {
     });
 
     spinner.text = 'process results';
-
     spinner.stop();
-    printResults(files, traverseResult, context);
+
+    const result = await processResults(files, traverseResult, context);
+
+    if (args.update) {
+      await updateAllowLists(result, context);
+      // doesn't make sense here to return a error code
+      process.exit(0);
+    } else {
+      printResults(result, context);
+    }
+
+    // return non-zero exit code in case the result wasn't clean, to support
+    // running in CI environments.
+    if (!result.clean) {
+      process.exit(1);
+    }
   } catch (error) {
     spinner.stop();
     console.error(chalk.redBright('something unexpected happened'));
     console.error(error);
-    process.exit(0);
+    process.exit(1);
   }
 }
 
 interface CliArguments {
   flow: boolean;
+  update: boolean;
 }
 
 yargs
@@ -138,12 +159,17 @@ yargs
       yargs.option('flow', {
         alias: 'f',
         type: 'boolean',
-        default: false,
         describe: 'indicates if your code is annotated with flow types',
+      });
+
+      yargs.option('update', {
+        alias: 'u',
+        type: 'boolean',
+        describe: 'update the ignore-lists stored in .unimportedrc.json',
       });
     },
     function (argv: Arguments<CliArguments>) {
-      return main({ flow: argv.flow });
+      return main({ flow: argv.flow, update: argv.update });
     },
   )
   .help().argv;

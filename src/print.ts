@@ -1,7 +1,7 @@
 import termSize from 'term-size';
 import chalk from 'chalk';
 import { Context } from './index';
-import { TraverseResult } from './traverse';
+import { ProcessedResult } from './process';
 
 const { columns } = termSize();
 
@@ -59,21 +59,16 @@ export function formatMetaTable(
   return `\n${lines.join('\n')}\n`;
 }
 
-export function printResults(
-  files: string[],
-  traverseResult: TraverseResult,
-  context: Context,
-): void {
-  // collect
-  const unresolved = Array.from(traverseResult.unresolved);
+export function printResults(result: ProcessedResult, context: Context): void {
+  if (result.clean) {
+    console.log(
+      chalk.greenBright(`✓`) +
+        chalk.white(" There don't seem to be any unimported files."),
+    );
+    return;
+  }
 
-  const unused = Object.keys(context.dependencies).filter(
-    (x) => !traverseResult.modules.has(x) && !context.peerDependencies[x],
-  );
-
-  const unimported = files
-    .filter((x) => !traverseResult.files.has(x))
-    .map((x) => x.substr(context.cwd.length + 1));
+  const { unresolved, unused, unimported } = result;
 
   // render
   console.log(
@@ -87,7 +82,7 @@ export function printResults(
   if (unresolved.length > 0) {
     console.log(
       formatList(
-        chalk.redBright(`${traverseResult.unresolved.size} unresolved imports`),
+        chalk.redBright(`${unresolved.length} unresolved imports`),
         unresolved,
       ),
     );
@@ -109,9 +104,5 @@ export function printResults(
         unimported,
       ),
     );
-  }
-
-  if (!unresolved.length && !unused.length && !unimported.length) {
-    console.log(chalk.greenBright(`You're project is looking clean and tidy`));
   }
 }

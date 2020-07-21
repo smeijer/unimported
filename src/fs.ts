@@ -5,6 +5,7 @@ import util from 'util';
 
 const globAsync = util.promisify(glob);
 const readFileAsync = util.promisify(fs.readFile);
+const writeFileAsync = util.promisify(fs.writeFile);
 const existsAsync = util.promisify(fs.exists);
 
 export async function exists(path: string, cwd = ''): Promise<boolean> {
@@ -19,6 +20,18 @@ export async function readText(path: string, cwd = ''): Promise<string> {
   }
 }
 
+export async function writeText(
+  path: string,
+  data: string,
+  cwd = '',
+): Promise<void> {
+  try {
+    return writeFileAsync(join(cwd, path), data, { encoding: 'utf8' });
+  } catch (e) {
+    return;
+  }
+}
+
 export async function readJson<T extends any>(
   path: string,
   cwd = '.',
@@ -27,6 +40,19 @@ export async function readJson<T extends any>(
     return JSON.parse(await readText(path, cwd));
   } catch (e) {
     return null;
+  }
+}
+
+export async function writeJson(
+  path: string,
+  data: object,
+  cwd = '.',
+): Promise<void> {
+  try {
+    const text = JSON.stringify(data, null, '  ');
+    return writeText(path, text, cwd);
+  } catch (e) {
+    return;
   }
 }
 
