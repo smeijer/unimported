@@ -4,6 +4,7 @@ import { readJson, writeJson } from './fs';
 import { Context } from './index';
 
 export interface UnimportedConfig {
+  ignorePatterns?: string[];
   ignore_unresolved: string[];
   ignore_unimported: string[];
   ignore_unused: string[];
@@ -29,16 +30,24 @@ function sort(arr) {
   return sorted;
 }
 
+export async function writeConfig(
+  config: Partial<UnimportedConfig>,
+  context: Context,
+) {
+  const cfg = Object.assign({}, context.config, config);
+  await writeJson('.unimportedrc.json', cfg);
+}
+
 export async function updateAllowLists(
   files: ProcessedResult,
   context: Context,
 ) {
-  const cfg = {
-    ...context.config,
-    ignore_unresolved: sort(files.unresolved),
-    ignore_unused: sort(files.unused),
-    ignore_unimported: sort(files.unimported),
-  };
-
-  await writeJson('.unimportedrc.json', cfg);
+  await writeConfig(
+    {
+      ignore_unresolved: sort(files.unresolved),
+      ignore_unused: sort(files.unused),
+      ignore_unimported: sort(files.unimported),
+    },
+    context,
+  );
 }

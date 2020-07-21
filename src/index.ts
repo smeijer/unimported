@@ -10,7 +10,12 @@ import { readJson } from './fs';
 import yargs, { Arguments } from 'yargs';
 import { CompilerOptions } from 'typescript';
 import { processResults } from './process';
-import { getConfig, UnimportedConfig, updateAllowLists } from './config';
+import {
+  getConfig,
+  UnimportedConfig,
+  updateAllowLists,
+  writeConfig,
+} from './config';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -88,20 +93,26 @@ async function main(args: CliArguments) {
       ...args,
     };
 
-    context.ignore = [
-      '**/node_modules/**',
-      '**/*.stories.{js,jsx,ts,tsx}',
-      '**/*.tests.{js,jsx,ts,tsx}',
-      '**/*.test.{js,jsx,ts,tsx}',
-      '**/*.spec.{js,jsx,ts,tsx}',
-      '**/tests/**',
-      '**/__tests__/**',
-      '**/*.d.ts',
-      context.type === 'meteor' && 'packages/**',
-    ].filter(Boolean) as string[];
+    context.ignore =
+      config.ignorePatterns ||
+      ([
+        '**/node_modules/**',
+        '**/*.stories.{js,jsx,ts,tsx}',
+        '**/*.tests.{js,jsx,ts,tsx}',
+        '**/*.test.{js,jsx,ts,tsx}',
+        '**/*.spec.{js,jsx,ts,tsx}',
+        '**/tests/**',
+        '**/__tests__/**',
+        '**/*.d.ts',
+        ...(context.type === 'meteor'
+          ? ['packages/**', 'public/**', 'private/**', 'tests/**']
+          : []),
+      ].filter(Boolean) as string[]);
 
-    if (context.type === 'meteor') {
-      context.ignore.push('public/**', 'private/**', 'tests/**');
+    if (args.init) {
+      await writeConfig({ ignorePatterns: context.ignore }, context);
+      spinner.stop();
+      process.exit(0);
     }
 
     // traverse all source files and get import data
@@ -147,6 +158,7 @@ async function main(args: CliArguments) {
 interface CliArguments {
   flow: boolean;
   update: boolean;
+  init: boolean;
 }
 
 yargs
@@ -156,6 +168,12 @@ yargs
     '*',
     'scan your project for dead files',
     (yargs) => {
+      yargs.option('init', {
+        alias: 'i',
+        type: 'boolean',
+        describe: 'dump default settings to .unimportedrc.json',
+      });
+
       yargs.option('flow', {
         alias: 'f',
         type: 'boolean',
@@ -169,7 +187,11 @@ yargs
       });
     },
     function (argv: Arguments<CliArguments>) {
-      return main({ flow: argv.flow, update: argv.update });
+      return main({
+        init: argv.init,
+        update: argv.update,
+        flow: argv.flow,
+      });
     },
   )
   .help().argv;
