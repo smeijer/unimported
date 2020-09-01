@@ -54,6 +54,7 @@ export interface Context {
   type: 'meteor' | 'node';
   flow?: boolean;
   config: UnimportedConfig;
+  moduleDirectory: string[];
 }
 
 async function main(args: CliArguments) {
@@ -80,6 +81,8 @@ async function main(args: CliArguments) {
       throw new Error('Failed to load package.json');
     }
 
+    const moduleDirectory = config.moduleDirectory ?? ['node_modules'];
+
     const context: Context = {
       version: packageJson.version,
       cwd,
@@ -91,6 +94,7 @@ async function main(args: CliArguments) {
       ignore: [],
       entry: [],
       config,
+      moduleDirectory,
       ...args,
     };
 

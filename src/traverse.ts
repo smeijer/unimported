@@ -81,7 +81,11 @@ export function resolveImport(
     return {
       type: 'source_file',
       path: resolve
-        .sync(path, { basedir: cwd, extensions: context.extensions })
+        .sync(path, {
+          basedir: cwd,
+          extensions: context.extensions,
+          moduleDirectory: context.moduleDirectory,
+        })
         .replace(/\\/g, '/'),
     };
   } catch (e) {}
@@ -99,6 +103,7 @@ export function resolveImport(
             .sync(path.replace(alias, alt), {
               basedir: cwd,
               extensions: context.extensions,
+              moduleDirectory: context.moduleDirectory,
             })
             .replace(/\\/g, '/'),
         };
@@ -115,6 +120,7 @@ export function resolveImport(
         .sync(`./${path}`, {
           basedir: cwd,
           extensions: context.extensions,
+          moduleDirectory: context.moduleDirectory,
         })
         .replace(/\\/g, '/'),
     };

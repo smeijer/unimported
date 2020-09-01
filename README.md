@@ -65,6 +65,15 @@ Save the file as `.unimportedrc.json` in the root of your project (next to `pack
 }
 ```
 
+**Custom module directory**  
+You can also add an optional `moduleDirectory` option to your configuration file to resolve dependencies from other directories than `node_modules`. This setting defaults to `node_modules`.
+
+```json
+{
+  "moduleDirectory": ["node_modules", "src/app"]
+}
+```
+
 ## Report
 
 The report will look something like [below](#example). When a particular check didn't have any positive results, it's section will be excluded from the output.
@@ -227,6 +236,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

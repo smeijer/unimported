@@ -10,6 +10,7 @@ export interface UnimportedConfig {
   ignoreUnresolved: string[];
   ignoreUnimported: string[];
   ignoreUnused: string[];
+  moduleDirectory?: string[];
 }
 
 export async function getConfig(): Promise<UnimportedConfig> {
