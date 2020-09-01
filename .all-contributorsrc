@@ -30,6 +30,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "danew",
+      "name": "Dane Wilson",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/5265684?v=4",
+      "profile": "https://github.com/danew",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
