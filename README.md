@@ -65,12 +65,11 @@ Save the file as `.unimportedrc.json` in the root of your project (next to `pack
 }
 ```
 
-**Custom module dorectory**  
-You can also add an optional `moduleDirectory` option to your configuration file to resolve depdenencies from other directories. It currently defaults to "node_modules".
+**Custom module directory**  
+You can also add an optional `moduleDirectory` option to your configuration file to resolve dependencies from other directories than `node_modules`. This setting defaults to `node_modules`.
 
 ```json
 {
-  ...
   "moduleDirectory": ["node_modules", "src/app"]
 }
 ```
