@@ -81,7 +81,7 @@ async function main(args: CliArguments) {
       throw new Error('Failed to load package.json');
     }
 
-    const moduleDirectory = config.moduleDirectories ?? ['node_modules'];
+    const moduleDirectory = config.moduleDirectory ?? ['node_modules'];
 
     const context: Context = {
       version: packageJson.version,
