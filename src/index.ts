@@ -1,6 +1,7 @@
 import * as fs from './fs';
 
 import { join } from 'path';
+import glob from 'fast-glob';
 import ora from 'ora';
 import { printResults } from './print';
 import * as meta from './meta';
@@ -121,7 +122,9 @@ async function main(args: CliArguments) {
     }
 
     // traverse all source files and get import data
-    context.entry = config.entry || (await meta.getEntry(cwd, context));
+    context.entry =
+      (config.entry && (await glob(config.entry))) ||
+      (await meta.getEntry(cwd, context));
     spinner.text = `resolving imports`;
     const traverseResult = await traverse(context.entry, context);
     traverseResult.files = new Map([...traverseResult.files].sort());

@@ -208,6 +208,19 @@ async function parse(path: string, context: Context): Promise<FileStats> {
   return stats;
 }
 
+const getFilePathsObject = () => new Set<string>();
+
+export async function expandGlobPath(
+  path: string | string[],
+  filePaths = getFilePathsObject(),
+) {
+  if (Array.isArray(path)) {
+    await Promise.all(path.map((path) => expandGlobPath(path, filePaths)));
+  }
+
+  return filePaths;
+}
+
 const getResultObject = () => ({
   unresolved: new Set<string>(),
   modules: new Set<string>(),

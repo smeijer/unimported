@@ -37,6 +37,7 @@
     "@typescript-eslint/typescript-estree": "^2.29.0",
     "chalk": "^4.0.0",
     "eslint": "^6.8.0",
+    "fast-glob": "^3.2.4",
     "flow-remove-types": "^2.123.0",
     "glob": "^7.1.6",
     "ora": "^4.0.4",

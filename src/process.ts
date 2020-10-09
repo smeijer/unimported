@@ -1,3 +1,4 @@
+import glob from 'fast-glob';
 import { TraverseResult } from './traverse';
 import { Context } from './index';
 
@@ -22,7 +23,9 @@ export async function processResults(
 ): Promise<ProcessedResult> {
   const ignoreUnresolvedIdx = index(context.config.ignoreUnresolved);
   const ignoreUnusedIdx = index(context.config.ignoreUnused);
-  const ignoreUnimportedIdx = index(context.config.ignoreUnimported);
+  const ignoreUnimportedIdx = index(
+    await glob(context.config.ignoreUnimported),
+  );
 
   const unresolved = Array.from(traverseResult.unresolved).filter(
     (x) => !ignoreUnresolvedIdx[x],
