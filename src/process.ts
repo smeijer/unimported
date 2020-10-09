@@ -41,6 +41,7 @@ export async function processResults(
   const unimported = files
     .filter((x) => !traverseResult.files.has(x))
     .map((x) => x.substr(context.cwd.length + 1))
+    .filter((x) => !context.entry.includes(x))
     .filter((x) => !ignoreUnimportedIdx[x]);
 
   return {
