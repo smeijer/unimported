@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "prepare": "npm run build",
     "lint": "tsc --noEmit && eslint 'src/**/*.ts' --quiet --fix",
     "prepublish": "npm run build",
     "run": "npm run build && node ./dist/index.js",
