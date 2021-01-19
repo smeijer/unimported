@@ -18,7 +18,7 @@
     "lint": "tsc --noEmit && eslint 'src/**/*.ts' --quiet --fix",
     "prepublish": "npm run build",
     "run": "npm run build && node ./dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "ci:lint": "eslint -c ./.eslintrc.js",
     "ci:tsc": "tsc --noEmit --project ./tsconfig.json"
   },
@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
+    "@types/jest": "^26.0.20",
     "@types/node": "^13.13.2",
     "@types/yargs": "^15.0.4",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
