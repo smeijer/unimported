@@ -59,7 +59,8 @@
     "lint-staged": "^10.1.7",
     "nodemon": "^2.0.3",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.4.4"
   },
   "husky": {
     "hooks": {
