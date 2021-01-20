@@ -97,4 +97,4 @@ jobs:
           key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.json') }}
 
       - name: Test
-        run: npm run build && npm run test
+        run: npm run test
