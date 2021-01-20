@@ -1,9 +1,21 @@
 import { ensureArray } from '../src/ensureArray';
 
-it('any value passed should return array', () => {
-  const arrayWithTestSting = ensureArray(['test']);
-  const testString = ensureArray('test');
+it('shoudl return the given value if it is an array', () => {
+  const arrayWithTestString = ensureArray(['test']);
 
-  expect(arrayWithTestSting).toEqual(['test']);
-  expect(testString).toEqual(['test']);
+  expect(arrayWithTestString).toEqual(['test']);
+});
+
+it('should return an array with the given value', () => {
+  const getFourtyTwo: () => number = () => 42;
+  const fourtyTwo = 42;
+  const objFourtyTwo = { num: 42 };
+
+  const testPrimitive = ensureArray(fourtyTwo);
+  const testFunction = ensureArray(getFourtyTwo);
+  const testObject = ensureArray(objFourtyTwo);
+
+  expect(testPrimitive).toEqual([fourtyTwo]);
+  expect(testFunction).toEqual([getFourtyTwo]);
+  expect(testObject).toEqual([objFourtyTwo]);
 });
