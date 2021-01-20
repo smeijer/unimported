@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  NODE_VERSION: "12.x"
+  NODE_VERSION: '12.x'
 
 jobs:
   setup:
@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v1
         with:
-          node-version: "${{ env.NODE_VERSION }}"
+          node-version: '${{ env.NODE_VERSION }}'
 
       - name: Cache node modules
         id: cache
@@ -42,7 +42,7 @@ jobs:
 
       - uses: actions/setup-node@v1
         with:
-          node-version: "${{ env.NODE_VERSION }}"
+          node-version: '${{ env.NODE_VERSION }}'
 
       - name: Fetch all branches
         run: |
@@ -67,7 +67,7 @@ jobs:
 
       - uses: actions/setup-node@v1
         with:
-          node-version: "${{ env.NODE_VERSION }}"
+          node-version: '${{ env.NODE_VERSION }}'
 
       - name: Cache node modules
         uses: actions/cache@v1
@@ -77,3 +77,24 @@ jobs:
 
       - name: Typescript
         run: npm run ci:tsc
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [setup]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Test
+        run: npm run test
