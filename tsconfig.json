@@ -6,19 +6,13 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "./dist",
-    "isolatedModules": true,
+    "isolatedModules": false,
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
     "declaration": true
   },
-  "include": [
-    "src",
-    "typings"
-  ],
-  "exclude": [
-    "node_modules",
-    "test/**"
-  ]
+  "include": ["src", "typings"],
+  "exclude": ["node_modules", "test/**"]
 }

@@ -1,7 +1,4 @@
 module.exports = {
-  rootDir: 'test',
-  testRegex: '\\.ts$',
-  transform: {
-    '\\.ts$': 'ts-jest',
-  },
+  preset: 'ts-jest',
+  testEnvironment: 'node',
 };
