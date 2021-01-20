@@ -1,6 +1,6 @@
 import { ensureArray } from '../src/ensureArray';
 
-it('shoudl return the given value if it is an array', () => {
+it('should return the given value if it is an array', () => {
   const fourtyTwoArray = [42];
   const getFourtyTwoArray = [(): number => 42];
   const objFourtyTwoArray = [{ num: 42 }];
