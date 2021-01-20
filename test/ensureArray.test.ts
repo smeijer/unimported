@@ -1,21 +1,29 @@
 import { ensureArray } from '../src/ensureArray';
 
 it('shoudl return the given value if it is an array', () => {
-  const arrayWithTestString = ensureArray(['test']);
+  const fourtyTwoArray = [42];
+  const getFourtyTwoArray = [(): number => 42];
+  const objFourtyTwoArray = [{ num: 42 }];
 
-  expect(arrayWithTestString).toEqual(['test']);
+  const ensureArrayFourtyTwoArray = ensureArray(fourtyTwoArray);
+  const ensureArrayGetFourtyTwoArray = ensureArray(getFourtyTwoArray);
+  const ensureArrayObjFourtyTwoArray = ensureArray(objFourtyTwoArray);
+
+  expect(ensureArrayFourtyTwoArray).toBe(fourtyTwoArray);
+  expect(ensureArrayGetFourtyTwoArray).toBe(getFourtyTwoArray);
+  expect(ensureArrayObjFourtyTwoArray).toBe(objFourtyTwoArray);
 });
 
 it('should return an array with the given value', () => {
-  const getFourtyTwo: () => number = () => 42;
   const fourtyTwo = 42;
+  const getFourtyTwo = (): number => 42;
   const objFourtyTwo = { num: 42 };
 
-  const testPrimitive = ensureArray(fourtyTwo);
-  const testFunction = ensureArray(getFourtyTwo);
-  const testObject = ensureArray(objFourtyTwo);
+  const fourtyTwoArray = ensureArray(fourtyTwo);
+  const getFourtyTwoArray = ensureArray(getFourtyTwo);
+  const objFourtyTwoArray = ensureArray(objFourtyTwo);
 
-  expect(testPrimitive).toEqual([fourtyTwo]);
-  expect(testFunction).toEqual([getFourtyTwo]);
-  expect(testObject).toEqual([objFourtyTwo]);
+  expect(fourtyTwoArray).toEqual([fourtyTwo]);
+  expect(getFourtyTwoArray).toEqual([getFourtyTwo]);
+  expect(objFourtyTwoArray).toEqual([objFourtyTwo]);
 });
