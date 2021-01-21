@@ -1,6 +1,7 @@
 .rts2_cache*
 .idea
 dist/
+.test-space/
 node_modules/
 
 # temporary ignored during raid => choose one to keep afterwards
