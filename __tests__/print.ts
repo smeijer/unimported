@@ -1,5 +1,6 @@
 import { formatList, formatMetaTable, printResults } from '../src/print';
 import { Context } from '../src/index';
+import chalk from 'chalk';
 
 describe('formatList', () => {
   it('should return a formatted list with a caption', () => {
@@ -101,6 +102,10 @@ describe('printResults', () => {
     };
     printResults(expectedProcessedResult, expectedContext);
     expect(consoleSpy).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      chalk.greenBright(`✓`) +
+        chalk.white(" There don't seem to be any unimported files."),
+    );
   });
 
   it('should print results to console', () => {
