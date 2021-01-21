@@ -3,11 +3,10 @@ import util from 'util';
 const exec = util.promisify(require('child_process').exec);
 
 test('npx unimported --help', async (done) => {
-  // note about `./` path: jest executes the tests from the root directory
-  await exec('node ./bin/unimported.js --help', async (error, stdout, stderr) => {
-    await expect(error).toBe(null);
-    await expect(stderr).toBe('');
-    await expect(stdout.trim()).toMatchInlineSnapshot(`
+  exec('node ./bin/unimported.js --help', async (error, stdout, stderr) => {
+    expect(error).toBe(null);
+    expect(stderr).toBe('');
+    expect(stdout.trim()).toMatchInlineSnapshot(`
       "unimported
 
       scan your project for dead files
@@ -26,10 +25,10 @@ test('npx unimported --help', async (done) => {
 test('npx unimported --help', async (done) => {
   // note about `./` path: jest executes the tests from the root directory
   // wrong file name
-  await exec('node ./bin/1unimported.js --help', async (error, stdout, stderr) => {
-    await expect(error).not.toBe(null);
-    await expect(stderr).not.toBe(null);
-    await expect(stdout).toBe('');
+  exec('node ./bin/1unimported.js --help', async (error, stdout, stderr) => {
+    expect(error).not.toBe(null);
+    expect(stderr).not.toBe(null);
+    expect(stdout).toBe('');
 
     done();
   });
