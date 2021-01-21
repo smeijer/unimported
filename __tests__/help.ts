@@ -27,8 +27,11 @@ test('npx unimported --help', async (done) => {
 
 test('error npx unimported --help', async (done) => {
   // wrong file name
-  const error = await exec('node ./bin/1unimported.js --help');
+  try {
+    await exec('node ./bin/1unimported.js --help');
+  } catch (e) {
+    expect(e).not.toBe(null);
+  }
 
-  expect(error).not.toBe(null);
   done();
 });
