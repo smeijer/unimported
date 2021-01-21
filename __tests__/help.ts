@@ -2,13 +2,10 @@ import util from 'util';
 
 const exec = util.promisify(require('child_process').exec);
 
-test('npx unimported --help', async (done) => {
+test('npx unimported --help', async () => {
   // note about `./` path: jest executes the tests from the root directory
-  const { stdout, stderr, error } = await exec(
-    'node ./bin/unimported.js --help',
-  );
+  const { stdout, stderr } = await exec('node ./bin/unimported.js --help');
 
-  expect(error).toBe(undefined);
   expect(stderr).toBe('');
   expect(stdout.trim()).toMatchInlineSnapshot(`
       "unimported
@@ -22,16 +19,11 @@ test('npx unimported --help', async (done) => {
         --flow, -f    indicates if your code is annotated with flow types    [boolean]
         --update, -u  update the ignore-lists stored in .unimportedrc.json   [boolean]"
     `);
-  done();
 });
 
-test('error npx unimported --help', async (done) => {
-  // wrong file name
-  try {
-    await exec('node ./bin/1unimported.js --help');
-  } catch (e) {
-    expect(e).not.toBe(null);
-  }
+test('error for wrong file name npx unimported --help', async () => {
+  const command = exec('node ./bin/1unimported.js --help');
 
-  done();
+  expect.assertions(1);
+  return expect(command).rejects.not.toBe(null);
 });
