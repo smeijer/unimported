@@ -51,6 +51,20 @@ const scenarios = [
     exitCode: 1,
     output: ['1 unimported files', 'bar.js'],
   },
+  {
+    description: 'should identify unused dependencies',
+    files: [
+      {
+        name: 'package.json',
+        content:
+          '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
+      },
+      { name: 'index.js', content: `import foo from './foo';` },
+      { name: 'foo.js', content: '' },
+    ],
+    exitCode: 1,
+    output: ['1 unused dependencies', '@test/dependency'],
+  },
 ];
 
 describe('cli integration tests', () => {
