@@ -12,9 +12,12 @@ function exec(
   options: { cwd: string },
 ): Promise<{ exitCode: number | null; stdout: string }> {
   return new Promise((resolve) => {
-    const process = childProcess.exec(command, options, (_error, stdout) => {
-      resolve({ exitCode: process.exitCode, stdout });
-    });
+    try {
+      const buffer = childProcess.execSync(command, options);
+      resolve({ exitCode: 0, stdout: buffer.toString() });
+    } catch (ex) {
+      resolve({ exitCode: ex.status, stdout: ex.stdout.toString() });
+    }
   });
 }
 
@@ -60,7 +63,7 @@ describe('cli integration tests', () => {
       );
 
       try {
-        const { exitCode, stdout } = await exec(`node ${executable}`, {
+        const { stdout, exitCode } = await exec(`node ${executable}`, {
           cwd: testProjectDir,
         });
 
