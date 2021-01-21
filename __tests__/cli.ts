@@ -51,7 +51,7 @@ const scenarios = [
 ];
 
 describe('cli integration tests', () => {
-  for (const scenario of scenarios) {
+  scenarios.forEach((scenario) => {
     test(scenario.description, async () => {
       const testProjectDir = await createProject(scenario.files);
       const executable = path.join(
@@ -72,5 +72,5 @@ describe('cli integration tests', () => {
         await rmdir(testProjectDir, { recursive: true });
       }
     });
-  }
+  });
 });
