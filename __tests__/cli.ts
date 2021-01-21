@@ -18,13 +18,6 @@ function exec(
   });
 }
 
-const projectFixture = [
-  { name: 'package.json', content: '{ "main": "index.js" }' },
-  { name: 'index.js', content: `import foo from './foo';` },
-  { name: 'foo.js', content: '' },
-  { name: 'bar.js', content: '' },
-];
-
 async function createProject(
   files: Array<{ name: string; content: string }>,
 ): Promise<string> {
@@ -43,21 +36,41 @@ async function createProject(
   return testSpaceDir;
 }
 
-let testProjectDir: string, executable: string;
+const scenarios = [
+  {
+    description: 'should identify unimported file',
+    files: [
+      { name: 'package.json', content: '{ "main": "index.js" }' },
+      { name: 'index.js', content: `import foo from './foo';` },
+      { name: 'foo.js', content: '' },
+      { name: 'bar.js', content: '' },
+    ],
+    exitCode: 1,
+    output: ['1 unimported files', 'bar.js'],
+  },
+];
 
-beforeEach(async () => {
-  testProjectDir = await createProject(projectFixture);
-  executable = path.join(path.relative(testProjectDir, 'bin'), 'unimported.js');
-});
+describe('cli integration tests', () => {
+  for (const scenario of scenarios) {
+    test(scenario.description, async () => {
+      const testProjectDir = await createProject(scenario.files);
+      const executable = path.join(
+        path.relative(testProjectDir, 'bin'),
+        'unimported.js',
+      );
 
-afterEach(() => rmdir(testProjectDir, { recursive: true }));
+      try {
+        const { exitCode, stdout } = await exec(`node ${executable}`, {
+          cwd: testProjectDir,
+        });
 
-test('should identify unimported file', async () => {
-  const { exitCode, stdout } = await exec(`node ${executable}`, {
-    cwd: testProjectDir,
-  });
-
-  expect(exitCode).not.toBe(0);
-  expect(stdout).toEqual(expect.stringContaining('1 unimported files'));
-  expect(stdout).toEqual(expect.stringContaining('bar.js'));
+        expect(exitCode).toBe(scenario.exitCode);
+        scenario.output.forEach((expectedOutput) => {
+          expect(stdout).toEqual(expect.stringContaining(expectedOutput));
+        });
+      } finally {
+        await rmdir(testProjectDir, { recursive: true });
+      }
+    });
+  }
 });
