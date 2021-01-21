@@ -3,10 +3,14 @@ import util from 'util';
 const exec = util.promisify(require('child_process').exec);
 
 test('npx unimported --help', async (done) => {
-  exec('node ./bin/unimported.js --help', async (error, stdout, stderr) => {
-    expect(error).toBe(null);
-    expect(stderr).toBe('');
-    expect(stdout.trim()).toMatchInlineSnapshot(`
+  // note about `./` path: jest executes the tests from the root directory
+  const { stdout, stderr, error } = await exec(
+    'node ./bin/unimported.js --help',
+  );
+
+  expect(error).toBe(undefined);
+  expect(stderr).toBe('');
+  expect(stdout.trim()).toMatchInlineSnapshot(`
       "unimported
 
       scan your project for dead files
@@ -18,18 +22,13 @@ test('npx unimported --help', async (done) => {
         --flow, -f    indicates if your code is annotated with flow types    [boolean]
         --update, -u  update the ignore-lists stored in .unimportedrc.json   [boolean]"
     `);
-    done();
-  });
+  done();
 });
 
-test('npx unimported --help', async (done) => {
-  // note about `./` path: jest executes the tests from the root directory
+test('error npx unimported --help', async (done) => {
   // wrong file name
-  exec('node ./bin/1unimported.js --help', async (error, stdout, stderr) => {
-    expect(error).not.toBe(null);
-    expect(stderr).not.toBe(null);
-    expect(stdout).toBe('');
+  const error = await exec('node ./bin/1unimported.js --help');
 
-    done();
-  });
+  expect(error).not.toBe(null);
+  done();
 });
