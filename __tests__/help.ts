@@ -20,10 +20,3 @@ test('npx unimported --help', async () => {
         --update, -u  update the ignore-lists stored in .unimportedrc.json   [boolean]"
     `);
 });
-
-test('error for wrong file name npx unimported --help', async () => {
-  const command = exec('node ./bin/1unimported.js --help');
-
-  expect.assertions(1);
-  return expect(command).rejects.not.toBe(null);
-});
