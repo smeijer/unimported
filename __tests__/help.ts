@@ -1,11 +1,13 @@
-import { exec } from 'child_process';
+import util from 'util';
 
-test('npx unimported --help', (done) => {
+const exec = util.promisify(require('child_process').exec);
+
+test('npx unimported --help', async () => {
   // note about `./` path: jest executes the tests from the root directory
-  exec('node ./bin/unimported.js --help', (error, stdout, stderr) => {
-    expect(error).toBe(null);
-    expect(stderr).toBe('');
-    expect(stdout.trim()).toMatchInlineSnapshot(`
+  const { stdout, stderr } = await exec('node ./bin/unimported.js --help');
+
+  expect(stderr).toBe('');
+  expect(stdout.trim()).toMatchInlineSnapshot(`
       "unimported
 
       scan your project for dead files
@@ -17,6 +19,4 @@ test('npx unimported --help', (done) => {
         --flow, -f    indicates if your code is annotated with flow types    [boolean]
         --update, -u  update the ignore-lists stored in .unimportedrc.json   [boolean]"
     `);
-    done();
-  });
 });
