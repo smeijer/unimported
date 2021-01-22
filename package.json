@@ -20,6 +20,7 @@
     "run": "npm run build && node ./dist/index.js",
     "pretest": "npm run build",
     "test": "jest",
+    "test:cov": "jest --coverage",
     "ci:lint": "eslint -c ./.eslintrc.js",
     "ci:tsc": "tsc --noEmit --project ./tsconfig.json"
   },

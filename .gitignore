@@ -7,3 +7,4 @@ node_modules/
 # temporary ignored during raid => choose one to keep afterwards
 package-lock.json
 yarn.lock
+coverage
