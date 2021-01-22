@@ -71,13 +71,10 @@ describe('cli integration tests', () => {
   scenarios.forEach((scenario) => {
     test(scenario.description, async () => {
       const testProjectDir = await createProject(scenario.files);
-      const executable = path.join(
-        path.relative(testProjectDir, 'bin'),
-        'unimported.js',
-      );
+      const executable = path.relative(testProjectDir, 'src/index.ts');
 
       try {
-        const { stdout, exitCode } = await exec(`node ${executable}`, {
+        const { stdout, exitCode } = await exec(`ts-node ${executable}`, {
           cwd: testProjectDir,
         });
 

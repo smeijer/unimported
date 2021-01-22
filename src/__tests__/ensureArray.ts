@@ -1,4 +1,4 @@
-import { ensureArray } from '../src/ensureArray';
+import { ensureArray } from '../ensureArray';
 
 it('should return the given value if it is an array', () => {
   const fourtyTwoArray = [42];

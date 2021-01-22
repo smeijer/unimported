@@ -1,6 +1,6 @@
 import { createConsole, getLog, mockConsole } from 'console-testing-library';
-import { Context } from '../src/index';
-import { printResults } from '../src/print';
+import { Context } from '../index';
+import { printResults } from '../print';
 
 describe('printResults', () => {
   const expectedContext = {
