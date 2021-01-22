@@ -4,7 +4,7 @@ const exec = util.promisify(require('child_process').exec);
 
 test('npx unimported --help', async () => {
   // note about `./` path: jest executes the tests from the root directory
-  const { stdout, stderr } = await exec('ts-node ./src/index.js --help');
+  const { stdout, stderr } = await exec('ts-node src/index.ts --help');
 
   expect(stderr).toBe('');
   expect(stdout.trim()).toMatchInlineSnapshot(`
