@@ -4,6 +4,7 @@ dist/
 .test-space/
 coverage/
 node_modules/
+.DS_Store
 
 # temporary ignored during raid => choose one to keep afterwards
 package-lock.json
