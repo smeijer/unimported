@@ -11,13 +11,20 @@ const readFile = util.promisify(fs.readFile);
 function exec(
   command: string,
   options: { cwd: string },
-): Promise<{ exitCode: number | null; stdout: string }> {
+): Promise<{ exitCode: number | null; stdout: string; stderr?: string }> {
   return new Promise((resolve) => {
     try {
       const buffer = childProcess.execSync(command, options);
-      resolve({ exitCode: 0, stdout: buffer.toString() });
+      resolve({
+        exitCode: 0,
+        stdout: buffer.toString(),
+      });
     } catch (ex) {
-      resolve({ exitCode: ex.status, stdout: ex.stdout.toString() });
+      resolve({
+        exitCode: ex.status,
+        stdout: ex.stdout.toString(),
+        stderr: ex.stderr.toString(),
+      });
     }
   });
 }
@@ -51,7 +58,7 @@ describe('cli integration tests', () => {
         { name: 'bar.js', content: '' },
       ],
       exitCode: 1,
-      output: ['1 unimported files', 'bar.js'],
+      stdout: /1 unimported files.*bar.js/s,
     },
     {
       description: 'should identify unused dependencies',
@@ -65,7 +72,7 @@ describe('cli integration tests', () => {
         { name: 'foo.js', content: '' },
       ],
       exitCode: 1,
-      output: ['1 unused dependencies', '@test/dependency'],
+      stdout: /1 unused dependencies.*@test\/dependency/s,
     },
     {
       description: 'everything is used',
@@ -86,7 +93,36 @@ import bar from './bar';
         { name: 'bar.js', content: 'import test from "@test/dependency"' },
       ],
       exitCode: 0,
-      output: [],
+      stdout: /There don't seem to be any unimported files./,
+    },
+    {
+      description: 'all variants of import/export',
+      files: [
+        {
+          name: 'package.json',
+          content: '{ "main": "index.js" }',
+        },
+        {
+          name: 'index.js',
+          content: `import a from './a'`,
+        },
+        {
+          name: 'a.js',
+          content: `
+import {b as a} from './b'
+const promise = import('./d')
+export {a}
+export {b} from './b'
+export * from './c'
+export default promise
+`,
+        },
+        { name: 'b.js', content: 'export const b = 2;' },
+        { name: 'c.js', content: 'const c = 3; export {c}' },
+        { name: 'd.js', content: 'export default 42' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
     },
   ];
 
@@ -96,20 +132,24 @@ import bar from './bar';
       const executable = path.relative(testProjectDir, 'src/index.ts');
 
       try {
-        const { stdout, exitCode } = await exec(`ts-node ${executable}`, {
-          cwd: testProjectDir,
-        });
+        const { stdout, exitCode, stderr = '' } = await exec(
+          `ts-node ${executable}`,
+          {
+            cwd: testProjectDir,
+          },
+        );
 
+        expect(stdout).toMatch(scenario.stdout);
+        expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
         expect(exitCode).toBe(scenario.exitCode);
-        scenario.output.forEach((expectedOutput) => {
-          expect(stdout).toEqual(expect.stringContaining(expectedOutput));
-        });
       } finally {
         await rmdir(testProjectDir, { recursive: true });
       }
     });
   });
 });
+
+// ---
 
 describe('cli integration tests with update option', () => {
   const scenarios = [
@@ -183,11 +223,12 @@ import bar from './bar';
         const { exitCode } = await exec(`ts-node ${executable} --update`, {
           cwd: testProjectDir,
         });
-        expect(exitCode).toBe(scenario.exitCode);
+
         const outputFileContent = JSON.parse(
           await readFile(outputFile, 'utf-8'),
         );
         expect(scenario.output).toEqual(outputFileContent);
+        expect(exitCode).toBe(scenario.exitCode);
       } finally {
         await rmdir(testProjectDir, { recursive: true });
       }
