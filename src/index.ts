@@ -57,7 +57,7 @@ export interface Context {
   moduleDirectory: string[];
 }
 
-export async function main(args: CliArguments) {
+export async function main(args: CliArguments): Promise<void> {
   const spinner = ora('initializing').start();
   const cwd = process.cwd();
 
