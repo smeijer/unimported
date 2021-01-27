@@ -235,3 +235,37 @@ import bar from './bar';
     });
   });
 });
+
+test('cli with init option should create default ignore file', async () => {
+  const output = {
+    ignorePatterns: [
+      '**/node_modules/**',
+      '**/*.stories.{js,jsx,ts,tsx}',
+      '**/*.tests.{js,jsx,ts,tsx}',
+      '**/*.test.{js,jsx,ts,tsx}',
+      '**/*.spec.{js,jsx,ts,tsx}',
+      '**/tests/**',
+      '**/__tests__/**',
+      '**/*.d.ts',
+    ],
+    ignoreUnresolved: [],
+    ignoreUnimported: [],
+    ignoreUnused: [],
+  };
+
+  const testProjectDir = await createProject([]);
+  const outputFile = path.join(testProjectDir, '.unimportedrc.json');
+  const executable = path.relative(testProjectDir, 'src/index.ts');
+
+  try {
+    const { exitCode } = await exec(`ts-node ${executable} --init`, {
+      cwd: testProjectDir,
+    });
+
+    const outputFileContent = JSON.parse(await readFile(outputFile, 'utf-8'));
+    expect(output).toEqual(outputFileContent);
+    expect(exitCode).toBe(0);
+  } finally {
+    await rmdir(testProjectDir, { recursive: true });
+  }
+});
