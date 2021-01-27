@@ -57,7 +57,7 @@ export interface Context {
   moduleDirectory: string[];
 }
 
-async function main(args: CliArguments) {
+export async function main(args: CliArguments) {
   const spinner = ora('initializing').start();
   const cwd = process.cwd();
 
@@ -160,7 +160,7 @@ async function main(args: CliArguments) {
   }
 }
 
-interface CliArguments {
+export interface CliArguments {
   flow: boolean;
   update: boolean;
   init: boolean;
