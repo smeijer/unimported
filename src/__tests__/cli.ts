@@ -236,36 +236,78 @@ import bar from './bar';
   });
 });
 
-test('cli with init option should create default ignore file', async () => {
-  const output = {
-    ignorePatterns: [
-      '**/node_modules/**',
-      '**/*.stories.{js,jsx,ts,tsx}',
-      '**/*.tests.{js,jsx,ts,tsx}',
-      '**/*.test.{js,jsx,ts,tsx}',
-      '**/*.spec.{js,jsx,ts,tsx}',
-      '**/tests/**',
-      '**/__tests__/**',
-      '**/*.d.ts',
-    ],
-    ignoreUnresolved: [],
-    ignoreUnimported: [],
-    ignoreUnused: [],
-  };
+describe('cli integration tests with init option', () => {
+  const scenarios = [
+    {
+      description: 'should create default ignore file',
+      files: [],
+      exitCode: 0,
+      output: {
+        ignorePatterns: [
+          '**/node_modules/**',
+          '**/*.stories.{js,jsx,ts,tsx}',
+          '**/*.tests.{js,jsx,ts,tsx}',
+          '**/*.test.{js,jsx,ts,tsx}',
+          '**/*.spec.{js,jsx,ts,tsx}',
+          '**/tests/**',
+          '**/__tests__/**',
+          '**/*.d.ts',
+        ],
+        ignoreUnresolved: [],
+        ignoreUnimported: [],
+        ignoreUnused: [],
+      },
+    },
+    {
+      description: 'should create expected ignore file for meteor project',
+      files: [
+        {
+          name: '.meteor',
+          content: '',
+        },
+      ],
+      exitCode: 0,
+      output: {
+        ignorePatterns: [
+          '**/node_modules/**',
+          '**/*.stories.{js,jsx,ts,tsx}',
+          '**/*.tests.{js,jsx,ts,tsx}',
+          '**/*.test.{js,jsx,ts,tsx}',
+          '**/*.spec.{js,jsx,ts,tsx}',
+          '**/tests/**',
+          '**/__tests__/**',
+          '**/*.d.ts',
+          'packages/**',
+          'public/**',
+          'private/**',
+          'tests/**',
+        ],
+        ignoreUnresolved: [],
+        ignoreUnimported: [],
+        ignoreUnused: [],
+      },
+    },
+  ];
 
-  const testProjectDir = await createProject([]);
-  const outputFile = path.join(testProjectDir, '.unimportedrc.json');
-  const executable = path.relative(testProjectDir, 'src/index.ts');
+  scenarios.forEach((scenario) => {
+    test(scenario.description, async () => {
+      const testProjectDir = await createProject(scenario.files);
+      const outputFile = path.join(testProjectDir, '.unimportedrc.json');
+      const executable = path.relative(testProjectDir, 'src/index.ts');
 
-  try {
-    const { exitCode } = await exec(`ts-node ${executable} --init`, {
-      cwd: testProjectDir,
+      try {
+        const { exitCode } = await exec(`ts-node ${executable} --init`, {
+          cwd: testProjectDir,
+        });
+
+        const outputFileContent = JSON.parse(
+          await readFile(outputFile, 'utf-8'),
+        );
+        expect(scenario.output).toEqual(outputFileContent);
+        expect(exitCode).toBe(scenario.exitCode);
+      } finally {
+        await rmdir(testProjectDir, { recursive: true });
+      }
     });
-
-    const outputFileContent = JSON.parse(await readFile(outputFile, 'utf-8'));
-    expect(output).toEqual(outputFileContent);
-    expect(exitCode).toBe(0);
-  } finally {
-    await rmdir(testProjectDir, { recursive: true });
-  }
+  });
 });
