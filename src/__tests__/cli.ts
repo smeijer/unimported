@@ -99,6 +99,23 @@ describe('cli integration tests', () => {
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      description: 'should identify unimported file in meteor project',
+      files: [
+        {
+          name: 'package.json',
+          content:
+            '{ "meteor" : { "mainModule": { "client": "client.js", "server": "server.js" } } }',
+        },
+        { name: 'client.js', content: `import foo from './foo';` },
+        { name: 'server.js', content: '' },
+        { name: '.meteor', content: '' },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
       description: 'should identify unused dependencies',
       files: [
         {
