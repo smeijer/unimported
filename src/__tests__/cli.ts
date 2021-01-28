@@ -1,32 +1,61 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import childProcess from 'child_process';
+import { CliArguments } from '..';
 
 const mkdir = util.promisify(fs.mkdir);
 const rmdir = util.promisify(fs.rmdir);
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 
-function exec(
-  command: string,
-  options: { cwd: string },
-): Promise<{ exitCode: number | null; stdout: string; stderr?: string }> {
-  return new Promise((resolve) => {
-    try {
-      const buffer = childProcess.execSync(command, options);
-      resolve({
-        exitCode: 0,
-        stdout: buffer.toString(),
-      });
-    } catch (ex) {
-      resolve({
-        exitCode: ex.status,
-        stdout: ex.stdout.toString(),
-        stderr: ex.stderr.toString(),
-      });
-    }
-  });
+async function exec(
+  testProjectDir: string,
+  { init = false, flow = false, update = false }: Partial<CliArguments> = {},
+): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
+  const originalExit = process.exit;
+  const originalCwd = process.cwd();
+  const originalConsole = {
+    log: console.log,
+    warn: console.warn,
+    error: console.error,
+  };
+
+  try {
+    let exitCode: number | null = null;
+    let stdout = '';
+    let stderr = '';
+
+    const appendStdout = (...args: any[]): void => {
+      stdout += args.map((arg) => arg.toString()).join(' ');
+    };
+
+    const appendStderr = (...args: any[]): void => {
+      stderr += args.map((arg) => arg.toString()).join(' ');
+    };
+
+    console.log = appendStdout;
+    console.warn = appendStdout;
+    console.error = appendStderr;
+
+    process.exit = (code: number): never => {
+      exitCode = exitCode ?? code;
+      return undefined as never;
+    };
+
+    process.chdir(testProjectDir);
+
+    const main = require('..').main as (args: CliArguments) => Promise<void>;
+
+    await main({ init, flow, update });
+
+    return { exitCode: exitCode ?? 0, stdout, stderr };
+  } finally {
+    process.chdir(originalCwd);
+    process.exit = originalExit;
+    Object.entries(originalConsole).forEach(([key, value]) => {
+      console[key] = value;
+    });
+  }
 }
 
 async function createProject(
@@ -129,15 +158,9 @@ export default promise
   scenarios.forEach((scenario) => {
     test(scenario.description, async () => {
       const testProjectDir = await createProject(scenario.files);
-      const executable = path.relative(testProjectDir, 'src/index.ts');
 
       try {
-        const { stdout, exitCode, stderr = '' } = await exec(
-          `ts-node ${executable}`,
-          {
-            cwd: testProjectDir,
-          },
-        );
+        const { stdout, stderr, exitCode } = await exec(testProjectDir);
 
         expect(stdout).toMatch(scenario.stdout);
         expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
@@ -217,11 +240,10 @@ import bar from './bar';
     test(scenario.description, async () => {
       const testProjectDir = await createProject(scenario.files);
       const outputFile = path.join(testProjectDir, '.unimportedrc.json');
-      const executable = path.relative(testProjectDir, 'src/index.ts');
 
       try {
-        const { exitCode } = await exec(`ts-node ${executable} --update`, {
-          cwd: testProjectDir,
+        const { exitCode } = await exec(testProjectDir, {
+          update: true,
         });
 
         const outputFileContent = JSON.parse(
