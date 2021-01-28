@@ -16,7 +16,7 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "lint": "tsc --noEmit && eslint 'src/**/*.ts' --quiet --fix",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "run": "npm run build && node ./dist/index.js",
     "test": "jest",
     "test:cov": "npm run test -- --coverage",
