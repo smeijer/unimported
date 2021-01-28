@@ -242,9 +242,7 @@ import bar from './bar';
       const outputFile = path.join(testProjectDir, '.unimportedrc.json');
 
       try {
-        const { exitCode } = await exec(testProjectDir, {
-          update: true,
-        });
+        const { exitCode } = await exec(testProjectDir, { update: true });
 
         const outputFileContent = JSON.parse(
           await readFile(outputFile, 'utf-8'),
@@ -315,12 +313,9 @@ describe('cli integration tests with init option', () => {
     test(scenario.description, async () => {
       const testProjectDir = await createProject(scenario.files);
       const outputFile = path.join(testProjectDir, '.unimportedrc.json');
-      const executable = path.relative(testProjectDir, 'src/index.ts');
 
       try {
-        const { exitCode } = await exec(`ts-node ${executable} --init`, {
-          cwd: testProjectDir,
-        });
+        const { exitCode } = await exec(testProjectDir, { init: true });
 
         const outputFileContent = JSON.parse(
           await readFile(outputFile, 'utf-8'),
