@@ -153,6 +153,21 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
     },
+    {
+      description: 'should identify ts paths imports',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        { name: 'index.ts', content: `import foo from '@root/foo';` },
+        { name: 'foo.ts', content: '' },
+        { name: 'bar.ts', content: '' },
+        {
+          name: 'tsconfig.json',
+          content: '{ "compilerOptions": { "paths": { "@root": ["."] } } }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.ts/s,
+    },
   ];
 
   scenarios.forEach((scenario) => {
