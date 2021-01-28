@@ -213,6 +213,22 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
     },
+    {
+      description: 'supports root slash import in meteor project',
+      files: [
+        {
+          name: 'package.json',
+          content:
+            '{ "meteor" : { "mainModule": { "client": "client.js", "server": "server.js" } } }',
+        },
+        { name: 'client.js', content: `import foo from '/foo';` },
+        { name: 'server.js', content: '' },
+        { name: '.meteor', content: '' },
+        { name: 'foo.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
   ];
 
   scenarios.forEach((scenario) => {
