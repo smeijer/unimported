@@ -60,6 +60,8 @@ async function exec(
 
 async function createProject(
   files: Array<{ name: string; content: string }>,
+  directories: string[] = [],
+  baseDir = '.',
 ): Promise<string> {
   const randomId = Math.floor(Math.random() * 1000000);
 
@@ -68,12 +70,18 @@ async function createProject(
   await mkdir(testSpaceDir, { recursive: true });
 
   await Promise.all(
+    directories.map((dir) =>
+      mkdir(path.join(testSpaceDir, dir), { recursive: true }),
+    ),
+  );
+
+  await Promise.all(
     files.map((file) =>
       writeFile(path.join(testSpaceDir, file.name), file.content),
     ),
   );
 
-  return testSpaceDir;
+  return path.join(testSpaceDir, baseDir);
 }
 
 describe('cli integration tests', () => {
@@ -168,12 +176,37 @@ export default promise
       exitCode: 1,
       stdout: /1 unimported files.*bar.ts/s,
     },
+    {
+      description: 'should identify monorepo-type sibling modules',
+      directories: ['packages/A', 'packages/B', 'packages/C'],
+      baseDir: 'packages/A',
+      files: [
+        {
+          name: 'packages/A/package.json',
+          content:
+            '{ "main": "index.js", "repository": { "directory": "path/goes/here" } }',
+        },
+        {
+          name: 'packages/A/index.js',
+          content: `import foo from 'B/foo';`,
+        },
+        { name: 'packages/B/foo.js', content: '' },
+        { name: 'packages/C/bar.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
+    },
   ];
 
   scenarios.forEach((scenario) => {
     test(scenario.description, async () => {
-      const testProjectDir = await createProject(scenario.files);
+      const testProjectDir = await createProject(
+        scenario.files,
+        scenario.directories,
+        scenario.baseDir,
+      );
 
+      console.log(testProjectDir);
       try {
         const { stdout, stderr, exitCode } = await exec(testProjectDir);
 
