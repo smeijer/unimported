@@ -206,7 +206,6 @@ export default promise
         scenario.baseDir,
       );
 
-      console.log(testProjectDir);
       try {
         const { stdout, stderr, exitCode } = await exec(testProjectDir);
 
