@@ -60,6 +60,7 @@ async function exec(
 
 async function createProject(
   files: Array<{ name: string; content: string }>,
+  baseDir = '.',
 ): Promise<string> {
   const randomId = Math.floor(Math.random() * 1000000);
 
@@ -69,11 +70,19 @@ async function createProject(
 
   await Promise.all(
     files.map((file) =>
+      mkdir(path.join(testSpaceDir, path.dirname(file.name)), {
+        recursive: true,
+      }),
+    ),
+  );
+
+  await Promise.all(
+    files.map((file) =>
       writeFile(path.join(testSpaceDir, file.name), file.content),
     ),
   );
 
-  return testSpaceDir;
+  return path.join(testSpaceDir, baseDir);
 }
 
 describe('cli integration tests', () => {
@@ -153,11 +162,48 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
     },
+    {
+      description: 'should identify ts paths imports',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        { name: 'index.ts', content: `import foo from '@root/foo';` },
+        { name: 'foo.ts', content: '' },
+        { name: 'bar.ts', content: '' },
+        {
+          name: 'tsconfig.json',
+          content: '{ "compilerOptions": { "paths": { "@root": ["."] } } }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.ts/s,
+    },
+    {
+      description: 'should identify monorepo-type sibling modules',
+      baseDir: 'packages/A',
+      files: [
+        {
+          name: 'packages/A/package.json',
+          content:
+            '{ "main": "index.js", "repository": { "directory": "path/goes/here" } }',
+        },
+        {
+          name: 'packages/A/index.js',
+          content: `import foo from 'B/foo';`,
+        },
+        { name: 'packages/B/foo.js', content: '' },
+        { name: 'packages/C/bar.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
+    },
   ];
 
   scenarios.forEach((scenario) => {
     test(scenario.description, async () => {
-      const testProjectDir = await createProject(scenario.files);
+      const testProjectDir = await createProject(
+        scenario.files,
+        scenario.baseDir,
+      );
 
       try {
         const { stdout, stderr, exitCode } = await exec(testProjectDir);
