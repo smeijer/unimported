@@ -60,7 +60,6 @@ async function exec(
 
 async function createProject(
   files: Array<{ name: string; content: string }>,
-  directories: string[] = [],
   baseDir = '.',
 ): Promise<string> {
   const randomId = Math.floor(Math.random() * 1000000);
@@ -70,8 +69,10 @@ async function createProject(
   await mkdir(testSpaceDir, { recursive: true });
 
   await Promise.all(
-    directories.map((dir) =>
-      mkdir(path.join(testSpaceDir, dir), { recursive: true }),
+    files.map((file) =>
+      mkdir(path.join(testSpaceDir, path.dirname(file.name)), {
+        recursive: true,
+      }),
     ),
   );
 
@@ -178,7 +179,6 @@ export default promise
     },
     {
       description: 'should identify monorepo-type sibling modules',
-      directories: ['packages/A', 'packages/B', 'packages/C'],
       baseDir: 'packages/A',
       files: [
         {
@@ -202,7 +202,6 @@ export default promise
     test(scenario.description, async () => {
       const testProjectDir = await createProject(
         scenario.files,
-        scenario.directories,
         scenario.baseDir,
       );
 
