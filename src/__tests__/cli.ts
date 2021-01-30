@@ -99,6 +99,15 @@ describe('cli integration tests', () => {
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      description: 'should identify unresolved imports',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from './foo';` },
+      ],
+      exitCode: 1,
+      stdout: /1 unresolved imports.*.\/foo/s,
+    },
+    {
       description: 'should identify unimported file in meteor project',
       files: [
         {
