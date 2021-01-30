@@ -39,6 +39,105 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mpeyper",
+      "name": "Michael Peyper",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23029903?v=4",
+      "profile": "https://github.com/mpeyper",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "marcosvega91",
+      "name": "Marco Moretti",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5365582?v=4",
+      "profile": "https://github.com/marcosvega91",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "Aprillion",
+      "name": "Peter Hozák",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1087670?v=4",
+      "profile": "http://peter.hozak.info/",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "JacobMGEvans",
+      "name": "Jacob M-G Evans",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27247160?v=4",
+      "profile": "https://dev.to/jacobmgevans",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "datner",
+      "name": "Datner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22598347?v=4",
+      "profile": "https://github.com/datner",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "codyarose",
+      "name": "Cody Rose",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35306025?v=4",
+      "profile": "https://github.com/codyarose",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "AhmedEldessouki",
+      "name": "Ahmed ElDessouki",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44158955?v=4",
+      "profile": "https://ahmedeldessouki-a7488.firebaseapp.com/",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "YPAzevedo",
+      "name": "Yago Pereira Azevedo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56167866?v=4",
+      "profile": "https://www.linkedin.com/in/ypazevedo/",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "juhanakristian",
+      "name": "Juhana Jauhiainen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/544386?v=4",
+      "profile": "https://github.com/juhanakristian",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "nobrayner",
+      "name": "Braydon Hall",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40751395?v=4",
+      "profile": "https://github.com/nobrayner",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "abeprincec",
+      "name": "abeprincec",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16880975?v=4",
+      "profile": "https://github.com/abeprincec",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
