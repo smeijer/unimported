@@ -238,6 +238,15 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./s,
     },
+    {
+      description: 'should report parse failure for invalid file',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `not valid` },
+      ],
+      exitCode: 1,
+      stdout: /Failed parsing.*\/index.js/s,
+    },
   ];
 
   scenarios.forEach((scenario) => {
