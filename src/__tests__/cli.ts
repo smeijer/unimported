@@ -238,6 +238,27 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./s,
     },
+    {
+      description: 'should report parse failure for invalid file',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `not valid` },
+      ],
+      exitCode: 1,
+      stdout: /Failed parsing.*\/index.js/s,
+    },
+    {
+      description: 'should ignore non import/require paths',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        {
+          name: 'index.js',
+          content: `import fs from 'fs'; const dependency = fs.readFileSync('some_path.js');`,
+        },
+      ],
+      exitCode: 0,
+      stdout: '',
+    },
   ];
 
   scenarios.forEach((scenario) => {
