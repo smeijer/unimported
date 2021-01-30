@@ -247,6 +247,18 @@ export default promise
       exitCode: 1,
       stdout: /Failed parsing.*\/index.js/s,
     },
+    {
+      description: 'should ignore non import/require paths',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        {
+          name: 'index.js',
+          content: `import fs from 'fs'; const dependency = fs.readFileSync('some_path.js');`,
+        },
+      ],
+      exitCode: 0,
+      stdout: '',
+    },
   ];
 
   scenarios.forEach((scenario) => {
@@ -262,8 +274,8 @@ export default promise
         expect(stdout).toMatch(scenario.stdout);
         expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
         expect(exitCode).toBe(scenario.exitCode);
-      } finally {
         await rmdir(testProjectDir, { recursive: true });
+      } finally {
       }
     });
   });
