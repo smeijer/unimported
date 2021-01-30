@@ -274,8 +274,8 @@ export default promise
         expect(stdout).toMatch(scenario.stdout);
         expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
         expect(exitCode).toBe(scenario.exitCode);
-        await rmdir(testProjectDir, { recursive: true });
       } finally {
+        await rmdir(testProjectDir, { recursive: true });
       }
     });
   });
