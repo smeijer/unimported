@@ -259,6 +259,57 @@ export default promise
       exitCode: 0,
       stdout: '',
     },
+    {
+      description: 'should not report unimported file which is in ignore file',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from './foo';` },
+        {
+          name: '.unimportedrc.json',
+          content: '{"ignoreUnimported": ["bar.js"]}',
+        },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
+    {
+      description:
+        'should not report unused dependency which is in ignore file',
+      files: [
+        {
+          name: 'package.json',
+          content:
+            '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
+        },
+        { name: 'index.js', content: `import foo from './foo';` },
+        {
+          name: '.unimportedrc.json',
+          content: '{"ignoreUnused": ["@test/dependency"]}',
+        },
+        { name: 'foo.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
+    {
+      description:
+        'should not report unresolved import which is in ignore file',
+      files: [
+        {
+          name: 'package.json',
+          content: '{ "main": "index.js"  }',
+        },
+        { name: 'index.js', content: `import foo from './foo';` },
+        {
+          name: '.unimportedrc.json',
+          content: '{"ignoreUnresolved": ["./foo"]}',
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
   ];
 
   scenarios.forEach((scenario) => {
@@ -430,78 +481,6 @@ describe('cli integration tests with init option', () => {
           await readFile(outputFile, 'utf-8'),
         );
         expect(scenario.output).toEqual(outputFileContent);
-        expect(exitCode).toBe(scenario.exitCode);
-      } finally {
-        await rmdir(testProjectDir, { recursive: true });
-      }
-    });
-  });
-});
-
-describe('cli integration tests with ignore file', () => {
-  const scenarios = [
-    {
-      description: 'should not report unimported file which is in ignore file',
-      files: [
-        { name: 'package.json', content: '{ "main": "index.js" }' },
-        { name: 'index.js', content: `import foo from './foo';` },
-        {
-          name: '.unimportedrc.json',
-          content: '{"ignoreUnimported": ["bar.js"]}',
-        },
-        { name: 'foo.js', content: '' },
-        { name: 'bar.js', content: '' },
-      ],
-      exitCode: 0,
-      stdout: /There don't seem to be any unimported files./s,
-    },
-    {
-      description:
-        'should not report unused dependency which is in ignore file',
-      files: [
-        {
-          name: 'package.json',
-          content:
-            '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
-        },
-        { name: 'index.js', content: `import foo from './foo';` },
-        {
-          name: '.unimportedrc.json',
-          content: '{"ignoreUnused": ["@test/dependency"]}',
-        },
-        { name: 'foo.js', content: '' },
-      ],
-      exitCode: 0,
-      stdout: /There don't seem to be any unimported files./s,
-    },
-    {
-      description:
-        'should not report unresolved import which is in ignore file',
-      files: [
-        {
-          name: 'package.json',
-          content: '{ "main": "index.js"  }',
-        },
-        { name: 'index.js', content: `import foo from './foo';` },
-        {
-          name: '.unimportedrc.json',
-          content: '{"ignoreUnresolved": ["./foo"]}',
-        },
-      ],
-      exitCode: 0,
-      stdout: /There don't seem to be any unimported files./s,
-    },
-  ];
-
-  scenarios.forEach((scenario) => {
-    test(scenario.description, async () => {
-      const testProjectDir = await createProject(scenario.files);
-
-      try {
-        const { stdout, stderr, exitCode } = await exec(testProjectDir);
-
-        expect(stdout).toMatch(scenario.stdout);
-        expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
         expect(exitCode).toBe(scenario.exitCode);
       } finally {
         await rmdir(testProjectDir, { recursive: true });
