@@ -100,7 +100,7 @@ To ignore specific results, add them to `.unimportedrc.json#ignoreUnused`.
 
 The files listed under `unimported files`, are the files that exist in your code base, but are not part of your final bundle. It should be safe to delete those files.
 
-For your convenience, some files are not shown, as we treat those as 'dev only' files which you might need. More about that [below](#how);
+For your convenience, some files are not shown, as we treat those as 'dev only' files which you might need. More about that [below](#how).
 
 To ignore specific results, add them to `.unimportedrc.json#ignoreUnimported`.
 
@@ -145,7 +145,7 @@ To ignore specific results, add them to `.unimportedrc.json#ignoreUnimported`.
 
 ## How
 
-`Unimported` follows your import statements, starting from one or more entry files. For Meteor projects, the entry files are read from the `package.json#meteor.mainModule` key. Meteors eager loading is not supported, as that mode will load all files within your directory, regardless of import statements.
+`Unimported` follows your import statements starting from one or more entry files. For Meteor projects, the entry files are read from the `package.json#meteor.mainModule` key. Meteors eager loading is not supported, as that mode will load all files within your directory, regardless of import statements.
 
 For all other project types, the entry point is looked up in the following order:
 
@@ -156,7 +156,7 @@ For all other project types, the entry point is looked up in the following order
 1. `./main`
 1. `./package.json#main`
 
-The last option is most likely never what you want, as the main field often points to a `dist` folder. Analyzing a bundled asset, is likely to result in false positives.
+The last option is most likely never what you want, as the main field often points to a `dist` folder. Analyzing a bundled asset is likely to result in false positives.
 
 To specify custom entry points, add them to `.unimportedrc.json#entry`.
 
