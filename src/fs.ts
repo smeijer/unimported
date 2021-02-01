@@ -9,12 +9,12 @@ const writeFileAsync = util.promisify(fs.writeFile);
 const existsAsync = util.promisify(fs.exists);
 
 export async function exists(path: string, cwd = ''): Promise<boolean> {
-  return existsAsync(join(cwd, path));
+  return await existsAsync(join(cwd, path));
 }
 
 export async function readText(path: string, cwd = ''): Promise<string> {
   try {
-    return readFileAsync(join(cwd, path), { encoding: 'utf8' });
+    return await readFileAsync(join(cwd, path), { encoding: 'utf8' });
   } catch (e) {
     return '';
   }
@@ -26,7 +26,7 @@ export async function writeText(
   cwd = '',
 ): Promise<void> {
   try {
-    return writeFileAsync(join(cwd, path), data, { encoding: 'utf8' });
+    return await writeFileAsync(join(cwd, path), data, { encoding: 'utf8' });
   } catch (e) {
     return;
   }
@@ -48,12 +48,8 @@ export async function writeJson(
   data: object,
   cwd = '.',
 ): Promise<void> {
-  try {
-    const text = JSON.stringify(data, null, '  ');
-    return writeText(path, text, cwd);
-  } catch (e) {
-    return;
-  }
+  const text = JSON.stringify(data, null, '  ');
+  return await writeText(path, text, cwd);
 }
 
 type ListOptions = GlobOptions & {
@@ -61,8 +57,8 @@ type ListOptions = GlobOptions & {
 };
 
 export async function list(
-  pattern = '**/*',
-  cwd = '.',
+  pattern: string,
+  cwd: string,
   options: ListOptions = {},
 ): Promise<string[]> {
   const { extensions, ...globOptions } = options;
@@ -72,15 +68,9 @@ export async function list(
     ? `${pattern}.{${extensions.map((x) => x.replace(/^\./, '')).join(',')}}`
     : pattern;
 
-  return globAsync(fullPattern, {
+  return await globAsync(fullPattern, {
     cwd,
     realpath: true,
     ...globOptions,
   });
-
-  // new Promise((resolve, reject) => glob(fullPattern, {
-  //   ...globOptions,
-  //   cwd,
-  //   realpath: true
-  // }, (error, result) => error ? reject(error) : resolve(result)));
 }

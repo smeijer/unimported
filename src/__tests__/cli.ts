@@ -310,6 +310,17 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./s,
     },
+    {
+      description: 'should not report missing entry file',
+      files: [
+        {
+          name: 'package.json',
+          content: '{ "main": "index.js"  }',
+        },
+      ],
+      exitCode: 1,
+      stdout: '',
+    },
   ];
 
   scenarios.forEach((scenario) => {
