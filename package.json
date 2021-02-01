@@ -19,7 +19,6 @@
     "prepare": "npm run build",
     "run": "npm run build && node ./dist/index.js",
     "test": "jest",
-    "test:cov": "npm run test -- --coverage",
     "ci:lint": "eslint -c ./.eslintrc.js",
     "ci:tsc": "tsc --noEmit --project ./tsconfig.json"
   },
