@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import { CliArguments } from '..';
+import { main, CliArguments } from '..';
 
 const mkdir = util.promisify(fs.mkdir);
 const rmdir = util.promisify(fs.rmdir);
@@ -43,8 +43,6 @@ async function exec(
     };
 
     process.chdir(testProjectDir);
-
-    const main = require('..').main as (args: CliArguments) => Promise<void>;
 
     await main({ init, flow, update });
 
