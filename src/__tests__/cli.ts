@@ -133,7 +133,7 @@ cases(
         },
         { name: 'client.js', content: `import foo from './foo';` },
         { name: 'server.js', content: '' },
-        { name: '.meteor', content: '' },
+        { name: '.meteor/release', content: '' },
         { name: 'foo.js', content: '' },
         { name: 'bar.js', content: '' },
       ],
