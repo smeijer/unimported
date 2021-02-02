@@ -325,7 +325,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./s,
     },
     {
-      name: 'should not report missing entry file',
+      name: 'should not report entry file as missing',
       files: [
         {
           name: 'package.json',
