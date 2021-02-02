@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import cases from 'jest-in-case';
 import { main, CliArguments } from '..';
 
 const mkdir = util.promisify(fs.mkdir);
@@ -83,10 +84,27 @@ async function createProject(
   return path.join(testSpaceDir, baseDir);
 }
 
-describe('cli integration tests', () => {
-  const scenarios = [
+cases(
+  'cli integration tests',
+  async (scenario) => {
+    const testProjectDir = await createProject(
+      scenario.files,
+      scenario.baseDir,
+    );
+
+    try {
+      const { stdout, stderr, exitCode } = await exec(testProjectDir);
+
+      expect(stdout).toMatch(scenario.stdout);
+      expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
+      expect(exitCode).toBe(scenario.exitCode);
+    } finally {
+      await rmdir(testProjectDir, { recursive: true });
+    }
+  },
+  [
     {
-      description: 'should identify unimported file',
+      name: 'should identify unimported file',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
         { name: 'index.js', content: `import foo from './foo';` },
@@ -97,7 +115,7 @@ describe('cli integration tests', () => {
       stdout: /1 unimported files.*bar.js/s,
     },
     {
-      description: 'should identify unresolved imports',
+      name: 'should identify unresolved imports',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
         { name: 'index.js', content: `import foo from './foo';` },
@@ -106,7 +124,7 @@ describe('cli integration tests', () => {
       stdout: /1 unresolved imports.*.\/foo/s,
     },
     {
-      description: 'should identify unimported file in meteor project',
+      name: 'should identify unimported file in meteor project',
       files: [
         {
           name: 'package.json',
@@ -123,7 +141,7 @@ describe('cli integration tests', () => {
       stdout: /1 unimported files.*bar.js/s,
     },
     {
-      description: 'should identify unused dependencies',
+      name: 'should identify unused dependencies',
       files: [
         {
           name: 'package.json',
@@ -137,7 +155,7 @@ describe('cli integration tests', () => {
       stdout: /1 unused dependencies.*@test\/dependency/s,
     },
     {
-      description: 'everything is used',
+      name: 'should not report issues when everything is used',
       files: [
         {
           name: 'package.json',
@@ -158,7 +176,7 @@ import bar from './bar';
       stdout: /There don't seem to be any unimported files./,
     },
     {
-      description: 'all variants of import/export',
+      name: 'should use all variants of import/export',
       files: [
         {
           name: 'package.json',
@@ -187,7 +205,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./,
     },
     {
-      description: 'should identify ts paths imports',
+      name: 'should identify ts paths imports',
       files: [
         { name: 'package.json', content: '{ "main": "index.ts" }' },
         { name: 'index.ts', content: `import foo from '@root/foo';` },
@@ -202,7 +220,7 @@ export default promise
       stdout: /1 unimported files.*bar.ts/s,
     },
     {
-      description: 'should identify monorepo-type sibling modules',
+      name: 'should identify monorepo-type sibling modules',
       baseDir: 'packages/A',
       files: [
         {
@@ -221,7 +239,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./,
     },
     {
-      description: 'supports root slash import in meteor project',
+      name: 'should support root slash import in meteor project',
       files: [
         {
           name: 'package.json',
@@ -237,7 +255,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./s,
     },
     {
-      description: 'should report parse failure for invalid file',
+      name: 'should report parse failure for invalid file',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
         { name: 'index.js', content: `not valid` },
@@ -246,7 +264,7 @@ export default promise
       stdout: /Failed parsing.*\/index.js/s,
     },
     {
-      description: 'should ignore non import/require paths',
+      name: 'should ignore non import/require paths',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
         {
@@ -258,7 +276,7 @@ export default promise
       stdout: '',
     },
     {
-      description: 'should not report unimported file which is in ignore file',
+      name: 'should not report unimported file which is in ignore file',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
         { name: 'index.js', content: `import foo from './foo';` },
@@ -273,8 +291,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./s,
     },
     {
-      description:
-        'should not report unused dependency which is in ignore file',
+      name: 'should not report unused dependency which is in ignore file',
       files: [
         {
           name: 'package.json',
@@ -292,8 +309,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./s,
     },
     {
-      description:
-        'should not report unresolved import which is in ignore file',
+      name: 'should not report unresolved import which is in ignore file',
       files: [
         {
           name: 'package.json',
@@ -309,7 +325,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./s,
     },
     {
-      description: 'should not report missing entry file',
+      name: 'should not report missing entry file',
       files: [
         {
           name: 'package.json',
@@ -319,34 +335,30 @@ export default promise
       exitCode: 1,
       stdout: '',
     },
-  ];
+  ],
+);
 
-  scenarios.forEach((scenario) => {
-    test(scenario.description, async () => {
-      const testProjectDir = await createProject(
-        scenario.files,
-        scenario.baseDir,
-      );
+// ----------------------------------------------------------------------------
 
-      try {
-        const { stdout, stderr, exitCode } = await exec(testProjectDir);
+cases(
+  'cli integration tests with update option',
+  async (scenario) => {
+    const testProjectDir = await createProject(scenario.files);
+    const outputFile = path.join(testProjectDir, '.unimportedrc.json');
 
-        expect(stdout).toMatch(scenario.stdout);
-        expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
-        expect(exitCode).toBe(scenario.exitCode);
-      } finally {
-        await rmdir(testProjectDir, { recursive: true });
-      }
-    });
-  });
-});
+    try {
+      const { exitCode } = await exec(testProjectDir, { update: true });
 
-// ---
-
-describe('cli integration tests with update option', () => {
-  const scenarios = [
+      const outputFileContent = JSON.parse(await readFile(outputFile, 'utf-8'));
+      expect(scenario.output).toEqual(outputFileContent);
+      expect(exitCode).toBe(scenario.exitCode);
+    } finally {
+      await rmdir(testProjectDir, { recursive: true });
+    }
+  },
+  [
     {
-      description: 'should identify unimported file',
+      name: 'should identify unimported file',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
         { name: 'index.js', content: `import foo from './foo';` },
@@ -361,7 +373,7 @@ describe('cli integration tests with update option', () => {
       },
     },
     {
-      description: 'should identify unused dependencies',
+      name: 'should identify unused dependencies',
       files: [
         {
           name: 'package.json',
@@ -379,7 +391,7 @@ describe('cli integration tests with update option', () => {
       },
     },
     {
-      description: 'everything is used',
+      name: 'should not ignore anything when everything is used',
       files: [
         {
           name: 'package.json',
@@ -403,32 +415,30 @@ import bar from './bar';
         ignoreUnused: [],
       },
     },
-  ];
+  ],
+);
 
-  scenarios.forEach((scenario) => {
-    test(scenario.description, async () => {
-      const testProjectDir = await createProject(scenario.files);
-      const outputFile = path.join(testProjectDir, '.unimportedrc.json');
+// ----------------------------------------------------------------------------
 
-      try {
-        const { exitCode } = await exec(testProjectDir, { update: true });
+cases(
+  'cli integration tests with init option',
+  async (scenario) => {
+    const testProjectDir = await createProject(scenario.files);
+    const outputFile = path.join(testProjectDir, '.unimportedrc.json');
 
-        const outputFileContent = JSON.parse(
-          await readFile(outputFile, 'utf-8'),
-        );
-        expect(scenario.output).toEqual(outputFileContent);
-        expect(exitCode).toBe(scenario.exitCode);
-      } finally {
-        await rmdir(testProjectDir, { recursive: true });
-      }
-    });
-  });
-});
+    try {
+      const { exitCode } = await exec(testProjectDir, { init: true });
 
-describe('cli integration tests with init option', () => {
-  const scenarios = [
+      const outputFileContent = JSON.parse(await readFile(outputFile, 'utf-8'));
+      expect(scenario.output).toEqual(outputFileContent);
+      expect(exitCode).toBe(scenario.exitCode);
+    } finally {
+      await rmdir(testProjectDir, { recursive: true });
+    }
+  },
+  [
     {
-      description: 'should create default ignore file',
+      name: 'should create default ignore file',
       files: [],
       exitCode: 0,
       output: {
@@ -448,7 +458,7 @@ describe('cli integration tests with init option', () => {
       },
     },
     {
-      description: 'should create expected ignore file for meteor project',
+      name: 'should create expected ignore file for meteor project',
       files: [
         {
           name: '.meteor',
@@ -476,24 +486,5 @@ describe('cli integration tests with init option', () => {
         ignoreUnused: [],
       },
     },
-  ];
-
-  scenarios.forEach((scenario) => {
-    test(scenario.description, async () => {
-      const testProjectDir = await createProject(scenario.files);
-      const outputFile = path.join(testProjectDir, '.unimportedrc.json');
-
-      try {
-        const { exitCode } = await exec(testProjectDir, { init: true });
-
-        const outputFileContent = JSON.parse(
-          await readFile(outputFile, 'utf-8'),
-        );
-        expect(scenario.output).toEqual(outputFileContent);
-        expect(exitCode).toBe(scenario.exitCode);
-      } finally {
-        await rmdir(testProjectDir, { recursive: true });
-      }
-    });
-  });
-});
+  ],
+);
