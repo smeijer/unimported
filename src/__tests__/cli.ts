@@ -248,7 +248,7 @@ export default promise
         },
         { name: 'client.js', content: `import foo from '/foo';` },
         { name: 'server.js', content: '' },
-        { name: '.meteor', content: '' },
+        { name: '.meteor/release', content: '' },
         { name: 'foo.js', content: '' },
       ],
       exitCode: 0,
