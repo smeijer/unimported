@@ -13,12 +13,6 @@
     "noImplicitAny": false,
     "declaration": true
   },
-  "include": [
-    "src",
-    "typings"
-  ],
-  "exclude": [
-    "node_modules",
-    "test/**"
-  ]
+  "include": ["src", "typings"],
+  "exclude": ["node_modules", "**/__tests__/**", "**/__mocks__/**"]
 }

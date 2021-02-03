@@ -100,7 +100,7 @@ To ignore specific results, add them to `.unimportedrc.json#ignoreUnused`.
 
 The files listed under `unimported files`, are the files that exist in your code base, but are not part of your final bundle. It should be safe to delete those files.
 
-For your convenience, some files are not shown, as we treat those as 'dev only' files which you might need. More about that [below](#how);
+For your convenience, some files are not shown, as we treat those as 'dev only' files which you might need. More about that [below](#how).
 
 To ignore specific results, add them to `.unimportedrc.json#ignoreUnimported`.
 
@@ -145,7 +145,7 @@ To ignore specific results, add them to `.unimportedrc.json#ignoreUnimported`.
 
 ## How
 
-`Unimported` follows your import statements, starting from one or more entry files. For Meteor projects, the entry files are read from the `package.json#meteor.mainModule` key. Meteors eager loading is not supported, as that mode will load all files within your directory, regardless of import statements.
+`Unimported` follows your import statements starting from one or more entry files. For Meteor projects, the entry files are read from the `package.json#meteor.mainModule` key. Meteors eager loading is not supported, as that mode will load all files within your directory, regardless of import statements.
 
 For all other project types, the entry point is looked up in the following order:
 
@@ -156,7 +156,7 @@ For all other project types, the entry point is looked up in the following order
 1. `./main`
 1. `./package.json#main`
 
-The last option is most likely never what you want, as the main field often points to a `dist` folder. Analyzing a bundled asset, is likely to result in false positives.
+The last option is most likely never what you want, as the main field often points to a `dist` folder. Analyzing a bundled asset is likely to result in false positives.
 
 To specify custom entry points, add them to `.unimportedrc.json#entry`.
 
@@ -229,14 +229,28 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/smeijer"><img src="https://avatars1.githubusercontent.com/u/1196524?v=4" width="100px;" alt=""/><br /><sub><b>Stephan Meijer</b></sub></a><br /><a href="#ideas-smeijer" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/smeijer/unimported/commits?author=smeijer" title="Code">💻</a> <a href="#infra-smeijer" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-smeijer" title="Maintenance">🚧</a></td>
-    <td align="center"><a href="https://in.linkedin.com/in/punit-makwana/"><img src="https://avatars1.githubusercontent.com/u/16760252?v=4" width="100px;" alt=""/><br /><sub><b>Punit Makwana</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=punit2502" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/danew"><img src="https://avatars1.githubusercontent.com/u/5265684?v=4" width="100px;" alt=""/><br /><sub><b>Dane Wilson</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=danew" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/smeijer"><img src="https://avatars1.githubusercontent.com/u/1196524?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stephan Meijer</b></sub></a><br /><a href="#ideas-smeijer" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/smeijer/unimported/commits?author=smeijer" title="Code">💻</a> <a href="#infra-smeijer" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-smeijer" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://in.linkedin.com/in/punit-makwana/"><img src="https://avatars1.githubusercontent.com/u/16760252?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Punit Makwana</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=punit2502" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/danew"><img src="https://avatars1.githubusercontent.com/u/5265684?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dane Wilson</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=danew" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/mpeyper"><img src="https://avatars.githubusercontent.com/u/23029903?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michael Peyper</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=mpeyper" title="Tests">⚠️</a> <a href="https://github.com/smeijer/unimported/commits?author=mpeyper" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/marcosvega91"><img src="https://avatars.githubusercontent.com/u/5365582?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marco Moretti</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=marcosvega91" title="Tests">⚠️</a></td>
+    <td align="center"><a href="http://peter.hozak.info/"><img src="https://avatars.githubusercontent.com/u/1087670?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Peter Hozák</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Aprillion" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://dev.to/jacobmgevans"><img src="https://avatars.githubusercontent.com/u/27247160?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jacob M-G Evans</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=JacobMGEvans" title="Tests">⚠️</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/datner"><img src="https://avatars.githubusercontent.com/u/22598347?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Datner</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=datner" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/codyarose"><img src="https://avatars.githubusercontent.com/u/35306025?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Cody Rose</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=codyarose" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://ahmedeldessouki-a7488.firebaseapp.com/"><img src="https://avatars.githubusercontent.com/u/44158955?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ahmed ElDessouki</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=AhmedEldessouki" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/ypazevedo/"><img src="https://avatars.githubusercontent.com/u/56167866?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yago Pereira Azevedo</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=YPAzevedo" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/juhanakristian"><img src="https://avatars.githubusercontent.com/u/544386?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Juhana Jauhiainen</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=juhanakristian" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/nobrayner"><img src="https://avatars.githubusercontent.com/u/40751395?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Braydon Hall</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=nobrayner" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/abeprincec"><img src="https://avatars.githubusercontent.com/u/16880975?v=4?s=100" width="100px;" alt=""/><br /><sub><b>abeprincec</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=abeprincec" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
