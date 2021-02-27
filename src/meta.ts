@@ -3,6 +3,7 @@ import { join } from 'path';
 import { ensureArray } from './ensureArray';
 import { Context, PackageJson, TsConfig } from './index';
 import { resolveImport } from './traverse';
+import { getConfig } from './config';
 
 export async function getProjectType(
   projectPath: string,
@@ -102,6 +103,14 @@ export async function getEntry(
   projectPath: string,
   context: Context,
 ): Promise<string[]> {
+  const config = await getConfig();
+
+  if (config.entry) {
+    return ensureArray(config.entry).map(
+      (entry) => resolveImport(entry, projectPath, context).path,
+    );
+  }
+
   const packageJson = await fs.readJson<PackageJson>(
     'package.json',
     projectPath,
@@ -118,12 +127,13 @@ export async function getEntry(
       );
     }
 
-    const client = await resolveImport(
+    const client = resolveImport(
       packageJson.meteor.mainModule.client,
       projectPath,
       context,
     );
-    const server = await resolveImport(
+
+    const server = resolveImport(
       packageJson.meteor.mainModule.server,
       projectPath,
       context,

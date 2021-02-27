@@ -123,7 +123,8 @@ export async function main(args: CliArguments): Promise<void> {
     }
 
     // traverse all source files and get import data
-    context.entry = config.entry || (await meta.getEntry(cwd, context));
+    context.entry = await meta.getEntry(cwd, context);
+
     spinner.text = `resolving imports`;
     const traverseResult = await traverse(context.entry, context);
     traverseResult.files = new Map([...traverseResult.files].sort());

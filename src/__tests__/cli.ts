@@ -176,6 +176,25 @@ import bar from './bar';
       stdout: /There don't seem to be any unimported files./,
     },
     {
+      name: 'should not report entry file loaded from config, as missing',
+      files: [
+        {
+          name: '.unimportedrc.json',
+          content: '{ "entry": ["index.js"] }',
+        },
+        {
+          name: 'index.js',
+          content: `import a from './a'`,
+        },
+        {
+          name: 'a.js',
+          content: `export default null`,
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files/,
+    },
+    {
       name: 'should use all variants of import/export',
       files: [
         {
