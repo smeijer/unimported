@@ -2,7 +2,7 @@
   "name": "unimported",
   "version": "1.5.1",
   "description": "Scans your nodejs project folder and shows obsolete files and modules",
-  "main": "./dist/unimported.js",
+  "main": "./dist/index.js",
   "bin": {
     "unimported": "bin/unimported.js"
   },
