@@ -51,7 +51,7 @@ export interface Context {
   extensions: string[];
   dependencies: { [key: string]: string };
   peerDependencies: { [key: string]: string };
-  type: 'meteor' | 'node';
+  type: 'meteor' | 'next' | 'node';
   flow?: boolean;
   config: UnimportedConfig;
   moduleDirectory: string[];

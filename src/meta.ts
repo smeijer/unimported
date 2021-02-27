@@ -3,11 +3,15 @@ import { join } from 'path';
 import { ensureArray } from './ensureArray';
 import { Context, PackageJson, TsConfig } from './index';
 import { resolveImport } from './traverse';
-import { getConfig } from './config';
+import { expandGlob, getConfig } from './config';
 
 export async function getProjectType(
   projectPath: string,
 ): Promise<Context['type']> {
+  if (await fs.exists('.next', projectPath)) {
+    return 'next';
+  }
+
   if (await fs.exists('.meteor', projectPath)) {
     return 'meteor';
   }
@@ -118,6 +122,11 @@ export async function getEntry(
 
   if (!packageJson) {
     throw new Error('could not load package.json');
+  }
+
+  if (context.type === 'next') {
+    const pages = await expandGlob('./pages/**/*.{js,jsx,ts,tsx}');
+    return pages.map((path) => resolveImport(path, projectPath, context).path);
   }
 
   if (context.type === 'meteor') {

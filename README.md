@@ -145,7 +145,7 @@ To ignore specific results, add them to `.unimportedrc.json#ignoreUnimported`.
 
 ## How
 
-`Unimported` follows your import statements starting from one or more entry files. For Meteor projects, the entry files are read from the `package.json#meteor.mainModule` key. Meteors eager loading is not supported, as that mode will load all files within your directory, regardless of import statements.
+`Unimported` follows your import statements starting from one or more entry files. For nextjs projects, the entry files default to `pages/**`. For Meteor projects, the entry files are read from the `package.json#meteor.mainModule` key. Meteors eager loading is not supported, as that mode will load all files within your directory, regardless of import statements.
 
 For all other project types, the entry point is looked up in the following order:
 
