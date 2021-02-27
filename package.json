@@ -26,7 +26,6 @@
     "bump:major": "npm version major -m 'release: cut the %s release'"
   },
   "files": [
-    "src",
     "dist",
     "bin"
   ],
