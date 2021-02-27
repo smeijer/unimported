@@ -96,7 +96,7 @@ cases(
       const { stdout, stderr, exitCode } = await exec(testProjectDir);
 
       expect(stdout).toMatch(scenario.stdout);
-      expect(stderr.replace(/- initializing\s+/, '')).toMatch('');
+      expect(stderr).toMatch('');
       expect(exitCode).toBe(scenario.exitCode);
     } finally {
       await rmdir(testProjectDir, { recursive: true });

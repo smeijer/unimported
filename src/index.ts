@@ -58,7 +58,9 @@ export interface Context {
 }
 
 export async function main(args: CliArguments): Promise<void> {
-  const spinner = ora('initializing').start();
+  const spinner = ora(
+    process.env.NODE_ENV === 'test' ? '' : 'initializing',
+  ).start();
   const cwd = process.cwd();
 
   try {
