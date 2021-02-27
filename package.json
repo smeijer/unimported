@@ -20,7 +20,10 @@
     "run": "npm run build && node ./dist/index.js",
     "test": "jest",
     "ci:lint": "eslint -c ./.eslintrc.js",
-    "ci:tsc": "tsc --noEmit --project ./tsconfig.json"
+    "ci:tsc": "tsc --noEmit --project ./tsconfig.json",
+    "bump:patch": "npm version patch -m 'release: cut the %s release'",
+    "bump:minor": "npm version minor -m 'release: cut the %s release'",
+    "bump:major": "npm version major -m 'release: cut the %s release'"
   },
   "files": [
     "src",
