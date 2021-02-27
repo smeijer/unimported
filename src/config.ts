@@ -1,6 +1,11 @@
 import { ProcessedResult } from './process';
 import { readJson, writeJson } from './fs';
 import { Context } from './index';
+import glob from 'glob';
+import { promisify } from 'util';
+import { ensureArray } from './ensureArray';
+
+const globAsync = promisify(glob);
 
 export interface UnimportedConfig {
   flow?: boolean;
@@ -13,11 +18,29 @@ export interface UnimportedConfig {
   moduleDirectory?: string[];
 }
 
+export async function expandGlob(
+  patterns: string | string[],
+): Promise<string[]> {
+  const set = new Set<string>();
+
+  for (const pattern of ensureArray(patterns)) {
+    const paths = await globAsync(pattern, {
+      realpath: false,
+    });
+
+    for (const path of paths) {
+      set.add(path);
+    }
+  }
+
+  return Array.from(set);
+}
+
 export async function getConfig(): Promise<UnimportedConfig> {
   const json: Partial<UnimportedConfig> =
     (await readJson('.unimportedrc.json')) || {};
 
-  return Object.assign<UnimportedConfig, Partial<UnimportedConfig>>(
+  const config = Object.assign<UnimportedConfig, Partial<UnimportedConfig>>(
     {
       ignoreUnresolved: [],
       ignoreUnimported: [],
@@ -25,6 +48,14 @@ export async function getConfig(): Promise<UnimportedConfig> {
     },
     json,
   );
+
+  config.ignoreUnimported = await expandGlob(config.ignoreUnimported);
+
+  if (config.entry) {
+    config.entry = await expandGlob(config.entry);
+  }
+
+  return config;
 }
 
 function sort(arr) {

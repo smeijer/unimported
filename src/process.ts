@@ -1,5 +1,6 @@
 import { TraverseResult } from './traverse';
 import { Context } from './index';
+import { ensureArray } from './ensureArray';
 
 export interface ProcessedResult {
   unresolved: string[];
@@ -8,8 +9,8 @@ export interface ProcessedResult {
   clean: boolean;
 }
 
-function index(array: string[]): { [key: string]: boolean } {
-  return array.reduce((acc, str) => {
+function index(array: string | string[]): { [key: string]: boolean } {
+  return ensureArray(array).reduce((acc, str) => {
     acc[str] = true;
     return acc;
   }, {});

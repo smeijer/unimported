@@ -354,6 +354,33 @@ export default promise
       exitCode: 1,
       stdout: '',
     },
+    {
+      name: 'can work with glob patterns in config file',
+      files: [
+        {
+          name: '.unimportedrc.json',
+          content: `{
+            "entry": ["src/index.tsx", "src/**/*.test.{j,t}s"],
+            "ignoreUnresolved": [],
+            "ignoreUnimported": ["src/setup{Proxy,Tests}.js"],
+            "ignoreUnused": [],
+            "ignorePatterns": ["**/node_modules/**", "**/*.d.ts"]
+          }`,
+        },
+        { name: 'src/index.tsx', content: `import './imported';` },
+        { name: 'src/imported.ts', content: 'export default null;' },
+        {
+          name: 'src/__tests__/imported.test.js',
+          content: `import proxy from '../setupProxy'`,
+        },
+        { name: 'src/setupProxy.js', content: '' },
+        { name: 'src/setupTests.js', content: '' },
+        { name: 'node_module/module/lib.js', content: '' },
+        { name: 'src/global.d.ts', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
   ],
 );
 
