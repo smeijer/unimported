@@ -45,7 +45,7 @@ export async function readJson<T extends any>(
 
 export async function writeJson(
   path: string,
-  data: object,
+  data: Record<string, any>,
   cwd = '.',
 ): Promise<void> {
   const text = JSON.stringify(data, null, '  ');

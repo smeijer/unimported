@@ -7,10 +7,10 @@ import {
 } from '@typescript-eslint/typescript-estree';
 import * as fs from './fs';
 import Traverser from 'eslint/lib/shared/traverser';
-import {
+import type {
   Identifier,
   Literal,
-} from '@typescript-eslint/typescript-estree/dist/ts-estree/ts-estree';
+} from '@typescript-eslint/types/dist/ts-estree';
 import resolve from 'resolve';
 import chalk from 'chalk';
 import removeFlowTypes from 'flow-remove-types';
@@ -185,14 +185,20 @@ async function parse(path: string, context: Context): Promise<FileStats> {
           target = (node.source as Literal).value as string;
           break;
 
-        // import('.x') || require('./x') || await import('.x') || await require('./x')
-        case AST_NODE_TYPES.CallExpression: {
-          if (
-            node.callee.type !== 'Import' &&
-            (node.callee as Identifier)?.name !== 'require'
-          ) {
+        // import('.x') || await import('.x')
+        case AST_NODE_TYPES.ImportExpression:
+          if (!node.source || !(node.source as Literal).value) {
             break;
           }
+          target = (node.source as Literal).value as string;
+          break;
+
+        // require('./x') || await require('./x')
+        case AST_NODE_TYPES.CallExpression: {
+          if ((node.callee as Identifier)?.name !== 'require') {
+            break;
+          }
+
           target = (node.arguments[0] as Literal).value;
           break;
         }
