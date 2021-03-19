@@ -31,13 +31,13 @@ export async function processResults(
 
   const unused = Object.keys(context.dependencies).filter(
     (x) =>
-      !traverseResult.modules.has(x.replace(/\\/g, '/')) &&
+      !traverseResult.modules.has(x) &&
       !context.peerDependencies[x] &&
       !ignoreUnusedIdx[x],
   );
 
   const unimported = files
-    .filter((x) => !traverseResult.files.has(x.replace(/\\/g, '/')))
+    .filter((x) => !traverseResult.files.has(x))
     .map((x) => x.substr(context.cwd.length + 1))
     .filter((x) => !ignoreUnimportedIdx[x]);
 
