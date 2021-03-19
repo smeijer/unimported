@@ -37,8 +37,10 @@ export async function readJson<T extends any>(
   cwd = '.',
 ): Promise<T | null> {
   try {
-    return JSON.parse(await readText(path, cwd));
+    const text = await readText(path, cwd);
+    return text ? JSON.parse(text) : null;
   } catch (e) {
+    console.error('\nfile does not contain valid json:', path, 'error: ', e);
     return null;
   }
 }
