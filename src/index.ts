@@ -137,10 +137,16 @@ export async function main(args: CliArguments): Promise<void> {
       ignore: context.ignore,
     });
 
+    const normalizedFiles = files.map((path) => path.replace(/\\/g, '/'));
+
     spinner.text = 'process results';
     spinner.stop();
 
-    const result = await processResults(files, traverseResult, context);
+    const result = await processResults(
+      normalizedFiles,
+      traverseResult,
+      context,
+    );
 
     if (args.update) {
       await updateAllowLists(result, context);

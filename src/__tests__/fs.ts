@@ -118,7 +118,7 @@ test('should list files', async () => {
   const files = await list('**/*', testSpaceDir);
 
   const cleanedFiles = files.map((file) =>
-    file.replace(path.resolve(testSpaceDir), '.'),
+    file.replace(path.resolve(testSpaceDir), '.').replace(/\\/g, '/'),
   );
 
   expect(cleanedFiles).toEqual([
@@ -136,7 +136,7 @@ test('should list files matching pattern', async () => {
   const files = await list('**/testFile*', testSpaceDir);
 
   const cleanedFiles = files.map((file) =>
-    file.replace(path.resolve(testSpaceDir), '.'),
+    file.replace(path.resolve(testSpaceDir), '.').replace(/\\/g, '/'),
   );
 
   expect(cleanedFiles).toEqual(['./testFile1.txt', './testFile2.txt']);
@@ -150,7 +150,7 @@ test('should list files matching extensions', async () => {
   const files = await list('**/*', testSpaceDir, { extensions: ['txt', 'js'] });
 
   const cleanedFiles = files.map((file) =>
-    file.replace(path.resolve(testSpaceDir), '.'),
+    file.replace(path.resolve(testSpaceDir), '.').replace(/\\/g, '/'),
   );
 
   expect(cleanedFiles).toEqual(['./testFile1.txt', './testFile2.js']);
