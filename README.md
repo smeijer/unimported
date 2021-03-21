@@ -246,6 +246,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/nobrayner"><img src="https://avatars.githubusercontent.com/u/40751395?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Braydon Hall</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=nobrayner" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/abeprincec"><img src="https://avatars.githubusercontent.com/u/16880975?v=4?s=100" width="100px;" alt=""/><br /><sub><b>abeprincec</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=abeprincec" title="Tests">⚠️</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="http://www.code-root.com/"><img src="https://avatars.githubusercontent.com/u/57859?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lucas Westermann</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=lswest" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=lswest" title="Tests">⚠️</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
