@@ -5,9 +5,17 @@ const execAsync = promisify(exec);
 
 test('npx unimported --help', async () => {
   // note about `./` path: jest executes the tests from the root directory
-  const { stdout, stderr } = await execAsync(
-    `LC_ALL='en' ts-node src/index.ts --help`,
-  );
+  let execResults;
+  if (process.platform === 'win32') {
+    // Windows won't understand LC_ALL='en'
+    execResults = await execAsync(
+      `set LC_All='en' && ts-node src/index.ts --help`,
+    );
+  } else {
+    execResults = await execAsync(`LC_ALL='en' ts-node src/index.ts --help`);
+  }
+
+  const { stdout, stderr } = execResults;
 
   expect(stderr).toBe('');
   expect(stdout.trim()).toMatchInlineSnapshot(`
