@@ -24,7 +24,7 @@
     "bump:patch": "npm version patch -m 'release: cut the %s release'",
     "bump:minor": "npm version minor -m 'release: cut the %s release'",
     "bump:major": "npm version major -m 'release: cut the %s release'",
-    "postinstall": "husky install",
+    "_postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
   },
