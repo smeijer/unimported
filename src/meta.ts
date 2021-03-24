@@ -56,6 +56,10 @@ export async function getAliases(
     }
   }
 
+  // Support for ntc
+  aliases['src'] = 'ntc/src';
+
+  console.log(aliases);
   return aliases;
 }
 
