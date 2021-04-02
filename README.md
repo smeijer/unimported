@@ -74,6 +74,29 @@ You can also add an optional `moduleDirectory` option to your configuration file
 }
 ```
 
+**Custom aliases**
+If you wish to use aliases to import your modules & these can't be imported
+directly (e.g. `tsconfig.json` in the case of Typescript), there is an option
+`aliases` to provide the correct path mapping:
+
+```json
+{
+  "aliases": {
+    "@components/*": ["./components", "./components/*"],
+    ...
+  }
+}
+```
+
+_Note:_ you may wish to also add the `rootDir` option to specify the base path to
+start looking for the aliases from:
+
+```json
+{
+  "rootDir": "./src"
+}
+```
+
 ## Report
 
 The report will look something like [below](#example). When a particular check didn't have any positive results, it's section will be excluded from the output.

@@ -4,6 +4,10 @@ import { exec } from 'child_process';
 const execAsync = promisify(exec);
 
 test('npx unimported --help', async () => {
+  // the async call below can take longer than the default 5 seconds,
+  // so increase as necessary.
+  jest.setTimeout(10000);
+
   // note about `./` path: jest executes the tests from the root directory
   let execResults;
   if (process.platform === 'win32') {

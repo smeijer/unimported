@@ -141,6 +141,35 @@ cases(
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      name: 'Invalid json',
+      files: [
+        {
+          name: '.unimportedrc.json',
+          content: '{ "entry": ["index.js"} }',
+        },
+      ],
+      exitCode: 1,
+      stdout: '',
+    },
+    {
+      name: 'next project',
+      files: [
+        {
+          name: '.next/test.json',
+          content: '{ "entry": ["index.js"] }',
+        },
+        {
+          name: 'package.json',
+          content:
+            '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
+        },
+        { name: 'index.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unused dependencies.*@test\/dependency/s,
+    },
+    {
       name: 'should identify unused dependencies',
       files: [
         {
@@ -233,6 +262,21 @@ export default promise
         {
           name: 'tsconfig.json',
           content: '{ "compilerOptions": { "paths": { "@root": ["."] } } }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.ts/s,
+    },
+    {
+      name: 'should identify config alias imports',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        { name: 'index.ts', content: `import foo from '@root/foo';` },
+        { name: 'foo.ts', content: '' },
+        { name: 'bar.ts', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "aliases": { "@root": ["."] }, "rootDir": "/" }',
         },
       ],
       exitCode: 1,

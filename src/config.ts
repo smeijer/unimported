@@ -4,6 +4,7 @@ import { Context } from './index';
 import glob from 'glob';
 import { promisify } from 'util';
 import { ensureArray } from './ensureArray';
+import { MapLike } from 'typescript';
 
 const globAsync = promisify(glob);
 
@@ -16,6 +17,8 @@ export interface UnimportedConfig {
   ignoreUnimported: string[];
   ignoreUnused: string[];
   moduleDirectory?: string[];
+  aliases?: MapLike<string[]>;
+  rootDir?: string;
 }
 
 export async function expandGlob(

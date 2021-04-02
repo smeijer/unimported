@@ -1,9 +1,14 @@
 import * as fs from './fs';
 import { join } from 'path';
+import { MapLike } from 'typescript';
 import { ensureArray } from './ensureArray';
 import { Context, PackageJson, TsConfig } from './index';
 import { resolveImport } from './traverse';
 import { expandGlob, getConfig } from './config';
+
+interface Aliases {
+  [index: string]: string[];
+}
 
 export async function getProjectType(
   projectPath: string,
@@ -27,7 +32,9 @@ export async function getAliases(
     fs.readJson<TsConfig>('tsconfig.json', projectPath),
   ]);
 
-  const aliases = {};
+  const config = await getConfig();
+
+  let aliases: Aliases = {};
 
   // add support for (meteor) root slash import
   aliases['/'] = [`${projectPath}/`];
@@ -43,17 +50,33 @@ export async function getAliases(
 
   // add support for typescript path aliases
   if (tsconfig?.compilerOptions?.paths) {
+    const paths = tsconfig.compilerOptions.paths;
     const root = join(projectPath, tsconfig.compilerOptions.rootDir || '.');
+    aliases = Object.assign(aliases, normalizeAliases(root, paths));
+  }
 
-    // normalize the aliases. The keys maintain trailing '/' to ease path comparison,
-    // in: { '@components/*': ['src/components/*'] }
-    // out: { '@components/': ['src/components/'] }
-    for (const key of Object.keys(tsconfig.compilerOptions.paths)) {
-      const alias = key.replace(/\*$/, '');
-      aliases[alias] = ensureArray(
-        tsconfig.compilerOptions.paths[key],
-      ).map((x) => join(root, x.replace(/\*$/, '')));
-    }
+  // add support for additional path aliases (in typescript compiler path
+  // like setup)
+  if (config?.aliases) {
+    const paths = config.aliases;
+    const root = join(projectPath, config?.rootDir || '.');
+    aliases = Object.assign(aliases, normalizeAliases(root, paths));
+  }
+
+  return aliases;
+}
+
+// normalize the aliases. The keys maintain trailing '/' to ease path comparison,
+// in: { '@components/*': ['src/components/*'] }
+// out: { '@components/': ['src/components/'] }
+function normalizeAliases(root: string, paths: MapLike<string[]>): Aliases {
+  const aliases: Aliases = {};
+
+  for (const key of Object.keys(paths)) {
+    const alias = key.replace(/\*$/, '');
+    aliases[alias] = ensureArray(paths[key]).map((x) =>
+      join(root, x.replace(/\*$/, '')),
+    );
   }
 
   return aliases;
