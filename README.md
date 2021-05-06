@@ -56,7 +56,7 @@ Save the file as `.unimportedrc.json` in the root of your project (next to `pack
 
 ```json
 {
-  "entry": ["src/main.ts", "src/pages/**/*{js,ts}"],
+  "entry": ["src/main.ts", "src/pages/**/*.{js,ts}"],
   "extensions": [".ts", ".js"],
   "ignorePatterns": ["**/node_modules/**", "private/**"],
   "ignoreUnresolved": ["some-npm-dependency"],
