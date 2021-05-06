@@ -239,6 +239,7 @@ import bar from './bar';
           content: `
 import {b as a} from './b'
 const promise = import('./d')
+const templatePromise = import(\`./e\`)
 export {a}
 export {b} from './b'
 export * from './c'
@@ -248,6 +249,7 @@ export default promise
         { name: 'b.js', content: 'export const b = 2;' },
         { name: 'c.js', content: 'const c = 3; export {c}' },
         { name: 'd.js', content: 'export default 42' },
+        { name: 'e.js', content: 'export default 42' },
       ],
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
