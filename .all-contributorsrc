@@ -159,6 +159,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "stovmascript",
+      "name": "Martin Šťovíček",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14262802?v=4",
+      "profile": "https://github.com/stovmascript",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
