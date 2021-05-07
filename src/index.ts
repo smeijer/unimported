@@ -1,3 +1,5 @@
+import simpleGit from 'simple-git';
+
 import * as fs from './fs';
 
 import { join } from 'path';
@@ -122,6 +124,17 @@ export async function main(args: CliArguments): Promise<void> {
       process.exit(0);
     }
 
+    // Filter untracked files from git repositories
+    if (args.ignoreUntracked) {
+      // Filter
+      const git = simpleGit({ baseDir: context.cwd });
+      const status = await git.status();
+      context.ignore = [
+        ...context.ignore,
+        ...status.not_added.map((notAdded) => `${cwd}/${notAdded}`),
+      ];
+    }
+
     // traverse all source files and get import data
     context.entry = await meta.getEntry(cwd, context);
 
@@ -173,39 +186,49 @@ export interface CliArguments {
   flow: boolean;
   update: boolean;
   init: boolean;
+  ignoreUntracked: boolean;
 }
 
-yargs
-  .scriptName('unimported')
-  .usage('$0 <cmd> [args]')
-  .command(
-    '*',
-    'scan your project for dead files',
-    (yargs) => {
-      yargs.option('init', {
-        alias: 'i',
-        type: 'boolean',
-        describe: 'dump default settings to .unimportedrc.json',
-      });
+if (process.env.NODE_ENV !== 'test') {
+  /* istanbul ignore next */
+  yargs
+    .scriptName('unimported')
+    .usage('$0 <cmd> [args]')
+    .command(
+      '*',
+      'scan your project for dead files',
+      (yargs) => {
+        yargs.option('init', {
+          alias: 'i',
+          type: 'boolean',
+          describe: 'dump default settings to .unimportedrc.json',
+        });
 
-      yargs.option('flow', {
-        alias: 'f',
-        type: 'boolean',
-        describe: 'indicates if your code is annotated with flow types',
-      });
+        yargs.option('flow', {
+          alias: 'f',
+          type: 'boolean',
+          describe: 'indicates if your code is annotated with flow types',
+        });
 
-      yargs.option('update', {
-        alias: 'u',
-        type: 'boolean',
-        describe: 'update the ignore-lists stored in .unimportedrc.json',
-      });
-    },
-    function (argv: Arguments<CliArguments>) {
-      return main({
-        init: argv.init,
-        update: argv.update,
-        flow: argv.flow,
-      });
-    },
-  )
-  .help().argv;
+        yargs.option('update', {
+          alias: 'u',
+          type: 'boolean',
+          describe: 'update the ignore-lists stored in .unimportedrc.json',
+        });
+
+        yargs.option('ignore-untracked', {
+          type: 'boolean',
+          describe: 'Ignore files that are not currently tracked by github.',
+        });
+      },
+      function (argv: Arguments<CliArguments>) {
+        return main({
+          init: argv.init,
+          update: argv.update,
+          flow: argv.flow,
+          ignoreUntracked: argv.ignoreUntracked,
+        });
+      },
+    )
+    .help().argv;
+}

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import cases from 'jest-in-case';
+import simpleGit from 'simple-git';
 import { main, CliArguments } from '..';
 
 const mkdir = util.promisify(fs.mkdir);
@@ -9,9 +10,16 @@ const rmdir = util.promisify(fs.rmdir);
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 
+jest.mock('simple-git');
+
 async function exec(
   testProjectDir: string,
-  { init = false, flow = false, update = false }: Partial<CliArguments> = {},
+  {
+    init = false,
+    flow = false,
+    update = false,
+    ignoreUntracked = false,
+  }: Partial<CliArguments> = {},
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
   const originalExit = process.exit;
   const originalCwd = process.cwd();
@@ -45,7 +53,12 @@ async function exec(
 
     process.chdir(testProjectDir);
 
-    await main({ init, flow, update });
+    await main({
+      init,
+      flow,
+      update,
+      ignoreUntracked,
+    });
 
     return { exitCode: exitCode ?? 0, stdout, stderr };
   } finally {
@@ -93,7 +106,20 @@ cases(
     );
 
     try {
-      const { stdout, stderr, exitCode } = await exec(testProjectDir);
+      if (scenario.ignoreUntracked) {
+        const status = jest.fn(async () => {
+          return { not_added: scenario.untracked };
+        });
+        (simpleGit as jest.Mock).mockImplementationOnce(() => {
+          return {
+            status,
+          };
+        });
+      }
+
+      const { stdout, stderr, exitCode } = await exec(testProjectDir, {
+        ignoreUntracked: scenario.ignoreUntracked,
+      });
 
       expect(stdout).toMatch(scenario.stdout);
       expect(stderr).toMatch('');
@@ -122,6 +148,19 @@ cases(
       ],
       exitCode: 1,
       stdout: /1 unresolved imports.*.\/foo/s,
+    },
+    {
+      name: 'should ignore untracked files that are not imported',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
+      ignoreUntracked: true,
+      untracked: ['bar.js'],
     },
     {
       name: 'should identify unimported file in meteor project',
