@@ -168,6 +168,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "kpdecker",
+      "name": "Kevin Decker",
+      "avatar_url": "https://avatars.githubusercontent.com/u/196390?v=4",
+      "profile": "http://www.incaseofstairs.com/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
