@@ -2,7 +2,7 @@
 
 **Find unused source files in javascript / typescript projects.**
 
-![screenshot of unimported results](./docs/screenshot-react.png)
+![screenshot of unimported results](./docs/unimported.png)
 
 While adding new code to our projects, we might forget to remove the old code. Linters warn us for unused code in a module, but they fail to report unused files.
 
@@ -54,25 +54,27 @@ npx unimported --flow
 
 Save the file as `.unimportedrc.json` in the root of your project (next to `package.json`)
 
-```json
+`
+``json
 {
-  "entry": ["src/main.ts", "src/pages/**/*.{js,ts}"],
-  "extensions": [".ts", ".js"],
-  "ignorePatterns": ["**/node_modules/**", "private/**"],
-  "ignoreUnresolved": ["some-npm-dependency"],
-  "ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
-  "ignoreUnused": ["bcrypt", "create-emotion"]
+"entry": ["src/main.ts", "src/pages/**/*.{js,ts}"],
+"extensions": [".ts", ".js"],
+"ignorePatterns": ["**/node_modules/**", "private/**"],
+"ignoreUnresolved": ["some-npm-dependency"],
+"ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
+"ignoreUnused": ["bcrypt", "create-emotion"]
 }
-```
 
-**Custom module directory**  
+````
+
+**Custom module directory**
 You can also add an optional `moduleDirectory` option to your configuration file to resolve dependencies from other directories than `node_modules`. This setting defaults to `node_modules`.
 
 ```json
 {
   "moduleDirectory": ["node_modules", "src/app"]
 }
-```
+````
 
 **Custom aliases**
 If you wish to use aliases to import your modules & these can't be imported
