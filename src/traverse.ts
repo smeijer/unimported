@@ -187,10 +187,19 @@ async function parse(path: string, context: Context): Promise<FileStats> {
 
         // import('.x') || await import('.x')
         case AST_NODE_TYPES.ImportExpression:
-          if (!node.source || !(node.source as Literal).value) {
+          const { source } = node;
+          if (!source) {
             break;
           }
-          target = (node.source as Literal).value as string;
+
+          if (source.type === 'TemplateLiteral') {
+            // Allow for constant template literals, import(`.x`)
+            if (source.expressions.length === 0 && source.quasis.length === 1) {
+              target = source.quasis[0].value.cooked;
+            }
+          } else {
+            target = (source as Literal).value;
+          }
           break;
 
         // require('./x') || await require('./x')
