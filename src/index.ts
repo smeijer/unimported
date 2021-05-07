@@ -190,6 +190,7 @@ export interface CliArguments {
 }
 
 if (process.env.NODE_ENV !== 'test') {
+  /* istanbul ignore next */
   yargs
     .scriptName('unimported')
     .usage('$0 <cmd> [args]')
