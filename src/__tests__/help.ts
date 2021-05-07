@@ -24,14 +24,18 @@ test('npx unimported --help', async () => {
   expect(stderr).toBe('');
   expect(stdout.trim()).toMatchInlineSnapshot(`
     "unimported
-    
+
     scan your project for dead files
-    
+
     Options:
-          --version  Show version number                                   [boolean]
-          --help     Show help                                             [boolean]
-      -i, --init     dump default settings to .unimportedrc.json           [boolean]
-      -f, --flow     indicates if your code is annotated with flow types   [boolean]
-      -u, --update   update the ignore-lists stored in .unimportedrc.json  [boolean]"
-    `);
+          --version           Show version number                          [boolean]
+          --help              Show help                                    [boolean]
+      -i, --init              dump default settings to .unimportedrc.json  [boolean]
+      -f, --flow              indicates if your code is annotated with flow types
+                                                                           [boolean]
+      -u, --update            update the ignore-lists stored in .unimportedrc.json
+                                                                           [boolean]
+          --ignore-untracked  Ignore files that are not currently tracked by github.
+                                                                           [boolean]"
+  `);
 });
