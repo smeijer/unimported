@@ -189,43 +189,45 @@ export interface CliArguments {
   ignoreUntracked: boolean;
 }
 
-yargs
-  .scriptName('unimported')
-  .usage('$0 <cmd> [args]')
-  .command(
-    '*',
-    'scan your project for dead files',
-    (yargs) => {
-      yargs.option('init', {
-        alias: 'i',
-        type: 'boolean',
-        describe: 'dump default settings to .unimportedrc.json',
-      });
+if (process.env.NODE_ENV !== 'test') {
+  yargs
+    .scriptName('unimported')
+    .usage('$0 <cmd> [args]')
+    .command(
+      '*',
+      'scan your project for dead files',
+      (yargs) => {
+        yargs.option('init', {
+          alias: 'i',
+          type: 'boolean',
+          describe: 'dump default settings to .unimportedrc.json',
+        });
 
-      yargs.option('flow', {
-        alias: 'f',
-        type: 'boolean',
-        describe: 'indicates if your code is annotated with flow types',
-      });
+        yargs.option('flow', {
+          alias: 'f',
+          type: 'boolean',
+          describe: 'indicates if your code is annotated with flow types',
+        });
 
-      yargs.option('update', {
-        alias: 'u',
-        type: 'boolean',
-        describe: 'update the ignore-lists stored in .unimportedrc.json',
-      });
+        yargs.option('update', {
+          alias: 'u',
+          type: 'boolean',
+          describe: 'update the ignore-lists stored in .unimportedrc.json',
+        });
 
-      yargs.option('ignore-untracked', {
-        type: 'boolean',
-        describe: 'Ignore files that are not currently tracked by github.',
-      });
-    },
-    function (argv: Arguments<CliArguments>) {
-      return main({
-        init: argv.init,
-        update: argv.update,
-        flow: argv.flow,
-        ignoreUntracked: argv.ignoreUntracked,
-      });
-    },
-  )
-  .help().argv;
+        yargs.option('ignore-untracked', {
+          type: 'boolean',
+          describe: 'Ignore files that are not currently tracked by github.',
+        });
+      },
+      function (argv: Arguments<CliArguments>) {
+        return main({
+          init: argv.init,
+          update: argv.update,
+          flow: argv.flow,
+          ignoreUntracked: argv.ignoreUntracked,
+        });
+      },
+    )
+    .help().argv;
+}

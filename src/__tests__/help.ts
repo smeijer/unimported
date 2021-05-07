@@ -13,10 +13,12 @@ test('npx unimported --help', async () => {
   if (process.platform === 'win32') {
     // Windows won't understand LC_ALL='en'
     execResults = await execAsync(
-      `set LC_All='en' && ts-node src/index.ts --help`,
+      `set LC_All='en' && set NODE_ENV='production' && ts-node src/index.ts --help`,
     );
   } else {
-    execResults = await execAsync(`LC_ALL='en' ts-node src/index.ts --help`);
+    execResults = await execAsync(
+      `LC_ALL='en' NODE_ENV='production' ts-node src/index.ts --help`,
+    );
   }
 
   const { stdout, stderr } = execResults;
