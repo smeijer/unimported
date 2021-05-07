@@ -277,6 +277,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/stovmascript"><img src="https://avatars.githubusercontent.com/u/14262802?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Martin Šťovíček</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=stovmascript" title="Documentation">📖</a></td>
     <td align="center"><a href="http://www.incaseofstairs.com/"><img src="https://avatars.githubusercontent.com/u/196390?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kevin Decker</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=kpdecker" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=kpdecker" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/olidacombe"><img src="https://avatars.githubusercontent.com/u/1752435?v=4?s=100" width="100px;" alt=""/><br /><sub><b>olidacombe</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=olidacombe" title="Code">💻</a></td>
+    <td align="center"><a href="https://in.linkedin.com/in/punit-makwana/"><img src="https://avatars.githubusercontent.com/u/16760252?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Punit Makwana</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=punitcodes" title="Documentation">📖</a></td>
   </tr>
 </table>
 
