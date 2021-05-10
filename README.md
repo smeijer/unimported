@@ -242,7 +242,7 @@ It ain't pretty, but it should work.
 - [unrequired](https://npmjs.com/unrequired)
 - [trucker](https://npmjs.com/trucker)
 
-## LICENSE
+## License
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/smeijer/unimported/blob/main/LICENSE)
 
