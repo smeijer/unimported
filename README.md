@@ -54,18 +54,16 @@ npx unimported --flow
 
 Save the file as `.unimportedrc.json` in the root of your project (next to `package.json`)
 
-`
-``json
+```json
 {
-"entry": ["src/main.ts", "src/pages/**/*.{js,ts}"],
-"extensions": [".ts", ".js"],
-"ignorePatterns": ["**/node_modules/**", "private/**"],
-"ignoreUnresolved": ["some-npm-dependency"],
-"ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
-"ignoreUnused": ["bcrypt", "create-emotion"]
+  "entry": ["src/main.ts", "src/pages/**/*.{js,ts}"],
+  "extensions": [".ts", ".js"],
+  "ignorePatterns": ["**/node_modules/**", "private/**"],
+  "ignoreUnresolved": ["some-npm-dependency"],
+  "ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
+  "ignoreUnused": ["bcrypt", "create-emotion"]
 }
-
-````
+```
 
 **Custom module directory**
 You can also add an optional `moduleDirectory` option to your configuration file to resolve dependencies from other directories than `node_modules`. This setting defaults to `node_modules`.
@@ -74,12 +72,11 @@ You can also add an optional `moduleDirectory` option to your configuration file
 {
   "moduleDirectory": ["node_modules", "src/app"]
 }
-````
+```
 
 **Custom aliases**
 If you wish to use aliases to import your modules & these can't be imported
-directly (e.g. `tsconfig.json` in the case of Typescript), there is an option
-`aliases` to provide the correct path mapping:
+directly (e.g. `tsconfig.json` in the case of Typescript), there is an option `aliases` to provide the correct path mapping:
 
 ```json
 {
@@ -244,6 +241,10 @@ It ain't pretty, but it should work.
 
 - [unrequired](https://npmjs.com/unrequired)
 - [trucker](https://npmjs.com/trucker)
+
+## License
+
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/smeijer/unimported/blob/main/LICENSE)
 
 ## Contributors ✨
 
