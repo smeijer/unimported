@@ -298,7 +298,14 @@ export default promise
       files: [
         { name: 'package.json', content: '{ "main": "index.ts" }' },
         { name: 'index.ts', content: `import foo from '@root/foo';` },
-        { name: 'foo.ts', content: '' },
+        {
+          name: 'foo.ts',
+          content: `
+            class Foo extends Bar {
+              override baz() {}
+            }
+          `,
+        },
         { name: 'bar.ts', content: '' },
         {
           name: 'tsconfig.json',
