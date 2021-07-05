@@ -14,6 +14,7 @@ import type {
 import resolve from 'resolve';
 import chalk from 'chalk';
 import removeFlowTypes from 'flow-remove-types';
+import { invalidateEntry, resolveEntry } from './cache';
 
 export interface FileStats {
   path: string;
@@ -251,9 +252,11 @@ export async function traverse(
 
   let parseResult;
   try {
-    parseResult = await parse(path, context);
+    parseResult = await resolveEntry(path, () => parse(path, context));
     result.files.set(path, parseResult);
   } catch (e) {
+    invalidateEntry(path);
+
     console.log(chalk.redBright(`\nFailed parsing ${path}`));
     console.log(e);
     process.exit(1);

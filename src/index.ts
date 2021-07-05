@@ -18,6 +18,7 @@ import {
   updateAllowLists,
   writeConfig,
 } from './config';
+import { storeCache } from './cache';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -160,6 +161,8 @@ export async function main(args: CliArguments): Promise<void> {
       traverseResult,
       context,
     );
+
+    storeCache();
 
     if (args.update) {
       await updateAllowLists(result, context);

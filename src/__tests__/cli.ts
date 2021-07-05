@@ -4,6 +4,7 @@ import util from 'util';
 import cases from 'jest-in-case';
 import simpleGit from 'simple-git';
 import { main, CliArguments } from '..';
+import { purgeCache } from '../cache';
 
 const mkdir = util.promisify(fs.mkdir);
 const rmdir = util.promisify(fs.rmdir);
@@ -97,6 +98,10 @@ async function createProject(
   return path.join(testSpaceDir, baseDir);
 }
 
+beforeAll(() => {
+  purgeCache();
+});
+
 cases(
   'cli integration tests',
   async (scenario) => {
@@ -117,9 +122,29 @@ cases(
         });
       }
 
-      const { stdout, stderr, exitCode } = await exec(testProjectDir, {
+      let { stdout, stderr, exitCode } = await exec(testProjectDir, {
         ignoreUntracked: scenario.ignoreUntracked,
       });
+
+      expect(stdout).toMatch(scenario.stdout);
+      expect(stderr).toMatch('');
+      expect(exitCode).toBe(scenario.exitCode);
+
+      // Exec again to test cache primed case
+      if (scenario.ignoreUntracked) {
+        const status = jest.fn(async () => {
+          return { not_added: scenario.untracked };
+        });
+        (simpleGit as jest.Mock).mockImplementationOnce(() => {
+          return {
+            status,
+          };
+        });
+      }
+
+      ({ stdout, stderr, exitCode } = await exec(testProjectDir, {
+        ignoreUntracked: scenario.ignoreUntracked,
+      }));
 
       expect(stdout).toMatch(scenario.stdout);
       expect(stderr).toMatch('');
