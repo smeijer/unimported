@@ -146,6 +146,7 @@ export async function main(args: CliArguments): Promise<void> {
     } catch (err) {
       // Retry once after invalid cache case.
       if (err instanceof InvalidCacheError) {
+        storeCache();
         traverseResult = await traverse(context.entry, context);
       } else {
         throw err;
