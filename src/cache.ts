@@ -1,4 +1,5 @@
 import fileEntryCache, { FileDescriptor } from 'file-entry-cache';
+import { Cache } from 'flat-cache';
 
 type CacheMeta<T> = FileDescriptor['meta'] & { data: T };
 
@@ -35,6 +36,14 @@ export async function resolveEntry<T>(
 
 export function invalidateEntry(path: string): void {
   cache.removeEntry(path);
+}
+
+export function invalidateEntries<T>(shouldRemove: (meta: T) => boolean): void {
+  Object.values((cache.cache as Cache).all()).forEach((cacheEntry) => {
+    if (shouldRemove(cacheEntry.data as T)) {
+      cache.removeEntry(cacheEntry.data.path);
+    }
+  });
 }
 
 export function storeCache(): void {

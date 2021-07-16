@@ -664,11 +664,7 @@ cases(
 
 describe('cache', () => {
   const files = [
-    {
-      name: 'package.json',
-      content:
-        '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
-    },
+    { name: 'package.json', content: '{ "main": "index.ts" }' },
     {
       name: 'index.js',
       content: `
@@ -676,8 +672,8 @@ import foo from './foo';
 import bar from './bar';
 `,
     },
-    { name: 'foo.js', content: '' },
-    { name: 'bar.js', content: 'import test from "@test/dependency"' },
+    { name: 'foo.js', content: 'import bar from "./bar"' },
+    { name: 'bar.js', content: '' },
   ];
 
   beforeEach(() => {
@@ -710,6 +706,9 @@ import bar from './bar';
         Array [
           "bar.js",
           "bar.js",
+          "index.js",
+          "foo.js",
+          "foo.js",
           "index.js",
         ]
       `);
@@ -747,6 +746,9 @@ import bar from './bar';
         Array [
           "bar.js",
           "bar.js",
+          "index.js",
+          "foo.js",
+          "foo.js",
           "index.js",
         ]
       `);

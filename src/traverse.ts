@@ -14,7 +14,7 @@ import type {
 import resolve from 'resolve';
 import chalk from 'chalk';
 import removeFlowTypes from 'flow-remove-types';
-import { invalidateEntry, resolveEntry } from './cache';
+import { invalidateEntries, invalidateEntry, resolveEntry } from './cache';
 
 export interface FileStats {
   path: string;
@@ -273,6 +273,11 @@ export async function traverse(
     }
   } catch (e) {
     invalidateEntry(path);
+    invalidateEntries<FileStats>((meta) => {
+      // Invalidate anyone referencing this file
+      return !!meta.imports.find((x) => x.path === path);
+    });
+
     if (!e.path) {
       e.path = path;
     }

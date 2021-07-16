@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@types/file-entry-cache": "^5.0.1",
+    "@types/flat-cache": "^2.0.0",
     "@types/glob": "^7.1.3",
     "@types/jest": "^26.0.20",
     "@types/jest-in-case": "^1.0.3",
