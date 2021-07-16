@@ -18,7 +18,7 @@ import {
   updateAllowLists,
   writeConfig,
 } from './config';
-import { InvalidCacheError, storeCache } from './cache';
+import { InvalidCacheError, purgeCache, storeCache } from './cache';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -146,7 +146,7 @@ export async function main(args: CliArguments): Promise<void> {
     } catch (err) {
       // Retry once after invalid cache case.
       if (err instanceof InvalidCacheError) {
-        storeCache();
+        purgeCache();
         traverseResult = await traverse(context.entry, context);
       } else {
         throw err;

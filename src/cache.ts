@@ -51,5 +51,5 @@ export function storeCache(): void {
 }
 
 export function purgeCache(): void {
-  cache.deleteCacheFile();
+  cache.destroy();
 }
