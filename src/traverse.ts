@@ -10,10 +10,11 @@ import Traverser from 'eslint/lib/shared/traverser';
 import type {
   Identifier,
   Literal,
-} from '@typescript-eslint/types/dist/ts-estree';
+} from '@typescript-eslint/types/dist/ast-spec';
 import resolve from 'resolve';
 import chalk from 'chalk';
 import removeFlowTypes from 'flow-remove-types';
+import { invalidateEntries, invalidateEntry, resolveEntry } from './cache';
 
 export interface FileStats {
   path: string;
@@ -251,29 +252,36 @@ export async function traverse(
 
   let parseResult;
   try {
-    parseResult = await parse(path, context);
+    parseResult = await resolveEntry(path, () => parse(path, context));
     result.files.set(path, parseResult);
-  } catch (e) {
-    console.log(chalk.redBright(`\nFailed parsing ${path}`));
-    console.log(e);
-    process.exit(1);
-  }
 
-  for (const file of parseResult.imports) {
-    switch (file.type) {
-      case 'node_module':
-        result.modules.add(file.name);
-        break;
-      case 'unresolved':
-        result.unresolved.add(file.path);
-        break;
-      case 'source_file':
-        if (result.files.has(file.path)) {
+    for (const file of parseResult.imports) {
+      switch (file.type) {
+        case 'node_module':
+          result.modules.add(file.name);
           break;
-        }
-        await traverse(file.path, context, result);
-        break;
+        case 'unresolved':
+          result.unresolved.add(file.path);
+          break;
+        case 'source_file':
+          if (result.files.has(file.path)) {
+            break;
+          }
+          await traverse(file.path, context, result);
+          break;
+      }
     }
+  } catch (e) {
+    invalidateEntry(path);
+    invalidateEntries<FileStats>((meta) => {
+      // Invalidate anyone referencing this file
+      return !!meta.imports.find((x) => x.path === path);
+    });
+
+    if (!e.path) {
+      e.path = path;
+    }
+    throw e;
   }
 
   return result;
