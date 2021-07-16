@@ -6,12 +6,29 @@ import simpleGit from 'simple-git';
 import { main, CliArguments } from '..';
 import { purgeCache } from '../cache';
 
+import FileEntryCache from 'file-entry-cache';
+
 const mkdir = util.promisify(fs.mkdir);
 const rmdir = util.promisify(fs.rmdir);
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 
 jest.mock('simple-git');
+
+jest.mock('file-entry-cache', () => {
+  const actual = jest.requireActual('file-entry-cache');
+  let mockedCache: FileEntryCache.FileEntryCache;
+  return {
+    get mockedCache() {
+      return mockedCache;
+    },
+    create(...args) {
+      mockedCache = actual.create(...args);
+      mockedCache.removeEntry = jest.fn(mockedCache.removeEntry);
+      return mockedCache;
+    },
+  };
+});
 
 async function exec(
   testProjectDir: string,
@@ -126,8 +143,8 @@ cases(
         ignoreUntracked: scenario.ignoreUntracked,
       });
 
-      expect(stdout).toMatch(scenario.stdout);
-      expect(stderr).toMatch('');
+      expect(stdout).toMatch(scenario.stdout || '');
+      expect(stderr).toMatch(scenario.stderr || '');
       expect(exitCode).toBe(scenario.exitCode);
 
       // Exec again to test cache primed case
@@ -146,8 +163,8 @@ cases(
         ignoreUntracked: scenario.ignoreUntracked,
       }));
 
-      expect(stdout).toMatch(scenario.stdout);
-      expect(stderr).toMatch('');
+      expect(stdout).toMatch(scenario.stdout || '');
+      expect(stderr).toMatch(scenario.stderr || '');
       expect(exitCode).toBe(scenario.exitCode);
     } finally {
       await rmdir(testProjectDir, { recursive: true });
@@ -390,7 +407,7 @@ export default promise
         { name: 'index.js', content: `not valid` },
       ],
       exitCode: 1,
-      stdout: /Failed parsing.*\/index.js/s,
+      stderr: /Failed parsing.*\/index.js/s,
     },
     {
       name: 'should ignore non import/require paths',
@@ -644,3 +661,97 @@ cases(
     },
   ],
 );
+
+describe('cache', () => {
+  const files = [
+    {
+      name: 'package.json',
+      content:
+        '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
+    },
+    {
+      name: 'index.js',
+      content: `
+import foo from './foo';
+import bar from './bar';
+`,
+    },
+    { name: 'foo.js', content: '' },
+    { name: 'bar.js', content: 'import test from "@test/dependency"' },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should invalidate the cache on parse error', async () => {
+    const testProjectDir = await createProject(files);
+
+    try {
+      let { stdout, stderr, exitCode } = await exec(testProjectDir);
+
+      expect(stdout).toMatch(/There don't seem to be any unimported files./);
+      expect(stderr).toMatch('');
+      expect(exitCode).toBe(0);
+
+      fs.unlinkSync(path.join(testProjectDir, 'bar.js'));
+
+      ({ stdout, stderr, exitCode } = await exec(testProjectDir, {}));
+
+      expect(stdout).toMatch(/1 unresolved imports.*.\/bar/s);
+      expect(stderr).toMatch('');
+      expect(exitCode).toBe(1);
+
+      expect(
+        (FileEntryCache as any).mockedCache.removeEntry.mock.calls.map(
+          ([filePath]) => path.basename(filePath),
+        ),
+      ).toMatchInlineSnapshot(`
+        Array [
+          "bar.js",
+          "bar.js",
+          "index.js",
+        ]
+      `);
+    } finally {
+      await rmdir(testProjectDir, { recursive: true });
+    }
+  });
+
+  it('should recover from extension rename', async () => {
+    const testProjectDir = await createProject(files);
+
+    try {
+      let { stdout, stderr, exitCode } = await exec(testProjectDir);
+
+      expect(stdout).toMatch(/There don't seem to be any unimported files./);
+      expect(stderr).toMatch('');
+      expect(exitCode).toBe(0);
+
+      fs.renameSync(
+        path.join(testProjectDir, 'bar.js'),
+        path.join(testProjectDir, 'bar.ts'),
+      );
+
+      ({ stdout, stderr, exitCode } = await exec(testProjectDir, {}));
+
+      expect(stdout).toMatch(/There don't seem to be any unimported files./);
+      expect(stderr).toMatch('');
+      expect(exitCode).toBe(0);
+
+      expect(
+        (FileEntryCache as any).mockedCache.removeEntry.mock.calls.map(
+          ([filePath]) => path.basename(filePath),
+        ),
+      ).toMatchInlineSnapshot(`
+        Array [
+          "bar.js",
+          "bar.js",
+          "index.js",
+        ]
+      `);
+    } finally {
+      await rmdir(testProjectDir, { recursive: true });
+    }
+  });
+});

@@ -18,7 +18,7 @@ import {
   updateAllowLists,
   writeConfig,
 } from './config';
-import { storeCache } from './cache';
+import { InvalidCacheError, storeCache } from './cache';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -140,7 +140,17 @@ export async function main(args: CliArguments): Promise<void> {
     context.entry = await meta.getEntry(cwd, context);
 
     spinner.text = `resolving imports`;
-    const traverseResult = await traverse(context.entry, context);
+    let traverseResult;
+    try {
+      traverseResult = await traverse(context.entry, context);
+    } catch (err) {
+      // Retry once after invalid cache case.
+      if (err instanceof InvalidCacheError) {
+        traverseResult = await traverse(context.entry, context);
+      } else {
+        throw err;
+      }
+    }
     traverseResult.files = new Map([...traverseResult.files].sort());
 
     // traverse the file system and get system data
@@ -179,7 +189,13 @@ export async function main(args: CliArguments): Promise<void> {
     }
   } catch (error) {
     spinner.stop();
-    console.error(chalk.redBright('something unexpected happened'));
+    console.error(
+      chalk.redBright(
+        error.path
+          ? `\nFailed parsing ${error.path}`
+          : 'something unexpected happened',
+      ),
+    );
     console.error(error);
     process.exit(1);
   }

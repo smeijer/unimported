@@ -4,6 +4,16 @@ type CacheMeta<T> = FileDescriptor['meta'] & { data: T };
 
 const cache = fileEntryCache.create('unimported', './node_modules/.cache/');
 
+export class InvalidCacheError extends Error {
+  path: string;
+
+  constructor(message: string, path: string) {
+    super(message);
+    this.name = 'InvalidCacheError';
+    this.path = path;
+  }
+}
+
 export async function resolveEntry<T>(
   path: string,
   generator: () => Promise<T>,
@@ -11,7 +21,12 @@ export async function resolveEntry<T>(
   const cacheEntry = cache.getFileDescriptor(path);
   const meta: CacheMeta<T> = cacheEntry.meta as CacheMeta<T>;
 
-  if (cacheEntry.changed || !meta?.data) {
+  if (!meta) {
+    // Something else referenced a now deleted file. Force error and let upstream handle
+    throw new InvalidCacheError(`${path} was deleted`, path);
+  }
+
+  if (cacheEntry.changed || !meta.data) {
     meta.data = await generator();
   }
 

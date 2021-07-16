@@ -254,29 +254,29 @@ export async function traverse(
   try {
     parseResult = await resolveEntry(path, () => parse(path, context));
     result.files.set(path, parseResult);
+
+    for (const file of parseResult.imports) {
+      switch (file.type) {
+        case 'node_module':
+          result.modules.add(file.name);
+          break;
+        case 'unresolved':
+          result.unresolved.add(file.path);
+          break;
+        case 'source_file':
+          if (result.files.has(file.path)) {
+            break;
+          }
+          await traverse(file.path, context, result);
+          break;
+      }
+    }
   } catch (e) {
     invalidateEntry(path);
-
-    console.log(chalk.redBright(`\nFailed parsing ${path}`));
-    console.log(e);
-    process.exit(1);
-  }
-
-  for (const file of parseResult.imports) {
-    switch (file.type) {
-      case 'node_module':
-        result.modules.add(file.name);
-        break;
-      case 'unresolved':
-        result.unresolved.add(file.path);
-        break;
-      case 'source_file':
-        if (result.files.has(file.path)) {
-          break;
-        }
-        await traverse(file.path, context, result);
-        break;
+    if (!e.path) {
+      e.path = path;
     }
+    throw e;
   }
 
   return result;
