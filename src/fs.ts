@@ -2,6 +2,7 @@ import fs from 'fs';
 import { join } from 'path';
 import glob, { IOptions as GlobOptions } from 'glob';
 import util from 'util';
+import { ensureArray } from './ensureArray';
 
 const globAsync = util.promisify(glob);
 const readFileAsync = util.promisify(fs.readFile);
@@ -65,9 +66,17 @@ export async function list(
 ): Promise<string[]> {
   const { extensions, ...globOptions } = options;
 
-  // transform ['.js', '.tsx'] to **/*.{js,tsx}
+  // transform:
+  // - ['.js', '.tsx'] to **/*.{js,tsx}
+  // -['.js'] to **/*.js
+  const normalizedExtensions = extensions?.map((x) => x.replace(/^\./, ''));
+  const wrappedExtensions =
+    extensions?.length === 1
+      ? normalizedExtensions
+      : `{${normalizedExtensions}}`;
+
   const fullPattern = Array.isArray(extensions)
-    ? `${pattern}.{${extensions.map((x) => x.replace(/^\./, '')).join(',')}}`
+    ? `${pattern}.${wrappedExtensions}`
     : pattern;
 
   return await globAsync(fullPattern, {

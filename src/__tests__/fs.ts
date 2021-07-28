@@ -155,3 +155,17 @@ test('should list files matching extensions', async () => {
 
   expect(cleanedFiles).toEqual(['./testFile1.txt', './testFile2.js']);
 });
+
+test('should list files matching single extension', async () => {
+  await writeText(path.join(testSpaceDir, 'testFile1.txt'), '');
+  await writeText(path.join(testSpaceDir, 'ignored.sh'), '');
+  await writeText(path.join(testSpaceDir, 'testFile2.js'), '');
+
+  const files = await list('**/*', testSpaceDir, { extensions: ['js'] });
+
+  const cleanedFiles = files.map((file) =>
+    file.replace(path.resolve(testSpaceDir), '.').replace(/\\/g, '/'),
+  );
+
+  expect(cleanedFiles).toEqual(['./testFile2.js']);
+});
