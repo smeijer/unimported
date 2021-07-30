@@ -419,6 +419,20 @@ export default promise
       stdout: /There don't seem to be any unimported files./s,
     },
     {
+      name: 'should support type imports for typescript projects',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        {
+          name: 'index.ts',
+          content: `import foo from './foo'; import type { Bar } from './bar'`,
+        },
+        { name: 'foo.ts', content: '' },
+        { name: 'bar.ts', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
+    {
       name: 'should report parse failure for invalid file',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
