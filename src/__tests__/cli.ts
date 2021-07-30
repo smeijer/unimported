@@ -392,6 +392,17 @@ export default promise
       stdout: /There don't seem to be any unimported files./,
     },
     {
+      name: 'should support root slash import',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from '/foo';` },
+        { name: 'foo/index.js', content: `import bar from '/bar';` },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
+    {
       name: 'should support root slash import in meteor project',
       files: [
         {
