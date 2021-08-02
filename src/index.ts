@@ -24,6 +24,10 @@ export interface TsConfig {
   compilerOptions: CompilerOptions;
 }
 
+export interface JsConfig {
+  compilerOptions: CompilerOptions;
+}
+
 export interface PackageJson {
   name: string;
   version: string;

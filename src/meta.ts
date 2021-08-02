@@ -2,7 +2,7 @@ import * as fs from './fs';
 import { join } from 'path';
 import { MapLike } from 'typescript';
 import { ensureArray } from './ensureArray';
-import { Context, PackageJson, TsConfig } from './index';
+import { Context, JsConfig, PackageJson, TsConfig } from './index';
 import { resolveImport } from './traverse';
 import { expandGlob, getConfig } from './config';
 
@@ -27,9 +27,10 @@ export async function getProjectType(
 export async function getAliases(
   projectPath: string,
 ): Promise<Context['aliases']> {
-  const [packageJson, tsconfig] = await Promise.all([
+  const [packageJson, tsconfig, jsconfig] = await Promise.all([
     fs.readJson<PackageJson>('package.json', projectPath),
     fs.readJson<TsConfig>('tsconfig.json', projectPath),
+    fs.readJson<JsConfig>('jsconfig.json', projectPath),
   ]);
 
   const config = await getConfig();
@@ -52,6 +53,13 @@ export async function getAliases(
   if (tsconfig?.compilerOptions?.paths) {
     const paths = tsconfig.compilerOptions.paths;
     const root = join(projectPath, tsconfig.compilerOptions.rootDir || '.');
+    aliases = Object.assign(aliases, normalizeAliases(root, paths));
+  }
+
+  // add support for jsconfig path aliases
+  if (jsconfig?.compilerOptions?.paths) {
+    const paths = jsconfig.compilerOptions.paths;
+    const root = join(projectPath, jsconfig.compilerOptions.baseUrl || '.');
     aliases = Object.assign(aliases, normalizeAliases(root, paths));
   }
 
