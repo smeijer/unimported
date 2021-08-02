@@ -392,6 +392,25 @@ export default promise
       stdout: /There don't seem to be any unimported files./,
     },
     {
+      name: 'should support rootDir config',
+      files: [
+        { name: 'package.json', content: '{ "main": "src/index.ts" }' },
+        { name: 'src/index.ts', content: `import '/nested'` },
+        {
+          name: 'src/nested/index.ts',
+          content: `import foo from '/nested/foo';`,
+        },
+        { name: 'src/nested/foo.ts', content: '' },
+        { name: 'src/nested/bar.ts', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "rootDir": "src" }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.ts/s,
+    },
+    {
       name: 'should support root slash import',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
