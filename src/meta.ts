@@ -59,7 +59,7 @@ export async function getAliases(
   // add support for typescript path aliases
   if (tsconfig?.compilerOptions?.paths) {
     const paths = tsconfig.compilerOptions.paths;
-    const root = join(projectPath, tsconfig.compilerOptions.rootDir || '.');
+    const root = join(projectPath, tsconfig.compilerOptions.baseUrl || '.');
     aliases = Object.assign(aliases, normalizeAliases(root, paths));
   }
 
