@@ -37,8 +37,15 @@ export async function getAliases(
 
   let aliases: Aliases = {};
 
+  const baseUrl =
+    config?.rootDir ??
+    tsconfig?.compilerOptions?.baseUrl ??
+    jsconfig?.compilerOptions?.baseUrl ??
+    '.';
+  const root = join(projectPath, baseUrl);
+
   // add support for (meteor) root slash import
-  aliases['/'] = [`${join(projectPath, config?.rootDir || '.')}/`];
+  aliases['/'] = [`${root}/`];
 
   // add support for mono-repos
   if (packageJson?.repository?.directory) {
