@@ -70,7 +70,7 @@ export async function main(args: CliArguments): Promise<void> {
   const spinner = ora(
     process.env.NODE_ENV === 'test' ? '' : 'initializing',
   ).start();
-  const pkg = await readPkgUp();
+  const pkg = await readPkgUp({ cwd: args.cwd });
 
   if (!pkg) {
     spinner.stop();
@@ -109,7 +109,6 @@ export async function main(args: CliArguments): Promise<void> {
 
     const context: Context = {
       version: packageJson.version,
-      cwd,
       aliases,
       dependencies,
       peerDependencies,
@@ -120,6 +119,7 @@ export async function main(args: CliArguments): Promise<void> {
       config,
       moduleDirectory,
       ...args,
+      cwd,
     };
 
     context.ignore =
@@ -230,6 +230,7 @@ export interface CliArguments {
   ignoreUntracked: boolean;
   clearCache: boolean;
   cache: boolean;
+  cwd?: string;
 }
 
 if (process.env.NODE_ENV !== 'test') {
@@ -238,9 +239,14 @@ if (process.env.NODE_ENV !== 'test') {
     .scriptName('unimported')
     .usage('$0 <cmd> [args]')
     .command(
-      '*',
+      '* [cwd]',
       'scan your project for dead files',
       (yargs) => {
+        yargs.positional('cwd', {
+          type: 'string',
+          describe: 'The root directory that unimported should run from.',
+        });
+
         yargs.option('cache', {
           type: 'boolean',
           describe:
@@ -288,6 +294,7 @@ if (process.env.NODE_ENV !== 'test') {
           ignoreUntracked: argv.ignoreUntracked,
           clearCache: argv.clearCache,
           cache: argv.cache,
+          cwd: argv.cwd,
         });
       },
     )

@@ -25,9 +25,12 @@ test('npx unimported --help', async () => {
 
   expect(stderr).toBe('');
   expect(stdout.trim()).toMatchInlineSnapshot(`
-    "unimported
+    "unimported [cwd]
 
     scan your project for dead files
+
+    Positionals:
+      cwd  The root directory that unimported should run from.              [string]
 
     Options:
           --version           Show version number                          [boolean]

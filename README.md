@@ -12,11 +12,19 @@ The result is a report showing which files are unimported, which dependencies ar
 
 ## Usage
 
-Run the following command in the root of your project (next to `package.json`) The result will be as shown under [example](#example)
+Run the following command in the root of your project (next to `package.json`). The result will be as shown under [example](#example)
 
 ```shell
 npx unimported
 ```
+
+When running unimported from a directory that doesn't contain a `package.json`, it will run from the first parent directory that does. To override this behavior, and run from an alternative work directory, use the `[cwd]` positional argument:
+
+```
+npx unimported ~/dev/leaflet-geosearch
+```
+
+By providing the path as argument, unimported will start looking for the project root, starting at that location.
 
 ## Options
 
