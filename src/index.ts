@@ -252,18 +252,20 @@ if (process.env.NODE_ENV !== 'test') {
 
         yargs.option('cache', {
           type: 'boolean',
-          describe: 'Whether to use the cache. Defaults to true. Disable the cache using --no-cache',
+          describe:
+            'Whether to use the cache. Defaults to true. Disable the cache using --no-cache',
           default: true,
         });
 
         yargs.option('clear-cache', {
           type: 'boolean',
-          describe: 'Deletes the unimported cache file and then exits without running',
+          describe:
+            'Deletes the unimported cache file and then exits without running',
         });
       },
       function (argv: Arguments<CliArguments>) {
         if (argv.clearCache) {
-          return purgeCache()
+          return purgeCache();
         }
 
         return main({
