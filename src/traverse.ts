@@ -252,7 +252,7 @@ export async function traverse(
 
   let parseResult;
   try {
-    parseResult = await resolveEntry(path, () => parse(path, context));
+    parseResult = context.cache ? await resolveEntry(path, () => parse(path, context)) : await parse(path, context);
     result.files.set(path, parseResult);
 
     for (const file of parseResult.imports) {
@@ -272,11 +272,13 @@ export async function traverse(
       }
     }
   } catch (e) {
-    invalidateEntry(path);
-    invalidateEntries<FileStats>((meta) => {
-      // Invalidate anyone referencing this file
-      return !!meta.imports.find((x) => x.path === path);
-    });
+    if (context.cache) {
+      invalidateEntry(path);
+      invalidateEntries<FileStats>((meta) => {
+        // Invalidate anyone referencing this file
+        return !!meta.imports.find((x) => x.path === path);
+      });
+    }
 
     if (!e.path) {
       e.path = path;

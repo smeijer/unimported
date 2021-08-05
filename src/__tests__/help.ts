@@ -37,7 +37,9 @@ test('npx unimported --help', async () => {
                                                                            [boolean]
       -u, --update            update the ignore-lists stored in .unimportedrc.json
                                                                            [boolean]
-                                                                           [boolean]"
           --ignore-untracked  Ignore files that are not currently tracked by git
+                                                                           [boolean]
+          --cache             Whether to use the cache. Defaults to true. Disable
+                              the cache using --no-cache   [boolean] [default: true]"
   `);
 });

@@ -60,6 +60,7 @@ export interface Context {
   peerDependencies: { [key: string]: string };
   type: 'meteor' | 'next' | 'node';
   flow?: boolean;
+  cache?: boolean;
   config: UnimportedConfig;
   moduleDirectory: string[];
 }
@@ -177,7 +178,9 @@ export async function main(args: CliArguments): Promise<void> {
       context,
     );
 
-    storeCache();
+    if (args.cache) {
+      storeCache();
+    }
 
     if (args.update) {
       await updateAllowLists(result, context);
@@ -211,6 +214,7 @@ export interface CliArguments {
   update: boolean;
   init: boolean;
   ignoreUntracked: boolean;
+  cache: boolean;
 }
 
 if (process.env.NODE_ENV !== 'test') {
@@ -244,6 +248,12 @@ if (process.env.NODE_ENV !== 'test') {
           type: 'boolean',
           describe: 'Ignore files that are not currently tracked by git',
         });
+
+        yargs.option('cache', {
+          type: 'boolean',
+          describe: 'Whether to use the cache. Defaults to true. Disable the cache using --no-cache',
+          default: true,
+        });
       },
       function (argv: Arguments<CliArguments>) {
         return main({
@@ -251,6 +261,7 @@ if (process.env.NODE_ENV !== 'test') {
           update: argv.update,
           flow: argv.flow,
           ignoreUntracked: argv.ignoreUntracked,
+          cache: argv.cache,
         });
       },
     )

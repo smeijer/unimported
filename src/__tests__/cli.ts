@@ -76,6 +76,7 @@ async function exec(
       flow,
       update,
       ignoreUntracked,
+      cache: true,
     });
 
     return { exitCode: exitCode ?? 0, stdout, stderr };
