@@ -242,7 +242,7 @@ if (process.env.NODE_ENV !== 'test') {
 
         yargs.option('ignore-untracked', {
           type: 'boolean',
-          describe: 'Ignore files that are not currently tracked by github.',
+          describe: 'Ignore files that are not currently tracked by git',
         });
       },
       function (argv: Arguments<CliArguments>) {
