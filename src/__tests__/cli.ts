@@ -389,6 +389,20 @@ export default promise
       stdout: /There don't seem to be any unimported files./,
     },
     {
+      name: 'should identify alias file imports',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        { name: 'index.ts', content: `import { random } from '@random';` },
+        { name: 'helpers/random.ts', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "aliases": { "@random": ["./helpers/random"] } }',
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
+    },
+    {
       name: 'should identify monorepo-type sibling modules',
       baseDir: 'packages/A',
       files: [
