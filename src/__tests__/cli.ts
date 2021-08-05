@@ -224,6 +224,30 @@ cases(
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      name: 'should work for vue files',
+      files: [
+        { name: 'package.json', content: '{ "main" : "index.js" }' },
+        { name: 'index.js', content: `import foo from './app.vue';` },
+        {
+          name: 'app.vue',
+          content: `
+            <template><div>html</div></template>
+            <script>
+               import { util } from './util.js';
+            </script>
+        `,
+        },
+        { name: 'util.js', content: '' },
+        { name: 'dangling.js', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "extensions": [".js", ".vue"] }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*dangling.js/s,
+    },
+    {
       name: 'Invalid json',
       files: [
         {

@@ -141,6 +141,30 @@ export function resolveImport(
   };
 }
 
+function extractFromScriptTag(code: string) {
+  const lines = code.split('\n');
+  let start = -1;
+  let end = -1;
+
+  // walk the code from start to end to find the first <script> tag on it's own line
+  for (let idx = 0; idx < lines.length; idx++) {
+    if (lines[idx].trim() === '<script>') {
+      start = idx;
+      break;
+    }
+  }
+
+  // walk the code in reverse to find the last </script> tag on it's own line
+  for (let idx = lines.length - 1; idx >= 0; idx--) {
+    if (lines[idx].trim() === '</script>') {
+      end = idx;
+      break;
+    }
+  }
+
+  return start > -1 && end > -1 ? lines.slice(start + 1, end).join('\n') : '';
+}
+
 async function parse(path: string, context: Context): Promise<FileStats> {
   const stats: FileStats = {
     path,
@@ -156,7 +180,11 @@ async function parse(path: string, context: Context): Promise<FileStats> {
 
   // removeFlowTypes checks for pragma's, use app arguments to override and
   // strip flow annotations from all files, regardless if it contains the pragma
-  code = removeFlowTypes(code, { all: context.flow });
+  code = removeFlowTypes(code, { all: context.flow }).toString();
+
+  if (stats.extname === '.vue') {
+    code = extractFromScriptTag(code);
+  }
 
   const ast = parseEstree(code, {
     comment: false,
