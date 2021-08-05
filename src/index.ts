@@ -1,8 +1,9 @@
 import simpleGit from 'simple-git';
 
 import * as fs from './fs';
+import readPkgUp from 'read-pkg-up';
 
-import { join } from 'path';
+import path, { join } from 'path';
 import ora from 'ora';
 import { printResults } from './print';
 import * as meta from './meta';
@@ -69,6 +70,22 @@ export async function main(args: CliArguments): Promise<void> {
   const spinner = ora(
     process.env.NODE_ENV === 'test' ? '' : 'initializing',
   ).start();
+  const pkg = await readPkgUp();
+
+  if (!pkg) {
+    spinner.stop();
+    console.error(
+      chalk.redBright(
+        `could not resolve package.json, are you in a node project?`,
+      ),
+    );
+    process.exit(1);
+    return;
+  }
+
+  // change the work dir for the process to the project root, this enables us
+  // to run unimported from nested paths within the project
+  process.chdir(path.dirname(pkg.path));
   const cwd = process.cwd();
 
   try {
@@ -82,10 +99,7 @@ export async function main(args: CliArguments): Promise<void> {
       meta.getProjectType(cwd),
     ]);
 
-    const packageJson = await readJson<PackageJson>(
-      '../package.json',
-      __dirname,
-    );
+    const packageJson = await readJson<PackageJson>('./package.json', cwd);
 
     if (!packageJson) {
       throw new Error('Failed to load package.json');

@@ -290,6 +290,7 @@ import bar from './bar';
     {
       name: 'should not report entry file loaded from config, as missing',
       files: [
+        { name: 'package.json', content: '{}' },
         {
           name: '.unimportedrc.json',
           content: '{ "entry": ["index.js"] }',
@@ -565,6 +566,7 @@ export default promise
     {
       name: 'can work with glob patterns in config file',
       files: [
+        { name: 'package.json', content: '{}' },
         {
           name: '.unimportedrc.json',
           content: `{
@@ -693,7 +695,7 @@ cases(
   [
     {
       name: 'should create default ignore file',
-      files: [],
+      files: [{ name: 'package.json', content: '{}' }],
       exitCode: 0,
       output: {
         ignorePatterns: [
@@ -714,6 +716,7 @@ cases(
     {
       name: 'should create expected ignore file for meteor project',
       files: [
+        { name: 'package.json', content: '{}' },
         {
           name: '.meteor',
           content: '',
