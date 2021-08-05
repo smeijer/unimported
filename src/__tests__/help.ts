@@ -40,6 +40,8 @@ test('npx unimported --help', async () => {
           --ignore-untracked  Ignore files that are not currently tracked by git
                                                                            [boolean]
           --cache             Whether to use the cache. Defaults to true. Disable
-                              the cache using --no-cache   [boolean] [default: true]"
+                              the cache using --no-cache   [boolean] [default: true]
+          --clear-cache       Deletes the unimported cache file and then exits
+                              without running                              [boolean]"
   `);
 });

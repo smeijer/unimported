@@ -214,6 +214,7 @@ export interface CliArguments {
   update: boolean;
   init: boolean;
   ignoreUntracked: boolean;
+  clearCache: boolean;
   cache: boolean;
 }
 
@@ -254,13 +255,23 @@ if (process.env.NODE_ENV !== 'test') {
           describe: 'Whether to use the cache. Defaults to true. Disable the cache using --no-cache',
           default: true,
         });
+
+        yargs.option('clear-cache', {
+          type: 'boolean',
+          describe: 'Deletes the unimported cache file and then exits without running',
+        });
       },
       function (argv: Arguments<CliArguments>) {
+        if (argv.clearCache) {
+          return purgeCache()
+        }
+
         return main({
           init: argv.init,
           update: argv.update,
           flow: argv.flow,
           ignoreUntracked: argv.ignoreUntracked,
+          clearCache: argv.clearCache,
           cache: argv.cache,
         });
       },
