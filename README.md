@@ -50,6 +50,24 @@ If your project is using flow type for typing, you might need this flag.
 npx unimported --flow
 ```
 
+### Cache
+
+Unimported uses a caching system to speed up recurring checks. This cache can be disabled using `--no-cache`. Note that the cache should only be disabled if you are experiencing caching related problems.
+
+```shell
+npx unimported --no-cache
+```
+
+If you need to clear the cache, use `--clearCache`.
+
+### Clear Cache
+
+Delete the cache file and then exits without running. Note that clearing the cache will reduce performance.
+
+```shell
+npx unimported --clear-cache
+```
+
 ### Example Config File
 
 Save the file as `.unimportedrc.json` in the root of your project (next to `package.json`)
@@ -76,13 +94,12 @@ You can also add an optional `moduleDirectory` option to your configuration file
 
 **Custom aliases**
 If you wish to use aliases to import your modules & these can't be imported
-directly (e.g. `tsconfig.json` in the case of Typescript), there is an option `aliases` to provide the correct path mapping:
+directly (e.g. `tsconfig.json` in the case of Typescript or `jsconfig.json` if you have one), there is an option `aliases` to provide the correct path mapping:
 
 ```json
 {
   "aliases": {
-    "@components/*": ["./components", "./components/*"],
-    ...
+    "@components/*": ["./components", "./components/*"]
   }
 }
 ```
