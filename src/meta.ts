@@ -89,9 +89,14 @@ function normalizeAliases(root: string, paths: MapLike<string[]>): Aliases {
 
   for (const key of Object.keys(paths)) {
     const alias = key.replace(/\*$/, '');
-    aliases[alias] = ensureArray(paths[key]).map((x) =>
-      join(root, x.replace(/\*$/, '')),
-    );
+
+    aliases[alias] = ensureArray(paths[key]).map((x) => {
+      const path = join(root, x.replace(/\*$/, ''));
+      return path.endsWith('/') ? path : `${path}/`;
+    });
+
+    // only keep uniqs
+    aliases[alias] = Array.from(new Set(aliases[alias]));
   }
 
   return aliases;
