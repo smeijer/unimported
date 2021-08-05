@@ -32,16 +32,15 @@ test('npx unimported --help', async () => {
     Options:
           --version           Show version number                          [boolean]
           --help              Show help                                    [boolean]
-      -i, --init              dump default settings to .unimportedrc.json  [boolean]
-      -f, --flow              indicates if your code is annotated with flow types
+          --cache             Whether to use the cache. Disable the cache using
+                              --no-cache.                  [boolean] [default: true]
+          --clear-cache       Clears the cache file and then exits.        [boolean]
+      -f, --flow              Whether to strip flow types, regardless of @flow
+                              pragma.                                      [boolean]
+          --ignore-untracked  Ignore files that are not currently tracked by git.
                                                                            [boolean]
-      -u, --update            update the ignore-lists stored in .unimportedrc.json
-                                                                           [boolean]
-          --ignore-untracked  Ignore files that are not currently tracked by git
-                                                                           [boolean]
-          --cache             Whether to use the cache. Defaults to true. Disable
-                              the cache using --no-cache   [boolean] [default: true]
-          --clear-cache       Deletes the unimported cache file and then exits
-                              without running                              [boolean]"
+      -i, --init              Dump default settings to .unimportedrc.json. [boolean]
+      -u, --update            Update the ignore-lists stored in .unimportedrc.json.
+                                                                           [boolean]"
   `);
 });

@@ -241,40 +241,39 @@ if (process.env.NODE_ENV !== 'test') {
       '*',
       'scan your project for dead files',
       (yargs) => {
-        yargs.option('init', {
-          alias: 'i',
-          type: 'boolean',
-          describe: 'dump default settings to .unimportedrc.json',
-        });
-
-        yargs.option('flow', {
-          alias: 'f',
-          type: 'boolean',
-          describe: 'indicates if your code is annotated with flow types',
-        });
-
-        yargs.option('update', {
-          alias: 'u',
-          type: 'boolean',
-          describe: 'update the ignore-lists stored in .unimportedrc.json',
-        });
-
-        yargs.option('ignore-untracked', {
-          type: 'boolean',
-          describe: 'Ignore files that are not currently tracked by git',
-        });
-
         yargs.option('cache', {
           type: 'boolean',
           describe:
-            'Whether to use the cache. Defaults to true. Disable the cache using --no-cache',
+            'Whether to use the cache. Disable the cache using --no-cache.',
           default: true,
         });
 
         yargs.option('clear-cache', {
           type: 'boolean',
-          describe:
-            'Deletes the unimported cache file and then exits without running',
+          describe: 'Clears the cache file and then exits.',
+        });
+
+        yargs.option('flow', {
+          alias: 'f',
+          type: 'boolean',
+          describe: 'Whether to strip flow types, regardless of @flow pragma.',
+        });
+
+        yargs.option('ignore-untracked', {
+          type: 'boolean',
+          describe: 'Ignore files that are not currently tracked by git.',
+        });
+
+        yargs.option('init', {
+          alias: 'i',
+          type: 'boolean',
+          describe: 'Dump default settings to .unimportedrc.json.',
+        });
+
+        yargs.option('update', {
+          alias: 'u',
+          type: 'boolean',
+          describe: 'Update the ignore-lists stored in .unimportedrc.json.',
         });
       },
       function (argv: Arguments<CliArguments>) {
