@@ -91,6 +91,13 @@ export function resolveImport(
     };
   } catch (e) {}
 
+  // import { random } from '@helpers'
+  if (context.aliases[`${path}/`]) {
+    // append a slash to the path so that the resolve logic below recognizes this as an /index import
+    path = `${path}/`;
+  }
+
+  // import random from '@helpers/random' > '@helpers/random'.startsWith('@helpers/')
   const aliases = Object.keys(context.aliases).filter((alias) =>
     path.startsWith(alias),
   );
@@ -252,7 +259,9 @@ export async function traverse(
 
   let parseResult;
   try {
-    parseResult = context.cache ? await resolveEntry(path, () => parse(path, context)) : await parse(path, context);
+    parseResult = context.cache
+      ? await resolveEntry(path, () => parse(path, context))
+      : await parse(path, context);
     result.files.set(path, parseResult);
 
     for (const file of parseResult.imports) {
