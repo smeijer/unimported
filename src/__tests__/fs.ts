@@ -94,6 +94,23 @@ test('should read json from file in cwd', async () => {
   expect(actualJson).toEqual(expectedJson);
 });
 
+test('should handle comments, unquoted props and trailing commas in json files', async () => {
+  const testFileName = 'testFile.txt';
+  const expectedJson = { json: 'prop' };
+  await writeText(
+    testFileName,
+    `
+    { 
+      // note the trailing comma?
+      json: 'prop',
+    }`,
+    testSpaceDir,
+  );
+
+  const actualJson = await readJson(testFileName, testSpaceDir);
+  expect(actualJson).toEqual(expectedJson);
+});
+
 test('should gracefully fail to read json from file', async () => {
   const testFileName = path.join(testSpaceDir, 'missing', 'testFile.txt');
   const expectedJson = null;

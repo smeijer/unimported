@@ -2,7 +2,7 @@ import fs from 'fs';
 import { join } from 'path';
 import glob, { IOptions as GlobOptions } from 'glob';
 import util from 'util';
-import { ensureArray } from './ensureArray';
+import json5 from 'json5';
 
 const globAsync = util.promisify(glob);
 const readFileAsync = util.promisify(fs.readFile);
@@ -39,7 +39,7 @@ export async function readJson<T extends any>(
 ): Promise<T | null> {
   try {
     const text = await readText(path, cwd);
-    return text ? JSON.parse(text) : null;
+    return text ? json5.parse(text) : null;
   } catch (e) {
     console.error('\nfile does not contain valid json:', path, 'error: ', e);
     return null;
