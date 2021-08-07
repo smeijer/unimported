@@ -165,6 +165,15 @@ export async function getConfig(): Promise<Config> {
 
   cachedConfig = config;
 
+  // collect _all_ extensions for file listing
+  const uniqExtensions = new Set(extensions);
+  for (const entryFile of config.entryFiles) {
+    for (const extension of entryFile.extensions) {
+      uniqExtensions.add(extension);
+    }
+  }
+
+  config.extensions = Array.from(uniqExtensions);
   return config;
 }
 
