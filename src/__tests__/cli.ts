@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { existsSync } from 'fs';
 import path from 'path';
 import util from 'util';
 import cases from 'jest-in-case';
@@ -7,11 +7,16 @@ import { main, CliArguments } from '..';
 import { purgeCache } from '../cache';
 
 import FileEntryCache from 'file-entry-cache';
+import { __clearCachedConfig } from '../config';
 
 const mkdir = util.promisify(fs.mkdir);
-const rmdir = util.promisify(fs.rmdir);
+const rmdir = util.promisify(fs.rm);
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
+
+afterAll(() => {
+  fs.rmSync('.test-space', { recursive: true });
+});
 
 jest.mock('simple-git');
 
@@ -37,6 +42,8 @@ async function exec(
     flow = false,
     update = false,
     ignoreUntracked = false,
+    cache = true,
+    clearCache = false,
   }: Partial<CliArguments> = {},
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
   const originalExit = process.exit;
@@ -76,8 +83,8 @@ async function exec(
       flow,
       update,
       ignoreUntracked,
-      cache: true,
-      clearCache: false,
+      cache,
+      clearCache,
     });
 
     return { exitCode: exitCode ?? 0, stdout, stderr };
@@ -93,12 +100,17 @@ async function exec(
 async function createProject(
   files: Array<{ name: string; content: string }>,
   baseDir = '.',
+  name?: string,
 ): Promise<string> {
   const randomId = Math.floor(Math.random() * 1000000);
 
   const testSpaceDir = path.join('.test-space', randomId.toString());
 
   await mkdir(testSpaceDir, { recursive: true });
+
+  if (name) {
+    fs.writeFileSync(path.join(testSpaceDir, '.scenario'), name);
+  }
 
   await Promise.all(
     files.map((file) =>
@@ -117,7 +129,8 @@ async function createProject(
   return path.join(testSpaceDir, baseDir);
 }
 
-beforeAll(() => {
+beforeEach(() => {
+  __clearCachedConfig();
   purgeCache();
 });
 
@@ -127,6 +140,7 @@ cases(
     const testProjectDir = await createProject(
       scenario.files,
       scenario.baseDir,
+      scenario.name,
     );
 
     try {
@@ -173,6 +187,12 @@ cases(
     }
   },
   [
+    {
+      name: 'logs an error message when package.json cannot be located',
+      files: [{ name: 'index.js', content: '' }],
+      exitCode: 1,
+      stderr: /could not resolve package.json, are you in a node project\?/s,
+    },
     {
       name: 'should identify unimported file',
       files: [
@@ -450,7 +470,7 @@ export default promise
       name: 'should support rootDir config',
       files: [
         { name: 'package.json', content: '{ "main": "src/index.ts" }' },
-        { name: 'src/index.ts', content: `import '/nested'` },
+        { name: 'src/index.ts', content: `import '/nested';` },
         {
           name: 'src/nested/index.ts',
           content: `import foo from '/nested/foo';`,
@@ -615,6 +635,79 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./s,
     },
+    {
+      name: 'supports alias overrides per entry point',
+      files: [
+        { name: 'package.json', content: '{}' },
+        {
+          name: '.unimportedrc.json',
+          content: `{
+          "entry": [{
+              "file": "src/entry-client.js",
+              "extend": { "aliases": { "create-api": ["./src/api/create-api-client"] } }
+            }, {
+              "file": "src/entry-server.js",
+              "extend": { "aliases": { "create-api": ["./src/api/create-api-server"] } }
+            }],
+          "extensions": [".js"],
+          "aliases": { "create-api": ["./src/api/create-api-server"] }
+        }`,
+        },
+        { name: 'src/entry-client.js', content: `import 'create-api';` },
+        { name: 'src/entry-server.js', content: `import 'create-api';` },
+        { name: 'src/api/create-api-client.js', content: `` },
+        { name: 'src/api/create-api-server.js', content: `` },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
+    {
+      name: 'supports extension overrides per entry point',
+      files: [
+        {
+          name: 'package.json',
+          content:
+            '{ "dependencies": { "@test/client": "1", "@test/server": "1" } }',
+        },
+        {
+          name: '.unimportedrc.json',
+          content: `{
+          "entry": [{
+              "file": "src/entry.js",
+              "label": "client",
+              "extend": { "extensions": [".client.js"] }
+            }, {
+              "file": "src/entry.js",
+              "label": "server",
+              "extend": { "extensions": [".server.js"] }
+            }],
+          "extensions": [".js"]
+        }`,
+        },
+        { name: 'src/entry.js', content: `import './config';` },
+        {
+          name: 'src/config.client.js',
+          content: `
+            import '@test/client';
+            import './client-only'; 
+            import './shared';
+          `,
+        },
+        {
+          name: 'src/config.server.js',
+          content: `
+            import '@test/server';
+            import './server-only'; 
+            import './shared';
+          `,
+        },
+        { name: 'src/shared.js', content: '' },
+        { name: 'src/client-only.js', content: '' },
+        { name: 'src/server-only.js', content: '' },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
   ],
 );
 
@@ -719,7 +812,10 @@ cases(
   [
     {
       name: 'should create default ignore file',
-      files: [{ name: 'package.json', content: '{}' }],
+      files: [
+        { name: 'package.json', content: '{}' },
+        { name: 'index.js', content: '' },
+      ],
       exitCode: 0,
       output: {
         ignorePatterns: [
@@ -740,7 +836,11 @@ cases(
     {
       name: 'should create expected ignore file for meteor project',
       files: [
-        { name: 'package.json', content: '{}' },
+        {
+          name: 'package.json',
+          content:
+            '{ "meteor": { "mainModule": { "client": "", "server": "" } } }',
+        },
         {
           name: '.meteor',
           content: '',
@@ -770,9 +870,45 @@ cases(
   ],
 );
 
+cases(
+  'cli integration tests with clear-cache option',
+  async (scenario) => {
+    const testProjectDir = await createProject(scenario.files);
+    const cachePath = path.resolve(
+      testProjectDir,
+      './node_modules/.cache/unimported',
+    );
+
+    try {
+      const { exitCode, stdout } = await exec(testProjectDir, {
+        clearCache: true,
+      });
+
+      const cacheExists = existsSync(cachePath);
+      expect(exitCode).toBe(scenario.exitCode);
+      expect(stdout).toBe(scenario.stdout);
+      expect(cacheExists).toBe(false);
+    } finally {
+      await rmdir(testProjectDir, { recursive: true });
+    }
+  },
+  [
+    {
+      name: 'should remove cache and exit silently',
+      files: [
+        { name: 'package.json', content: '{}' },
+        { name: 'index.js', content: '' },
+        { name: 'node_modules/.cache/unimported/cache-1', content: '' },
+      ],
+      exitCode: 0,
+      stdout: '',
+    },
+  ],
+);
+
 describe('cache', () => {
   const files = [
-    { name: 'package.json', content: '{ "main": "index.ts" }' },
+    { name: 'package.json', content: '{ "main": "index.js" }' },
     {
       name: 'index.js',
       content: `

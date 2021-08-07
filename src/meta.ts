@@ -1,23 +1,22 @@
 import * as fs from './fs';
-import { join } from 'path';
+import path, { join } from 'path';
 import { MapLike } from 'typescript';
 import { ensureArray } from './ensureArray';
 import { Context, JsConfig, PackageJson, TsConfig } from './index';
-import { resolveImport } from './traverse';
-import { expandGlob, getConfig } from './config';
+import { EntryConfig, expandGlob, getConfig } from './config';
+import { log } from './log';
+import resolve from 'resolve';
 
 interface Aliases {
   [index: string]: string[];
 }
 
-export async function getProjectType(
-  projectPath: string,
-): Promise<Context['type']> {
-  if (await fs.exists('.next', projectPath)) {
+export async function getProjectType(): Promise<string> {
+  if (await fs.exists('.next')) {
     return 'next';
   }
 
-  if (await fs.exists('.meteor', projectPath)) {
+  if (await fs.exists('.meteor')) {
     return 'meteor';
   }
 
@@ -25,31 +24,37 @@ export async function getProjectType(
 }
 
 export async function getAliases(
-  projectPath: string,
-): Promise<Context['aliases']> {
+  entryFile: EntryConfig,
+): Promise<MapLike<string[]>> {
   const [packageJson, tsconfig, jsconfig] = await Promise.all([
-    fs.readJson<PackageJson>('package.json', projectPath),
-    fs.readJson<TsConfig>('tsconfig.json', projectPath),
-    fs.readJson<JsConfig>('jsconfig.json', projectPath),
+    fs.readJson<PackageJson>('package.json'),
+    fs.readJson<TsConfig>('tsconfig.json'),
+    fs.readJson<JsConfig>('jsconfig.json'),
   ]);
 
   const config = await getConfig();
 
   let aliases: Aliases = {};
 
-  const baseUrl =
+  let baseUrl =
     config?.rootDir ??
     tsconfig?.compilerOptions?.baseUrl ??
     jsconfig?.compilerOptions?.baseUrl ??
     '.';
-  const root = join(projectPath, baseUrl);
 
-  // add support for (meteor) root slash import
+  // '/' doesn't resolve
+  if (baseUrl === '/') {
+    baseUrl = '.';
+  }
+
+  const root = path.resolve(baseUrl);
+
+  // add support for root slash import
   aliases['/'] = [`${root}/`];
 
   // add support for mono-repos
   if (packageJson?.repository?.directory) {
-    const root = join(projectPath, '../');
+    const root = path.resolve('../');
     const packages = await fs.list('*/', root, { realpath: false });
     for (const alias of packages) {
       aliases[alias] = [join(root, alias)];
@@ -58,26 +63,28 @@ export async function getAliases(
 
   // add support for typescript path aliases
   if (tsconfig?.compilerOptions?.paths) {
-    const paths = tsconfig.compilerOptions.paths;
-    const root = join(projectPath, tsconfig.compilerOptions.baseUrl || '.');
-    aliases = Object.assign(aliases, normalizeAliases(root, paths));
+    const root = path.resolve(tsconfig.compilerOptions.baseUrl || '.');
+    aliases = Object.assign(
+      aliases,
+      normalizeAliases(root, tsconfig.compilerOptions.paths),
+    );
   }
 
   // add support for jsconfig path aliases
   if (jsconfig?.compilerOptions?.paths) {
-    const paths = jsconfig.compilerOptions.paths;
-    const root = join(projectPath, jsconfig.compilerOptions.baseUrl || '.');
-    aliases = Object.assign(aliases, normalizeAliases(root, paths));
+    const root = path.resolve(jsconfig.compilerOptions.baseUrl || '.');
+    aliases = Object.assign(
+      aliases,
+      normalizeAliases(root, jsconfig.compilerOptions.paths),
+    );
   }
 
-  // add support for additional path aliases (in typescript compiler path
-  // like setup)
-  if (config?.aliases) {
-    const paths = config.aliases;
-    const root = join(projectPath, config?.rootDir || '.');
-    aliases = Object.assign(aliases, normalizeAliases(root, paths));
+  // add support for additional path aliases (in typescript compiler path like setup)
+  if (entryFile.aliases) {
+    aliases = Object.assign(aliases, normalizeAliases(root, entryFile.aliases));
   }
 
+  log.info(`aliases for %s %O`, entryFile ?? '*', aliases);
   return aliases;
 }
 
@@ -142,59 +149,34 @@ export async function getPeerDependencies(
   return peerDependencies;
 }
 
-function isString(value): value is string {
-  return typeof value === 'string';
-}
-
-export async function getEntry(
-  projectPath: string,
-  context: Context,
+/**
+ * Return relative paths to resolved entry files
+ */
+export async function findEntryFiles(
+  preset: string,
+  extensions: string[],
 ): Promise<string[]> {
-  const config = await getConfig();
-
-  if (config.entry) {
-    return ensureArray(config.entry).map(
-      (entry) => resolveImport(entry, projectPath, context).path,
-    );
-  }
-
-  const packageJson = await fs.readJson<PackageJson>(
-    'package.json',
-    projectPath,
-  );
+  const packageJson = await fs.readJson<PackageJson>('package.json');
 
   if (!packageJson) {
     throw new Error('could not load package.json');
   }
 
-  if (context.type === 'next') {
+  if (preset === 'next') {
     const pages = await expandGlob('./pages/**/*.{js,jsx,ts,tsx}');
-    return pages.map((path) => resolveImport(path, projectPath, context).path);
+    return pages.map((page) => page);
   }
 
-  if (context.type === 'meteor') {
-    if (!packageJson.meteor?.mainModule) {
+  if (preset === 'meteor') {
+    const mainModule = packageJson.meteor?.mainModule;
+
+    if (!mainModule) {
       throw new Error(
         'Meteor projects are only supported if the mainModule is defined in package.json',
       );
     }
 
-    const client = resolveImport(
-      packageJson.meteor.mainModule.client,
-      projectPath,
-      context,
-    );
-
-    const server = resolveImport(
-      packageJson.meteor.mainModule.server,
-      projectPath,
-      context,
-    );
-
-    return [
-      client.type !== 'unresolved' && client.path,
-      server.type !== 'unresolved' && server.path,
-    ].filter(isString);
+    return [mainModule.client, mainModule.server];
   }
 
   const { source, main } = packageJson;
@@ -205,15 +187,23 @@ export async function getEntry(
     './index',
     './main',
     main,
-  ];
+  ].filter(Boolean) as string[];
 
-  const resolved = await Promise.all(
-    options.map((x) => resolveImport(`${x}`, projectPath, context)),
-  );
+  const [entry] = options
+    .map((x) => {
+      try {
+        return resolve
+          .sync(x, {
+            basedir: process.cwd(),
+            extensions,
+          })
+          .replace(/\\/g, '/');
+      } catch {}
+    })
+    .filter(Boolean);
 
-  const entry = resolved.find((x) => x.type === 'source_file');
   if (entry) {
-    return [entry.path];
+    return [path.relative(process.cwd(), entry)];
   }
 
   throw new Error('could not find entry point');

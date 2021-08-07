@@ -1,9 +1,53 @@
-import fileEntryCache, { FileDescriptor } from 'file-entry-cache';
+import fileEntryCache, {
+  FileDescriptor,
+  FileEntryCache,
+} from 'file-entry-cache';
 import { Cache } from 'flat-cache';
+import { log } from './log';
+import path from 'path';
+import { rmSync } from 'fs';
+import { EntryConfig } from './config';
 
 type CacheMeta<T> = FileDescriptor['meta'] & { data: T };
 
-const cache = fileEntryCache.create('unimported', './node_modules/.cache/');
+// we keep cache groups per entry file, to keep the cache free from override conflicts
+const caches: Record<string, FileEntryCache> = {};
+
+export function getCacheIdentity(entry: EntryConfig): string {
+  // don't use just the file name, the entry file can be the same, while the
+  // overrides make it build target specific.
+  const value = JSON.stringify({
+    ...entry,
+    filepath: path.resolve(entry.file),
+  });
+
+  return hash(value);
+}
+
+function getCache(identity: string) {
+  if (caches[identity]) {
+    return caches[identity];
+  }
+
+  caches[identity] = fileEntryCache.create(
+    identity,
+    path.resolve(process.cwd(), './node_modules/.cache/unimported'),
+  );
+
+  return caches[identity];
+}
+
+// Create short hashes for file names
+function hash(path: string): string {
+  let h;
+  let i;
+
+  for (h = 0, i = 0; i < path.length; h &= h) {
+    h = 31 * h + path.charCodeAt(i++);
+  }
+
+  return Math.abs(h).toString(16);
+}
 
 export class InvalidCacheError extends Error {
   path: string;
@@ -18,8 +62,9 @@ export class InvalidCacheError extends Error {
 export async function resolveEntry<T>(
   path: string,
   generator: () => Promise<T>,
+  cacheIdentity = '*',
 ): Promise<T> {
-  const cacheEntry = cache.getFileDescriptor(path);
+  const cacheEntry = getCache(cacheIdentity).getFileDescriptor(path);
   const meta: CacheMeta<T> = cacheEntry.meta as CacheMeta<T>;
 
   if (!meta) {
@@ -35,21 +80,34 @@ export async function resolveEntry<T>(
 }
 
 export function invalidateEntry(path: string): void {
-  cache.removeEntry(path);
+  for (const cache of Object.values(caches)) {
+    cache.removeEntry(path);
+  }
 }
 
 export function invalidateEntries<T>(shouldRemove: (meta: T) => boolean): void {
-  Object.values((cache.cache as Cache).all()).forEach((cacheEntry) => {
-    if (shouldRemove(cacheEntry.data as T)) {
-      cache.removeEntry(cacheEntry.data.path);
-    }
-  });
+  for (const cache of Object.values(caches)) {
+    Object.values((cache.cache as Cache).all()).forEach((cacheEntry) => {
+      if (shouldRemove(cacheEntry.data as T)) {
+        cache.removeEntry(cacheEntry.data.path);
+      }
+    });
+  }
 }
 
 export function storeCache(): void {
-  cache.reconcile();
+  log.info('store cache');
+
+  for (const key of Object.keys(caches)) {
+    caches[key].reconcile();
+  }
 }
 
 export function purgeCache(): void {
-  cache.destroy();
+  log.info('purge cache');
+
+  rmSync(path.resolve(process.cwd(), './node_modules/.cache/unimported'), {
+    recursive: true,
+    force: true,
+  });
 }

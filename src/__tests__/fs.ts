@@ -9,7 +9,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  fs.rmdirSync(testSpaceDir, { recursive: true });
+  fs.rmSync(testSpaceDir, { recursive: true });
 });
 
 test('should check if file exists', async () => {

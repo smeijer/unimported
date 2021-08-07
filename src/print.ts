@@ -29,10 +29,11 @@ export function formatMetaTable(
   data: { unresolved: string[]; unimported: string[]; unused: string[] },
   context: Context,
 ): string {
+  const entryFiles = context.config.entryFiles;
   const records = [
-    ...context.entry.map<[string, string]>((x, idx) => [
-      `entry file ${context.entry.length > 1 ? idx + 1 : ''}`,
-      x.substr(context.cwd.length + 1),
+    ...entryFiles.map<[string, string]>((entry, idx) => [
+      `entry file ${entryFiles.length > 1 ? idx + 1 : ''}`,
+      entry.label ? `${entry.file} — ${entry.label}` : entry.file,
     ]),
     ['', ''],
     ['unresolved imports', data.unresolved.length],

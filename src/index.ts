@@ -7,7 +7,7 @@ import path, { join } from 'path';
 import ora from 'ora';
 import { printResults } from './print';
 import * as meta from './meta';
-import { traverse } from './traverse';
+import { getResultObject, traverse, TraverseConfig } from './traverse';
 import chalk from 'chalk';
 import { readJson } from './fs';
 import yargs, { Arguments } from 'yargs';
@@ -15,11 +15,18 @@ import { CompilerOptions } from 'typescript';
 import { processResults } from './process';
 import {
   getConfig,
-  UnimportedConfig,
+  Config,
   updateAllowLists,
   writeConfig,
+  EntryConfig,
 } from './config';
-import { InvalidCacheError, purgeCache, storeCache } from './cache';
+import {
+  getCacheIdentity,
+  InvalidCacheError,
+  purgeCache,
+  storeCache,
+} from './cache';
+import { log } from './log';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -53,27 +60,30 @@ export interface PackageJson {
 export interface Context {
   version: string;
   cwd: string;
-  entry: string[];
-  aliases: { [key: string]: string[] };
-  ignore: string[];
-  extensions: string[];
   dependencies: { [key: string]: string };
   peerDependencies: { [key: string]: string };
-  type: 'meteor' | 'next' | 'node';
   flow?: boolean;
   cache?: boolean;
-  config: UnimportedConfig;
+  config: Config;
   moduleDirectory: string[];
+  cacheId?: string;
 }
 
-export async function main(args: CliArguments): Promise<void> {
-  const spinner = ora(
-    process.env.NODE_ENV === 'test' ? '' : 'initializing',
-  ).start();
-  const pkg = await readPkgUp({ cwd: args.cwd });
+const oraStub = {
+  set text(msg) {
+    log.info(msg);
+  },
+  stop(msg = '') {
+    log.info(msg);
+  },
+};
 
-  if (!pkg) {
-    spinner.stop();
+export async function main(args: CliArguments): Promise<void> {
+  const projectPkg = await readPkgUp({ cwd: args.cwd });
+  const unimportedPkg = await readPkgUp({ cwd: __dirname });
+
+  // equality check to prevent tests from walking up and running on unimported itself
+  if (!projectPkg || !unimportedPkg || unimportedPkg.path === projectPkg.path) {
     console.error(
       chalk.redBright(
         `could not resolve package.json, are you in a node project?`,
@@ -85,100 +95,129 @@ export async function main(args: CliArguments): Promise<void> {
 
   // change the work dir for the process to the project root, this enables us
   // to run unimported from nested paths within the project
-  process.chdir(path.dirname(pkg.path));
+  process.chdir(path.dirname(projectPkg.path));
   const cwd = process.cwd();
+
+  // clear cache and return
+  if (args.clearCache) {
+    return purgeCache();
+  }
+
+  const spinner =
+    log.enabled() || process.env.NODE_ENV === 'test'
+      ? oraStub
+      : ora('initializing').start();
 
   try {
     const config = await getConfig();
     args.flow = config.flow ?? args.flow;
 
-    const [aliases, dependencies, peerDependencies, type] = await Promise.all([
-      meta.getAliases(cwd),
+    const [dependencies, peerDependencies] = await Promise.all([
       meta.getDependencies(cwd),
       meta.getPeerDependencies(cwd),
-      meta.getProjectType(cwd),
     ]);
-
-    const packageJson = await readJson<PackageJson>('./package.json', cwd);
-
-    if (!packageJson) {
-      throw new Error('Failed to load package.json');
-    }
 
     const moduleDirectory = config.moduleDirectory ?? ['node_modules'];
 
     const context: Context = {
-      version: packageJson.version,
-      aliases,
+      version: unimportedPkg.packageJson.version,
       dependencies,
       peerDependencies,
-      type,
-      extensions: config.extensions || ['.js', '.jsx', '.ts', '.tsx'],
-      ignore: [],
-      entry: [],
       config,
       moduleDirectory,
       ...args,
       cwd,
     };
 
-    context.ignore =
-      config.ignorePatterns ||
-      ([
-        '**/node_modules/**',
-        '**/*.stories.{js,jsx,ts,tsx}',
-        '**/*.tests.{js,jsx,ts,tsx}',
-        '**/*.test.{js,jsx,ts,tsx}',
-        '**/*.spec.{js,jsx,ts,tsx}',
-        '**/tests/**',
-        '**/__tests__/**',
-        '**/*.d.ts',
-        ...(context.type === 'meteor'
-          ? ['packages/**', 'public/**', 'private/**', 'tests/**']
-          : []),
-      ].filter(Boolean) as string[]);
-
     if (args.init) {
-      await writeConfig({ ignorePatterns: context.ignore }, context);
+      await writeConfig({
+        ignorePatterns: config.ignorePatterns,
+        ignoreUnimported: config.ignoreUnimported,
+        ignoreUnused: config.ignoreUnused,
+        ignoreUnresolved: config.ignoreUnresolved,
+      });
+
       spinner.stop();
       process.exit(0);
     }
 
     // Filter untracked files from git repositories
     if (args.ignoreUntracked) {
-      // Filter
       const git = simpleGit({ baseDir: context.cwd });
       const status = await git.status();
-      context.ignore = [
-        ...context.ignore,
-        ...status.not_added.map((notAdded) => `${cwd}/${notAdded}`),
-      ];
+      config.ignorePatterns.push(
+        ...status.not_added.map((file) => path.resolve(file)),
+      );
     }
-
-    // traverse all source files and get import data
-    context.entry = await meta.getEntry(cwd, context);
 
     spinner.text = `resolving imports`;
-    let traverseResult;
-    try {
-      traverseResult = await traverse(context.entry, context);
-    } catch (err) {
-      // Retry once after invalid cache case.
-      if (err instanceof InvalidCacheError) {
-        purgeCache();
-        traverseResult = await traverse(context.entry, context);
-      } else {
-        throw err;
+
+    const traverseResult = getResultObject();
+
+    for (const entry of config.entryFiles) {
+      log.info('start traversal at %s', entry);
+
+      const traverseConfig: TraverseConfig = {
+        extensions: entry.extensions,
+        // resolve full path of aliases
+        aliases: await meta.getAliases(entry),
+        cacheId: args.cache ? getCacheIdentity(entry) : undefined,
+        flow: args.flow,
+        moduleDirectory,
+        preset: config.preset,
+        dependencies,
+      };
+
+      // we can't use the third argument here, to keep feeding to traverseResult
+      // as that would break the import alias overrides. A client-entry file
+      // can resolve `create-api` as `create-api-client.js` while server-entry
+      // would resolve `create-api` to `create-api-server`.
+      const subResult = await traverse(path.resolve(entry.file), traverseConfig)
+        .catch((err) => {
+          if (err instanceof InvalidCacheError) {
+            purgeCache();
+          } else {
+            throw err;
+          }
+        })
+        // Retry once after invalid cache case.
+        .then(() => traverse(path.resolve(entry.file), traverseConfig));
+
+      subResult.files = new Map([...subResult.files].sort());
+
+      // and that's why we need to merge manually
+      subResult.modules.forEach((module) => {
+        traverseResult.modules.add(module);
+      });
+      subResult.unresolved.forEach((unresolved) => {
+        traverseResult.unresolved.add(unresolved);
+      });
+
+      for (const [key, stat] of subResult.files) {
+        const prev = traverseResult.files.get(key);
+
+        if (!prev) {
+          traverseResult.files.set(key, stat);
+          continue;
+        }
+
+        const added = new Set(prev.imports.map((x) => x.path));
+
+        for (const file of stat.imports) {
+          if (!added.has(file.path)) {
+            prev.imports.push(file);
+            added.add(file.path);
+          }
+        }
       }
     }
-    traverseResult.files = new Map([...traverseResult.files].sort());
 
     // traverse the file system and get system data
     spinner.text = 'traverse the file system';
     const baseUrl = (await fs.exists('src', cwd)) ? join(cwd, 'src') : cwd;
     const files = await fs.list('**/*', baseUrl, {
-      extensions: context.extensions,
-      ignore: context.ignore,
+      extensions: config.extensions,
+      ignore: config.ignorePatterns,
     });
 
     const normalizedFiles = files.map((path) => path.replace(/\\/g, '/'));
@@ -210,6 +249,11 @@ export async function main(args: CliArguments): Promise<void> {
       process.exit(1);
     }
   } catch (error) {
+    // console.log is intercepted for output comparison, this helps debugging
+    if (process.env.NODE_ENV === 'test') {
+      console.log(error.message);
+    }
+
     spinner.stop();
     console.error(
       chalk.redBright(
@@ -283,10 +327,6 @@ if (process.env.NODE_ENV !== 'test') {
         });
       },
       function (argv: Arguments<CliArguments>) {
-        if (argv.clearCache) {
-          return purgeCache();
-        }
-
         return main({
           init: argv.init,
           update: argv.update,

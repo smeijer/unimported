@@ -6,7 +6,17 @@ describe('printResults', () => {
   const expectedContext = {
     version: '1.0.0',
     cwd: 'cwd/string',
-    entry: ['src/client/main.js'],
+    moduleDirectory: [],
+    dependencies: {},
+    peerDependencies: {},
+    config: {
+      entryFiles: [{ file: 'src/client/main.js', aliases: {}, extensions: [] }],
+      extensions: [],
+      ignorePatterns: [],
+      ignoreUnimported: [],
+      ignoreUnused: [],
+      ignoreUnresolved: [],
+    },
   } as Context;
 
   let restore: any;
@@ -46,7 +56,7 @@ describe('printResults', () => {
       "
              summary               unimported v1.0.0
       ────────────────────────────────────────────────────────────────────────────────
-             entry file          : main.js
+             entry file          : src/client/main.js
 
              unresolved imports  : 2
              unused dependencies : 3

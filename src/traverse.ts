@@ -1,5 +1,5 @@
 import { dirname, extname } from 'path';
-import { Context } from './index';
+
 import {
   AST_NODE_TYPES,
   parse as parseEstree,
@@ -12,9 +12,10 @@ import type {
   Literal,
 } from '@typescript-eslint/types/dist/ast-spec';
 import resolve from 'resolve';
-import chalk from 'chalk';
 import removeFlowTypes from 'flow-remove-types';
 import { invalidateEntries, invalidateEntry, resolveEntry } from './cache';
+import { log } from './log';
+import { MapLike } from 'typescript';
 
 export interface FileStats {
   path: string;
@@ -29,19 +30,22 @@ export interface TraverseResult {
   modules: Set<string>;
 }
 
-function getDependencyName(path: string, context: Context): string | null {
-  if (context.type === 'meteor' && path.startsWith('meteor/')) {
+function getDependencyName(
+  path: string,
+  config: TraverseConfig,
+): string | null {
+  if (config.preset === 'meteor' && path.startsWith('meteor/')) {
     return path;
   }
 
   const [namespace, module] = path.split('/');
   const name = path[0] === '@' ? `${namespace}/${module}` : namespace;
 
-  if (context.dependencies[name]) {
+  if (config.dependencies[name]) {
     return name;
   }
 
-  if (context.dependencies[`@types/${name}`]) {
+  if (config.dependencies[`@types/${name}`]) {
     return `@types/${name}`;
   }
 
@@ -66,9 +70,9 @@ export type ResolvedResult =
 export function resolveImport(
   path: string,
   cwd: string,
-  context: Context,
+  config: TraverseConfig,
 ): ResolvedResult {
-  const dependencyName = getDependencyName(path, context);
+  const dependencyName = getDependencyName(path, config);
 
   if (dependencyName) {
     return {
@@ -84,34 +88,34 @@ export function resolveImport(
       path: resolve
         .sync(path, {
           basedir: cwd,
-          extensions: context.extensions,
-          moduleDirectory: context.moduleDirectory,
+          extensions: config.extensions,
+          moduleDirectory: config.moduleDirectory,
         })
         .replace(/\\/g, '/'),
     };
   } catch (e) {}
 
   // import { random } from '@helpers'
-  if (context.aliases[`${path}/`]) {
+  if (config.aliases[`${path}/`]) {
     // append a slash to the path so that the resolve logic below recognizes this as an /index import
     path = `${path}/`;
   }
 
   // import random from '@helpers/random' > '@helpers/random'.startsWith('@helpers/')
-  const aliases = Object.keys(context.aliases).filter((alias) =>
+  const aliases = Object.keys(config.aliases).filter((alias) =>
     path.startsWith(alias),
   );
 
   for (const alias of aliases) {
-    for (const alt of context.aliases[alias]) {
+    for (const alt of config.aliases[alias]) {
       try {
         return {
           type: 'source_file',
           path: resolve
             .sync(path.replace(alias, alt), {
               basedir: cwd,
-              extensions: context.extensions,
-              moduleDirectory: context.moduleDirectory,
+              extensions: config.extensions,
+              moduleDirectory: config.moduleDirectory,
             })
             .replace(/\\/g, '/'),
         };
@@ -127,8 +131,8 @@ export function resolveImport(
       path: resolve
         .sync(`./${path}`, {
           basedir: cwd,
-          extensions: context.extensions,
-          moduleDirectory: context.moduleDirectory,
+          extensions: config.extensions,
+          moduleDirectory: config.moduleDirectory,
         })
         .replace(/\\/g, '/'),
     };
@@ -165,7 +169,9 @@ function extractFromScriptTag(code: string) {
   return start > -1 && end > -1 ? lines.slice(start + 1, end).join('\n') : '';
 }
 
-async function parse(path: string, context: Context): Promise<FileStats> {
+async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
+  log.info('parse %s', path);
+
   const stats: FileStats = {
     path,
     extname: extname(path),
@@ -180,7 +186,7 @@ async function parse(path: string, context: Context): Promise<FileStats> {
 
   // removeFlowTypes checks for pragma's, use app arguments to override and
   // strip flow annotations from all files, regardless if it contains the pragma
-  code = removeFlowTypes(code, { all: context.flow }).toString();
+  code = removeFlowTypes(code, { all: config.flow }).toString();
 
   if (stats.extname === '.vue') {
     code = extractFromScriptTag(code);
@@ -250,7 +256,7 @@ async function parse(path: string, context: Context): Promise<FileStats> {
       }
 
       if (target) {
-        const resolved = resolveImport(target, stats.dirname, context);
+        const resolved = resolveImport(target, stats.dirname, config);
         stats.imports.push(resolved);
       }
     },
@@ -259,19 +265,29 @@ async function parse(path: string, context: Context): Promise<FileStats> {
   return stats;
 }
 
-const getResultObject = () => ({
+export const getResultObject = () => ({
   unresolved: new Set<string>(),
   modules: new Set<string>(),
   files: new Map<string, FileStats>(),
 });
 
+export interface TraverseConfig {
+  aliases: MapLike<string[]>;
+  extensions: string[];
+  moduleDirectory: string[];
+  cacheId?: string;
+  flow?: boolean;
+  preset?: string;
+  dependencies: MapLike<string>;
+}
+
 export async function traverse(
   path: string | string[],
-  context: Context,
+  config: TraverseConfig,
   result = getResultObject(),
 ): Promise<TraverseResult> {
   if (Array.isArray(path)) {
-    await Promise.all(path.map((x) => traverse(x, context, result)));
+    await Promise.all(path.map((x) => traverse(x, config, result)));
     return result;
   }
 
@@ -281,15 +297,15 @@ export async function traverse(
   }
 
   // only process code files, no json or css
-  if (!context.extensions.includes(extname(path))) {
+  if (!config.extensions.includes(extname(path))) {
     return result;
   }
 
   let parseResult;
   try {
-    parseResult = context.cache
-      ? await resolveEntry(path, () => parse(path, context))
-      : await parse(path, context);
+    parseResult = config.cacheId
+      ? await resolveEntry(path, () => parse(path, config), config.cacheId)
+      : await parse(path, config);
     result.files.set(path, parseResult);
 
     for (const file of parseResult.imports) {
@@ -304,12 +320,12 @@ export async function traverse(
           if (result.files.has(file.path)) {
             break;
           }
-          await traverse(file.path, context, result);
+          await traverse(file.path, config, result);
           break;
       }
     }
   } catch (e) {
-    if (context.cache) {
+    if (config.cacheId) {
       invalidateEntry(path);
       invalidateEntries<FileStats>((meta) => {
         // Invalidate anyone referencing this file
