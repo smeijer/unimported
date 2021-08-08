@@ -52,7 +52,7 @@ npx unimported --update
 
 ### Flow Type
 
-If your project is using flow type for typing, you might need this flag.
+By default, flow types are stripped from files containing the `@flow` pragma. When the `--flow` argument is provided, types will be stripped from all files, regardless of the pragma. This flag defaults to false, but when `flow-bin` is detected in one of the dependency lists in `package.json`.
 
 ```shell
 npx unimported --flow
@@ -74,6 +74,28 @@ Delete the cache file and then exits without running. Note that clearing the cac
 
 ```shell
 npx unimported --clear-cache
+```
+
+### Show Config
+
+Show the runtime config and then exists without running. The config displayed is a working copy created by merging arguments, your config file, and the applied preset.
+
+```shell
+npx unimported --show-config
+```
+
+### Show Preset
+
+Show the preset being used and then exists without running. Note that presets are dynamic and based on your project structure. The same preset can show a different setup for different projects based on the installed packages and available files.
+
+```shell
+npx unimported --show-preset react
+```
+
+Omit the preset name to get a list of available presets.
+
+```shell
+npx unimported --show-preset
 ```
 
 ### Example Config File
