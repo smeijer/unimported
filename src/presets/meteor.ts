@@ -7,8 +7,8 @@ const preset: Preset = {
   isMatch: ({ packageJson }) => Boolean(packageJson.meteor?.mainModule),
   getConfig: async (options) => {
     const base = await nodePreset.getConfig(options);
-    const mainModule = options.packageJson.meteor!.mainModule;
-    const entry = [mainModule!.client, mainModule!.server].filter(typedBoolean);
+    const mainModule = options.packageJson.meteor?.mainModule;
+    const entry = [mainModule?.client, mainModule?.server].filter(typedBoolean);
 
     return {
       ...base,

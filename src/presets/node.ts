@@ -11,16 +11,20 @@ const preset: Preset = {
     const hasFlow = hasPackage('flow-bin');
     const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 
-    const entry = resolveFilesSync(
-      [
-        packageJson.source,
-        './src/index',
-        './src/main',
-        './index',
-        './main',
-        packageJson.main,
-      ],
-      extensions,
+    const entry = Array.from(
+      new Set(
+        resolveFilesSync(
+          [
+            packageJson.source,
+            './src/index',
+            './src/main',
+            './index',
+            './main',
+            packageJson.main,
+          ],
+          extensions,
+        ),
+      ),
     ).filter(typedBoolean);
 
     return {

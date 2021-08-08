@@ -8,9 +8,10 @@ const preset: Preset = {
   getConfig: async (options) => {
     const base = await nodePreset.getConfig(options);
 
-    const entry = (await exists('./src'))
-      ? await expandGlob('./src/pages/**/*.{js,jsx,ts,tsx}')
-      : await expandGlob('./pages/**/*.{js,jsx,ts,tsx}');
+    const entry = [
+      './pages/**/*.{js,jsx,ts,tsx}',
+      './src/pages/**/*.{js,jsx,ts,tsx}',
+    ];
 
     return {
       ...base,

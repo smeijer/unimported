@@ -94,9 +94,9 @@ export function __clearCachedConfig() {
   cachedConfig = undefined;
 }
 
-async function resolvePreset(
+export async function getPreset(
   name?: string,
-): Promise<(UnimportedConfig & { name: string }) | undefined> {
+): Promise<UnimportedConfig | undefined> {
   const packageJson =
     (await readJson<PackageJson>('package.json')) || ({} as PackageJson);
 
@@ -116,7 +116,7 @@ async function resolvePreset(
   const config = await preset.getConfig(options);
 
   return {
-    name: preset.name,
+    preset: preset.name,
     ...config,
   };
 }
@@ -129,11 +129,11 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
   const configFile = await readJson<Partial<UnimportedConfig>>(CONFIG_FILE);
   const unimportedPkg = await readPkgUp({ cwd: __dirname });
 
-  const preset = await resolvePreset(configFile?.preset);
+  const preset = await getPreset(configFile?.preset);
 
   const config: Config = {
     version: unimportedPkg?.packageJson.version || 'unknown',
-    preset: preset?.name,
+    preset: preset?.preset,
     flow: args?.flow ?? configFile?.flow ?? preset?.flow ?? false,
     rootDir: configFile?.rootDir ?? preset?.rootDir,
     ignoreUnresolved:
@@ -155,7 +155,7 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
   if (entryFiles.length === 0) {
     throw new Error(
       `Unable to locate entry points for this ${
-        preset?.name ?? ''
+        preset?.preset ?? ''
       } project. Please declare them in package.json or .unimportedrc.json`,
     );
   }
