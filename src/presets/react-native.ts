@@ -6,6 +6,7 @@ import { typedBoolean } from '../meta';
 function getEntry(target: string, rootExtensions: string[]) {
   const extensions = [
     ...rootExtensions.map((e) => `.${target}${e}`),
+    ...rootExtensions.map((e) => `.native${e}`),
     ...rootExtensions,
   ];
 
