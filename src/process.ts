@@ -34,7 +34,7 @@ export async function processResults(
     (x) =>
       !traverseResult.modules.has(x) &&
       !context.peerDependencies[x] &&
-      !ignoreUnused.some((ignore) => x == ignore || minimatch(x, ignore)),
+      !ignoreUnused.some((ignore) => x === ignore || minimatch(x, ignore)),
   );
 
   const unimported = files
