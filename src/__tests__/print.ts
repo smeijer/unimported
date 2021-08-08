@@ -4,12 +4,12 @@ import { printResults } from '../print';
 
 describe('printResults', () => {
   const expectedContext = {
-    version: '1.0.0',
     cwd: 'cwd/string',
     moduleDirectory: [],
     dependencies: {},
     peerDependencies: {},
     config: {
+      version: '1.0.0',
       entryFiles: [{ file: 'src/client/main.js', aliases: {}, extensions: [] }],
       extensions: [],
       ignorePatterns: [],

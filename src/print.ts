@@ -45,10 +45,7 @@ export function formatMetaTable(
   const width = records.reduce((max, next) => Math.max(max, next[0].length), 0);
 
   const divider = chalk.grey('─'.repeat(columns));
-  const {
-    version,
-    config: { preset },
-  } = context;
+  const { preset, version } = context.config;
 
   const lines = [
     `${space} ${caption}               ${chalk.grey(

@@ -43,6 +43,7 @@ test('npx unimported --help', async () => {
           --ignore-untracked  Ignore files that are not currently tracked by git.
                                                                            [boolean]
       -i, --init              Dump default settings to .unimportedrc.json. [boolean]
+          --show-config       Show config and then exists.                 [boolean]
       -u, --update            Update the ignore-lists stored in .unimportedrc.json.
                                                                            [boolean]"
   `);

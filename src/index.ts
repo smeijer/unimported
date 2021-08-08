@@ -51,7 +51,6 @@ export interface PackageJson {
 }
 
 export interface Context {
-  version: string;
   cwd: string;
   dependencies: { [key: string]: string };
   peerDependencies: { [key: string]: string };
@@ -103,6 +102,12 @@ export async function main(args: CliArguments): Promise<void> {
   try {
     const config = await getConfig(args);
 
+    if (args.showConfig) {
+      spinner.stop();
+      console.dir(config, { depth: 5 });
+      process.exit(0);
+    }
+
     const [dependencies, peerDependencies] = await Promise.all([
       meta.getDependencies(cwd),
       meta.getPeerDependencies(cwd),
@@ -111,7 +116,6 @@ export async function main(args: CliArguments): Promise<void> {
     const moduleDirectory = config.moduleDirectory ?? ['node_modules'];
 
     const context: Context = {
-      version: unimportedPkg.packageJson.version,
       dependencies,
       peerDependencies,
       config,
@@ -263,6 +267,7 @@ export interface CliArguments {
   clearCache: boolean;
   cache: boolean;
   cwd?: string;
+  showConfig: boolean;
 }
 
 if (process.env.NODE_ENV !== 'test') {
@@ -308,6 +313,11 @@ if (process.env.NODE_ENV !== 'test') {
           describe: 'Dump default settings to .unimportedrc.json.',
         });
 
+        yargs.option('show-config', {
+          type: 'boolean',
+          describe: 'Show config and then exists.',
+        });
+
         yargs.option('update', {
           alias: 'u',
           type: 'boolean',
@@ -315,15 +325,7 @@ if (process.env.NODE_ENV !== 'test') {
         });
       },
       function (argv: Arguments<CliArguments>) {
-        return main({
-          init: argv.init,
-          update: argv.update,
-          flow: argv.flow,
-          ignoreUntracked: argv.ignoreUntracked,
-          clearCache: argv.clearCache,
-          cache: argv.cache,
-          cwd: argv.cwd,
-        });
+        return main(argv);
       },
     )
     .help().argv;

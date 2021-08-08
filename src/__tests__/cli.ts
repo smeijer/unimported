@@ -43,6 +43,7 @@ async function exec(
     ignoreUntracked = false,
     cache = true,
     clearCache = false,
+    showConfig = false,
   }: Partial<CliArguments> = {},
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
   const originalExit = process.exit;
@@ -84,6 +85,7 @@ async function exec(
       ignoreUntracked,
       cache,
       clearCache,
+      showConfig,
     });
 
     return { exitCode: exitCode ?? 0, stdout, stderr };

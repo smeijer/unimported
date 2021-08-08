@@ -7,6 +7,7 @@ import { ensureArray } from './ensureArray';
 import { MapLike } from 'typescript';
 import { hasPackage } from './meta';
 import { presets } from './presets';
+import readPkgUp from 'read-pkg-up';
 
 const globAsync = promisify(glob);
 
@@ -56,6 +57,7 @@ export type Preset = {
 };
 
 export interface Config {
+  version: string;
   preset?: string;
   flow?: boolean;
   entryFiles: EntryConfig[];
@@ -125,10 +127,13 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
   }
 
   const configFile = await readJson<Partial<UnimportedConfig>>(CONFIG_FILE);
+  const unimportedPkg = await readPkgUp({ cwd: __dirname });
+
   const preset = await resolvePreset(configFile?.preset);
 
   const config: Config = {
-    preset: configFile ? undefined : preset?.name,
+    version: unimportedPkg?.packageJson.version || 'unknown',
+    preset: preset?.name,
     flow: args?.flow ?? configFile?.flow ?? preset?.flow ?? false,
     rootDir: configFile?.rootDir ?? preset?.rootDir,
     ignoreUnresolved:
