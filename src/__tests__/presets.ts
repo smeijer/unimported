@@ -43,9 +43,6 @@ test('can identify react-native projects', async () => {
   );
 
   expect(config.preset).toEqual('react-native');
-  expect(config.extensions).toEqual(
-    expect.arrayContaining(['.android.js', '.ios.js']),
-  );
   expect(config.entryFiles).toMatchPartial([
     { file: 'index.js', label: 'android' },
     { file: 'index.js', label: 'ios' },
@@ -63,9 +60,6 @@ test('can identify react-native platform specific entry points', async () => {
   );
 
   expect(config.preset).toEqual('react-native');
-  expect(config.extensions).toEqual(
-    expect.arrayContaining(['.android.js', '.ios.js']),
-  );
   expect(config.entryFiles).toMatchPartial([
     { file: 'index.android.js', label: 'android' },
     { file: 'index.ios.js', label: 'ios' },
@@ -82,8 +76,6 @@ test('can identify react-native with single build target', async () => {
   );
 
   expect(config.preset).toEqual('react-native');
-  expect(config.extensions).toEqual(expect.arrayContaining(['.android.js']));
-
   expect(config.entryFiles).toMatchPartial([
     { file: 'index.android.js', label: 'android' },
   ]);

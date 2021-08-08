@@ -197,7 +197,8 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
   const uniqExtensions = new Set(extensions);
   for (const entryFile of config.entryFiles) {
     for (const extension of entryFile.extensions) {
-      uniqExtensions.add(extension);
+      // pop the last part, so that .server.js merges with .js
+      uniqExtensions.add('.' + extension.split('.').pop());
     }
   }
 
