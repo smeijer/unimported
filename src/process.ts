@@ -1,6 +1,7 @@
 import { TraverseResult } from './traverse';
 import { Context } from './index';
 import { ensureArray } from './ensureArray';
+import minimatch from 'minimatch';
 
 export interface ProcessedResult {
   unresolved: string[];
@@ -22,7 +23,7 @@ export async function processResults(
   context: Context,
 ): Promise<ProcessedResult> {
   const ignoreUnresolvedIdx = index(context.config.ignoreUnresolved);
-  const ignoreUnusedIdx = index(context.config.ignoreUnused);
+  const ignoreUnused = context.config.ignoreUnused;
   const ignoreUnimportedIdx = index(context.config.ignoreUnimported);
 
   const unresolved = Array.from(traverseResult.unresolved).filter(
@@ -33,7 +34,7 @@ export async function processResults(
     (x) =>
       !traverseResult.modules.has(x) &&
       !context.peerDependencies[x] &&
-      !ignoreUnusedIdx[x],
+      !ignoreUnused.some((ignore) => x == ignore || minimatch(x, ignore)),
   );
 
   const unimported = files
