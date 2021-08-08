@@ -145,6 +145,11 @@ export function resolveImport(
   };
 }
 
+const VueScriptRegExp = new RegExp(
+  '<script(?:(\\s?(?<key>lang|setup|src))(?:=[\'"](?<value>.+)[\'"])?)?\\s?\\/?>',
+  'i',
+);
+
 function extractFromScriptTag(code: string) {
   const lines = code.split('\n');
   let start = -1;
@@ -152,10 +157,17 @@ function extractFromScriptTag(code: string) {
 
   // walk the code from start to end to find the first <script> tag on it's own line
   for (let idx = 0; idx < lines.length; idx++) {
-    if (lines[idx].trim() === '<script>') {
-      start = idx;
-      break;
+    const matches = lines[idx].match(VueScriptRegExp);
+    if (!matches) {
+      continue;
     }
+
+    if (matches.groups?.key === 'src') {
+      return `import '${matches.groups?.value.trim()}';`;
+    }
+
+    start = idx;
+    break;
   }
 
   // walk the code in reverse to find the last </script> tag on it's own line
@@ -166,7 +178,10 @@ function extractFromScriptTag(code: string) {
     }
   }
 
-  return start > -1 && end > -1 ? lines.slice(start + 1, end).join('\n') : '';
+  const str =
+    start > -1 && end > -1 ? lines.slice(start + 1, end).join('\n') : '';
+
+  return str;
 }
 
 async function parse(path: string, config: TraverseConfig): Promise<FileStats> {

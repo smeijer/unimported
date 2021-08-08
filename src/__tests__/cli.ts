@@ -215,18 +215,60 @@ cases(
       name: 'should work for vue files',
       files: [
         { name: 'package.json', content: '{ "main" : "index.js" }' },
-        { name: 'index.js', content: `import foo from './app.vue';` },
-        {
-          name: 'app.vue',
-          content: `
-            <template><div>html</div></template>
-            <script>
-               import { util } from './util.js';
-            </script>
-        `,
-        },
-        { name: 'util.js', content: '' },
         { name: 'dangling.js', content: '' },
+        {
+          name: 'index.js',
+          content: `
+            import './script.vue'
+            import './script-ts.vue'
+            import './script-src.vue'
+            import './script-setup.vue';
+          `,
+        },
+        {
+          name: 'script.vue',
+          content: `
+            <template>
+              <script-editor-input>
+                value
+              </script-editor-input>
+            </template>
+            
+            <script>
+              import './script-imported';
+            </script>
+          `,
+        },
+        { name: 'script-imported.js', content: '' },
+        {
+          name: 'script-ts.vue',
+          content: `           
+            <script>
+              import './script-ts-imported';
+            </script>
+          `,
+        },
+        { name: 'script-ts-imported.js', content: '' },
+        {
+          name: 'script-setup.vue',
+          content: `
+            <script>
+              import './script-setup-imported';
+            </script>
+          `,
+        },
+        { name: 'script-setup-imported.js', content: '' },
+        {
+          name: 'script-src.vue',
+          content: `            
+            <script src="./script-src-imported.js"></script>
+          `,
+        },
+        {
+          name: 'script-src-imported.js',
+          content: `import 'script-src-imported-content'`,
+        },
+        { name: 'script-src-imported-content.js', content: '' },
         {
           name: '.unimportedrc.json',
           content: '{ "extensions": [".js", ".vue"] }',
