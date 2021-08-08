@@ -44,6 +44,7 @@ test('npx unimported --help', async () => {
                                                                            [boolean]
       -i, --init              Dump default settings to .unimportedrc.json. [boolean]
           --show-config       Show config and then exists.                 [boolean]
+          --show-preset       Show preset and then exists.                  [string]
       -u, --update            Update the ignore-lists stored in .unimportedrc.json.
                                                                            [boolean]"
   `);

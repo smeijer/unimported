@@ -12,7 +12,13 @@ import chalk from 'chalk';
 import yargs, { Arguments } from 'yargs';
 import { CompilerOptions } from 'typescript';
 import { processResults } from './process';
-import { getConfig, Config, updateAllowLists, writeConfig } from './config';
+import {
+  getConfig,
+  Config,
+  updateAllowLists,
+  writeConfig,
+  getPreset,
+} from './config';
 import {
   getCacheIdentity,
   InvalidCacheError,
@@ -20,6 +26,7 @@ import {
   storeCache,
 } from './cache';
 import { log } from './log';
+import { presets } from './presets';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -105,6 +112,24 @@ export async function main(args: CliArguments): Promise<void> {
     if (args.showConfig) {
       spinner.stop();
       console.dir(config, { depth: 5 });
+      process.exit(0);
+    }
+
+    if (typeof args.showPreset === 'string') {
+      spinner.stop();
+      if (args.showPreset) {
+        console.dir(await getPreset(args.showPreset), { depth: 5 });
+      } else {
+        const available = presets
+          .map((x) => x.name)
+          .sort()
+          .map((x) => `  - ${x}`)
+          .join('\n');
+
+        console.log(
+          `you didn't provide a preset name, please choose one of the following: \n\n${available}`,
+        );
+      }
       process.exit(0);
     }
 
@@ -268,6 +293,7 @@ export interface CliArguments {
   cache: boolean;
   cwd?: string;
   showConfig: boolean;
+  showPreset?: string;
 }
 
 if (process.env.NODE_ENV !== 'test') {
@@ -316,6 +342,11 @@ if (process.env.NODE_ENV !== 'test') {
         yargs.option('show-config', {
           type: 'boolean',
           describe: 'Show config and then exists.',
+        });
+
+        yargs.option('show-preset', {
+          type: 'string',
+          describe: 'Show preset and then exists.',
         });
 
         yargs.option('update', {
