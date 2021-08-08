@@ -1,8 +1,10 @@
 import fs from 'fs';
-import { join } from 'path';
+import { join, relative } from 'path';
 import glob, { IOptions as GlobOptions } from 'glob';
 import util from 'util';
 import json5 from 'json5';
+import { typedBoolean } from './meta';
+import resolve from 'resolve';
 
 const globAsync = util.promisify(glob);
 const readFileAsync = util.promisify(fs.readFile);
@@ -36,13 +38,13 @@ export async function writeText(
 export async function readJson<T extends any>(
   path: string,
   cwd = '.',
-): Promise<T | null> {
+): Promise<T | undefined> {
   try {
     const text = await readText(path, cwd);
-    return text ? json5.parse(text) : null;
+    return text ? json5.parse(text) : undefined;
   } catch (e) {
     console.error('\nfile does not contain valid json:', path, 'error: ', e);
-    return null;
+    return undefined;
   }
 }
 
@@ -84,4 +86,33 @@ export async function list(
     realpath: true,
     ...globOptions,
   });
+}
+
+export function resolveFilesSync(
+  options: Array<string | undefined>,
+  extensions: string[],
+): Array<string | undefined> {
+  const basedir = process.cwd();
+
+  return options
+    .map((file) => {
+      try {
+        if (!file) {
+          return;
+        }
+
+        file = file.startsWith('./') ? file : `./${file}`;
+
+        return (
+          file &&
+          resolve
+            .sync(file, {
+              basedir,
+              extensions,
+            })
+            .replace(/\\/g, '/')
+        );
+      } catch {}
+    })
+    .map((file) => file && relative(basedir, file));
 }

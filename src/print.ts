@@ -45,10 +45,14 @@ export function formatMetaTable(
   const width = records.reduce((max, next) => Math.max(max, next[0].length), 0);
 
   const divider = chalk.grey('─'.repeat(columns));
+  const {
+    version,
+    config: { preset },
+  } = context;
 
   const lines = [
     `${space} ${caption}               ${chalk.grey(
-      'unimported v' + context.version,
+      'unimported v' + version + (preset ? ` (${preset})` : ''),
     )}`,
     divider,
     ...records.reduce<string[]>((acc, [label, value]) => {

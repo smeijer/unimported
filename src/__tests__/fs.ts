@@ -113,7 +113,7 @@ test('should handle comments, unquoted props and trailing commas in json files',
 
 test('should gracefully fail to read json from file', async () => {
   const testFileName = path.join(testSpaceDir, 'missing', 'testFile.txt');
-  const expectedJson = null;
+  const expectedJson = undefined;
 
   const actualJson = await readJson(testFileName, testSpaceDir);
 

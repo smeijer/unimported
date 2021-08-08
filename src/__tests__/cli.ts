@@ -8,10 +8,9 @@ import { purgeCache } from '../cache';
 
 import FileEntryCache from 'file-entry-cache';
 import { __clearCachedConfig } from '../config';
+import { createTestProject } from '../__utils__';
 
-const mkdir = util.promisify(fs.mkdir);
 const rmdir = util.promisify(fs.rm);
-const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 
 afterAll(() => {
@@ -97,38 +96,6 @@ async function exec(
   }
 }
 
-async function createProject(
-  files: Array<{ name: string; content: string }>,
-  baseDir = '.',
-  name?: string,
-): Promise<string> {
-  const randomId = Math.floor(Math.random() * 1000000);
-
-  const testSpaceDir = path.join('.test-space', randomId.toString());
-
-  await mkdir(testSpaceDir, { recursive: true });
-
-  if (name) {
-    fs.writeFileSync(path.join(testSpaceDir, '.scenario'), name);
-  }
-
-  await Promise.all(
-    files.map((file) =>
-      mkdir(path.join(testSpaceDir, path.dirname(file.name)), {
-        recursive: true,
-      }),
-    ),
-  );
-
-  await Promise.all(
-    files.map((file) =>
-      writeFile(path.join(testSpaceDir, file.name), file.content),
-    ),
-  );
-
-  return path.join(testSpaceDir, baseDir);
-}
-
 beforeEach(() => {
   __clearCachedConfig();
   purgeCache();
@@ -137,7 +104,7 @@ beforeEach(() => {
 cases(
   'cli integration tests',
   async (scenario) => {
-    const testProjectDir = await createProject(
+    const testProjectDir = await createTestProject(
       scenario.files,
       scenario.baseDir,
       scenario.name,
@@ -236,7 +203,6 @@ cases(
         },
         { name: 'client.js', content: `import foo from './foo';` },
         { name: 'server.js', content: '' },
-        { name: '.meteor/release', content: '' },
         { name: 'foo.js', content: '' },
         { name: 'bar.js', content: '' },
       ],
@@ -282,16 +248,12 @@ cases(
       name: 'next project',
       files: [
         {
-          name: '.next/test.json',
-          content: '{ "entry": ["index.js"] }',
-        },
-        {
           name: 'package.json',
           content:
-            '{ "main": "index.js", "dependencies": { "@test/dependency": "1.0.0" } }',
+            '{ "main": "index.js", "dependencies": { "next": "1.0.0", "@test/dependency": "1.0.0" } }',
         },
-        { name: 'index.js', content: `import foo from './foo';` },
-        { name: 'foo.js', content: '' },
+        { name: 'pages/index.js', content: `import foo from './foo';` },
+        { name: 'pages/foo.js', content: '' },
       ],
       exitCode: 1,
       stdout: /1 unused dependencies.*@test\/dependency/s,
@@ -405,6 +367,28 @@ export default promise
       stdout: /1 unimported files.*bar.ts/s,
     },
     {
+      name: 'should identify js paths imports',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from '@root/foo';` },
+        {
+          name: 'foo.js',
+          content: `
+            class Foo extends Bar {
+              override baz() {}
+            }
+          `,
+        },
+        { name: 'bar.js', content: '' },
+        {
+          name: 'jsconfig.json',
+          content: '{ "compilerOptions": { "paths": { "@root": ["."] } } }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
       name: 'should identify config alias imports',
       files: [
         { name: 'package.json', content: '{ "main": "index.ts" }' },
@@ -506,7 +490,6 @@ export default promise
         },
         { name: 'client.js', content: `import foo from '/foo';` },
         { name: 'server.js', content: '' },
-        { name: '.meteor/release', content: '' },
         { name: 'foo.js', content: '' },
       ],
       exitCode: 0,
@@ -716,7 +699,7 @@ export default promise
 cases(
   'cli integration tests with update option',
   async (scenario) => {
-    const testProjectDir = await createProject(scenario.files);
+    const testProjectDir = await createTestProject(scenario.files);
     const outputFile = path.join(testProjectDir, '.unimportedrc.json');
 
     try {
@@ -796,7 +779,7 @@ import bar from './bar';
 cases(
   'cli integration tests with init option',
   async (scenario) => {
-    const testProjectDir = await createProject(scenario.files);
+    const testProjectDir = await createTestProject(scenario.files);
     const outputFile = path.join(testProjectDir, '.unimportedrc.json');
 
     try {
@@ -820,7 +803,6 @@ cases(
       output: {
         ignorePatterns: [
           '**/node_modules/**',
-          '**/*.stories.{js,jsx,ts,tsx}',
           '**/*.tests.{js,jsx,ts,tsx}',
           '**/*.test.{js,jsx,ts,tsx}',
           '**/*.spec.{js,jsx,ts,tsx}',
@@ -839,10 +821,10 @@ cases(
         {
           name: 'package.json',
           content:
-            '{ "meteor": { "mainModule": { "client": "", "server": "" } } }',
+            '{ "meteor": { "mainModule": { "client": "index.js", "server": "" } } }',
         },
         {
-          name: '.meteor',
+          name: 'index.js',
           content: '',
         },
       ],
@@ -850,7 +832,6 @@ cases(
       output: {
         ignorePatterns: [
           '**/node_modules/**',
-          '**/*.stories.{js,jsx,ts,tsx}',
           '**/*.tests.{js,jsx,ts,tsx}',
           '**/*.test.{js,jsx,ts,tsx}',
           '**/*.spec.{js,jsx,ts,tsx}',
@@ -864,7 +845,7 @@ cases(
         ],
         ignoreUnresolved: [],
         ignoreUnimported: [],
-        ignoreUnused: [],
+        ignoreUnused: ['@babel/runtime', 'meteor-node-stubs'],
       },
     },
   ],
@@ -873,7 +854,7 @@ cases(
 cases(
   'cli integration tests with clear-cache option',
   async (scenario) => {
-    const testProjectDir = await createProject(scenario.files);
+    const testProjectDir = await createTestProject(scenario.files);
     const cachePath = path.resolve(
       testProjectDir,
       './node_modules/.cache/unimported',
@@ -925,7 +906,7 @@ import bar from './bar';
   });
 
   it('should invalidate the cache on parse error', async () => {
-    const testProjectDir = await createProject(files);
+    const testProjectDir = await createTestProject(files);
 
     try {
       let { stdout, stderr, exitCode } = await exec(testProjectDir);
@@ -962,7 +943,7 @@ import bar from './bar';
   });
 
   it('should recover from extension rename', async () => {
-    const testProjectDir = await createProject(files);
+    const testProjectDir = await createTestProject(files);
 
     try {
       let { stdout, stderr, exitCode } = await exec(testProjectDir);

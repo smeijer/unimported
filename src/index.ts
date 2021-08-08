@@ -9,17 +9,10 @@ import { printResults } from './print';
 import * as meta from './meta';
 import { getResultObject, traverse, TraverseConfig } from './traverse';
 import chalk from 'chalk';
-import { readJson } from './fs';
 import yargs, { Arguments } from 'yargs';
 import { CompilerOptions } from 'typescript';
 import { processResults } from './process';
-import {
-  getConfig,
-  Config,
-  updateAllowLists,
-  writeConfig,
-  EntryConfig,
-} from './config';
+import { getConfig, Config, updateAllowLists, writeConfig } from './config';
 import {
   getCacheIdentity,
   InvalidCacheError,
@@ -62,7 +55,6 @@ export interface Context {
   cwd: string;
   dependencies: { [key: string]: string };
   peerDependencies: { [key: string]: string };
-  flow?: boolean;
   cache?: boolean;
   config: Config;
   moduleDirectory: string[];
@@ -109,8 +101,7 @@ export async function main(args: CliArguments): Promise<void> {
       : ora('initializing').start();
 
   try {
-    const config = await getConfig();
-    args.flow = config.flow ?? args.flow;
+    const config = await getConfig(args);
 
     const [dependencies, peerDependencies] = await Promise.all([
       meta.getDependencies(cwd),
@@ -162,7 +153,7 @@ export async function main(args: CliArguments): Promise<void> {
         // resolve full path of aliases
         aliases: await meta.getAliases(entry),
         cacheId: args.cache ? getCacheIdentity(entry) : undefined,
-        flow: args.flow,
+        flow: config.flow,
         moduleDirectory,
         preset: config.preset,
         dependencies,
@@ -257,12 +248,9 @@ export async function main(args: CliArguments): Promise<void> {
     spinner.stop();
     console.error(
       chalk.redBright(
-        error.path
-          ? `\nFailed parsing ${error.path}`
-          : 'something unexpected happened',
+        error.path ? `\nFailed parsing ${error.path}` : error.message,
       ),
     );
-    console.error(error);
     process.exit(1);
   }
 }

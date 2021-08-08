@@ -3,24 +3,25 @@ import path, { join } from 'path';
 import { MapLike } from 'typescript';
 import { ensureArray } from './ensureArray';
 import { Context, JsConfig, PackageJson, TsConfig } from './index';
-import { EntryConfig, expandGlob, getConfig } from './config';
+import { EntryConfig, getConfig } from './config';
 import { log } from './log';
-import resolve from 'resolve';
 
 interface Aliases {
   [index: string]: string[];
 }
 
-export async function getProjectType(): Promise<string> {
-  if (await fs.exists('.next')) {
-    return 'next';
-  }
+export function hasPackage(packageJson: PackageJson, name: string): boolean {
+  return Boolean(
+    packageJson.dependencies?.[name] ||
+      packageJson.devDependencies?.[name] ||
+      packageJson.peerDependencies?.[name],
+  );
+}
 
-  if (await fs.exists('.meteor')) {
-    return 'meteor';
-  }
-
-  return 'node';
+export function typedBoolean<T>(
+  value: T,
+): value is Exclude<T, false | null | undefined | '' | 0> {
+  return Boolean(value);
 }
 
 export async function getAliases(
@@ -121,7 +122,7 @@ export async function getDependencies(
     return {};
   }
 
-  return packageJson.dependencies || {};
+  return packageJson!.dependencies || {};
 }
 
 export async function getPeerDependencies(
@@ -147,64 +148,4 @@ export async function getPeerDependencies(
   }
 
   return peerDependencies;
-}
-
-/**
- * Return relative paths to resolved entry files
- */
-export async function findEntryFiles(
-  preset: string,
-  extensions: string[],
-): Promise<string[]> {
-  const packageJson = await fs.readJson<PackageJson>('package.json');
-
-  if (!packageJson) {
-    throw new Error('could not load package.json');
-  }
-
-  if (preset === 'next') {
-    const pages = await expandGlob('./pages/**/*.{js,jsx,ts,tsx}');
-    return pages.map((page) => page);
-  }
-
-  if (preset === 'meteor') {
-    const mainModule = packageJson.meteor?.mainModule;
-
-    if (!mainModule) {
-      throw new Error(
-        'Meteor projects are only supported if the mainModule is defined in package.json',
-      );
-    }
-
-    return [mainModule.client, mainModule.server];
-  }
-
-  const { source, main } = packageJson;
-  const options = [
-    source,
-    './src/index',
-    './src/main',
-    './index',
-    './main',
-    main,
-  ].filter(Boolean) as string[];
-
-  const [entry] = options
-    .map((x) => {
-      try {
-        return resolve
-          .sync(x, {
-            basedir: process.cwd(),
-            extensions,
-          })
-          .replace(/\\/g, '/');
-      } catch {}
-    })
-    .filter(Boolean);
-
-  if (entry) {
-    return [path.relative(process.cwd(), entry)];
-  }
-
-  throw new Error('could not find entry point');
 }

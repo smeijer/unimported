@@ -226,7 +226,6 @@ Also ignored are files with paths matching the following patterns:
 
 ```
 **/node_modules/**
-**/*.stories.{js,jsx,ts,tsx}
 **/*.tests.{js,jsx,ts,tsx}
 **/*.spec.{js,jsx,ts,tsx}
 ```

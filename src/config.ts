@@ -1,11 +1,12 @@
 import { ProcessedResult } from './process';
 import { readJson, writeJson } from './fs';
-import { Context } from './index';
+import { CliArguments, Context, PackageJson } from './index';
 import glob from 'glob';
 import { promisify } from 'util';
 import { ensureArray } from './ensureArray';
 import { MapLike } from 'typescript';
-import { findEntryFiles, getProjectType } from './meta';
+import { hasPackage } from './meta';
+import { presets } from './presets';
 
 const globAsync = promisify(glob);
 
@@ -19,6 +20,7 @@ export interface EntryConfig {
 }
 
 export interface UnimportedConfig {
+  preset?: string;
   flow?: boolean;
   entry?: (
     | string
@@ -39,6 +41,19 @@ export interface UnimportedConfig {
   extensions?: string[];
   aliases?: MapLike<string[]>;
 }
+
+type PresetParams = {
+  packageJson: PackageJson;
+  hasPackage: (name: string) => boolean;
+};
+
+export type Preset = {
+  name: string;
+  isMatch: (options: PresetParams) => Promise<boolean> | boolean;
+  getConfig: (
+    options: PresetParams,
+  ) => Promise<UnimportedConfig> | UnimportedConfig;
+};
 
 export interface Config {
   preset?: string;
@@ -77,93 +92,101 @@ export function __clearCachedConfig() {
   cachedConfig = undefined;
 }
 
-export async function getConfig(): Promise<Config> {
+async function resolvePreset(
+  name?: string,
+): Promise<(UnimportedConfig & { name: string }) | undefined> {
+  const packageJson =
+    (await readJson<PackageJson>('package.json')) || ({} as PackageJson);
+
+  const options = {
+    packageJson,
+    hasPackage: (name: string) => hasPackage(packageJson, name),
+  };
+
+  const preset = presets.find(
+    (preset) => preset.name === name || preset.isMatch(options),
+  );
+
+  if (!preset) {
+    return;
+  }
+
+  const config = await preset.getConfig(options);
+
+  return {
+    name: preset.name,
+    ...config,
+  };
+}
+
+export async function getConfig(args?: CliArguments): Promise<Config> {
   if (cachedConfig) {
     return cachedConfig;
   }
 
-  const configFile: Partial<UnimportedConfig> =
-    (await readJson(CONFIG_FILE)) || {};
-
-  const preset = await getProjectType();
+  const configFile = await readJson<Partial<UnimportedConfig>>(CONFIG_FILE);
+  const preset = await resolvePreset(configFile?.preset);
 
   const config: Config = {
-    preset,
-    rootDir: configFile.rootDir,
-    ignoreUnresolved: configFile.ignoreUnresolved || [],
-    ignoreUnimported: await expandGlob(configFile.ignoreUnimported || []),
-    ignoreUnused: configFile.ignoreUnused || [],
-    ignorePatterns:
-      configFile.ignorePatterns ||
-      ([
-        '**/node_modules/**',
-        '**/*.stories.{js,jsx,ts,tsx}',
-        '**/*.tests.{js,jsx,ts,tsx}',
-        '**/*.test.{js,jsx,ts,tsx}',
-        '**/*.spec.{js,jsx,ts,tsx}',
-        '**/tests/**',
-        '**/__tests__/**',
-        '**/*.d.ts',
-        ...(preset === 'meteor'
-          ? ['packages/**', 'public/**', 'private/**', 'tests/**']
-          : []),
-      ].filter(Boolean) as string[]),
+    preset: configFile ? undefined : preset?.name,
+    flow: args?.flow ?? configFile?.flow ?? preset?.flow ?? false,
+    rootDir: configFile?.rootDir ?? preset?.rootDir,
+    ignoreUnresolved:
+      configFile?.ignoreUnresolved ?? preset?.ignoreUnresolved ?? [],
+    ignoreUnimported: await expandGlob(
+      configFile?.ignoreUnimported ?? preset?.ignoreUnimported ?? [],
+    ),
+    ignoreUnused: configFile?.ignoreUnused ?? preset?.ignoreUnused ?? [],
+    ignorePatterns: configFile?.ignorePatterns ?? preset?.ignorePatterns ?? [],
     entryFiles: [],
-    extensions: configFile.extensions || ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [],
   };
 
-  const aliases = configFile.aliases || {};
-  const extensions = config.extensions;
+  const aliases = configFile?.aliases ?? preset?.aliases ?? {};
+  const extensions = configFile?.extensions ?? preset?.extensions ?? [];
+  const entryFiles = configFile?.entry ?? preset?.entry ?? [];
 
-  if (configFile.entry) {
-    for (const entry of configFile.entry) {
-      if (typeof entry === 'string') {
-        for (const file of await expandGlob(entry)) {
-          config.entryFiles.push({
-            file,
-            aliases,
-            extensions,
-          });
-        }
-      } else {
-        const entryAliases = entry.aliases
-          ? entry.aliases
-          : entry.extend?.aliases
-          ? { ...aliases, ...entry.extend.aliases }
-          : aliases;
+  // throw if no entry point could be found
+  if (entryFiles.length === 0) {
+    throw new Error(
+      `Unable to locate entry points for this ${
+        preset?.name ?? ''
+      } project. Please declare them in package.json or .unimportedrc.json`,
+    );
+  }
 
-        const entryExtensions = entry.extensions
-          ? entry.extensions
-          : entry.extend?.extensions
-          ? [...entry.extend.extensions, ...extensions]
-          : extensions;
+  for (const entry of entryFiles) {
+    if (typeof entry === 'string') {
+      for (const file of await expandGlob(entry)) {
+        config.entryFiles.push({
+          file,
+          aliases,
+          extensions,
+        });
+      }
+    } else {
+      const entryAliases = entry.aliases
+        ? entry.aliases
+        : entry.extend?.aliases
+        ? { ...aliases, ...entry.extend.aliases }
+        : aliases;
 
-        for (const file of await expandGlob(entry.file)) {
-          config.entryFiles.push({
-            file,
-            label: entry.label,
-            aliases: entryAliases,
-            extensions: entryExtensions,
-          });
-        }
+      const entryExtensions = entry.extensions
+        ? entry.extensions
+        : entry.extend?.extensions
+        ? [...entry.extend.extensions, ...extensions]
+        : extensions;
+
+      for (const file of await expandGlob(entry.file)) {
+        config.entryFiles.push({
+          file,
+          label: entry.label,
+          aliases: entryAliases,
+          extensions: entryExtensions,
+        });
       }
     }
   }
-
-  // try to resolve entry files based on conventions
-  if (!config.entryFiles.length) {
-    const entryFiles = await findEntryFiles(preset, extensions);
-
-    for (const file of entryFiles) {
-      config.entryFiles.push({
-        file,
-        aliases,
-        extensions,
-      });
-    }
-  }
-
-  cachedConfig = config;
 
   // collect _all_ extensions for file listing
   const uniqExtensions = new Set(extensions);
@@ -174,6 +197,8 @@ export async function getConfig(): Promise<Config> {
   }
 
   config.extensions = Array.from(uniqExtensions);
+
+  cachedConfig = config;
   return config;
 }
 
