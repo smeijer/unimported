@@ -1,0 +1,79 @@
+diff --git a/node_modules/flow-remove-types/index.js b/node_modules/flow-remove-types/index.js
+index f28c303..c595c79 100644
+--- a/node_modules/flow-remove-types/index.js
++++ b/node_modules/flow-remove-types/index.js
+@@ -148,6 +148,25 @@ function resultPrinter(options, source, removedNodes) {
+ 
+ var LINE_RX = /(\r\n?|\n|\u2028|\u2029)/;
+ 
++function removeImportKind(context, node, offset) {
++  var ast = context.ast;
++
++  // Flow quirk: Remove importKind which is outside the node
++  var idxStart = findTokenIndex(ast.tokens, startOf(node));
++
++  // offset +1 for imports like `import type x from
++  // offset -1 for imports like `import { type x } from
++  var maybeImportKind = ast.tokens[idxStart + offset];
++  var maybeImportKindLabel = getLabel(maybeImportKind);
++
++  if (
++    maybeImportKindLabel === 'type' ||
++    maybeImportKindLabel === 'typeof'
++  ) {
++    removeNode(context, maybeImportKind);
++  }
++}
++
+ // A collection of methods for each AST type names which contain Flow types to
+ // be removed.
+ var removeFlowVisitor = {
+@@ -209,41 +228,20 @@ var removeFlowVisitor = {
+     }
+   },
+ 
++  // We've patched this function so that `import type x from` statements aren't
++  // stripped out, instead only the 'type' or 'typeof' modifier is removed.
++  // type imports could have been handled by typescript, but typeof not.
+   ImportDeclaration: function(context, node) {
+     if (node.importKind === 'type' || node.importKind === 'typeof') {
+-      return removeNode(context, node);
++      // import type from '.';
++      removeImportKind(context, node, + 1);
+     }
+   },
+ 
+   ImportSpecifier: function(context, node) {
+     if (node.importKind === 'type' || node.importKind === 'typeof') {
+-      var ast = context.ast;
+-
+-      // Flow quirk: Remove importKind which is outside the node
+-      var idxStart = findTokenIndex(ast.tokens, startOf(node));
+-      var maybeImportKind = ast.tokens[idxStart - 1];
+-      var maybeImportKindLabel = getLabel(maybeImportKind);
+-      if (
+-        maybeImportKindLabel === 'type' ||
+-        maybeImportKindLabel === 'typeof'
+-      ) {
+-        removeNode(context, maybeImportKind);
+-      }
+-
+-      // Remove the node itself
+-      removeNode(context, node);
+-
+-      // Remove trailing comma
+-      var idx = findTokenIndex(ast.tokens, endOf(node));
+-
+-      while (isComment(ast.tokens[idx])) {
+-        // NOTE: ast.tokens has no comments in Flow
+-        idx++;
+-      }
+-      if (getLabel(ast.tokens[idx]) === ',') {
+-        removeNode(context, ast.tokens[idx]);
+-      }
+-      return false;
++      // import { type x, y } from '.';
++      removeImportKind(context, node, - 1);
+     }
+   },
+ 

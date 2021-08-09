@@ -278,6 +278,45 @@ cases(
       stdout: /1 unimported files.*dangling.js/s,
     },
     {
+      name: 'should support flow type',
+      files: [
+        {
+          name: 'package.json',
+          content:
+            '{ "main" : "index.js", "devDependencies": { "flow-bin": "1" } }',
+        },
+        { name: 'dangling.js', content: '' },
+        {
+          name: 'index.js',
+          content: `
+            // @flow
+            import './imported';
+            import type myNumber from './exports-1';
+            import typeof { MyClass } from './exports-2';
+            import { type MyClass } from './exports-3';
+            import { typeof MyClass} from './exports-4';
+          `,
+        },
+        { name: 'imported', content: '' },
+        {
+          name: 'exports-1.js',
+          content: `
+            // @flow
+            const myNumber = 42;
+            export default myNumber;
+            export class MyClass {
+              // ...
+            }
+          `,
+        },
+        { name: 'exports-2.js', content: '' },
+        { name: 'exports-3.js', content: '' },
+        { name: 'exports-4.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*dangling.js/s,
+    },
+    {
       name: 'Invalid json',
       files: [
         {

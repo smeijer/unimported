@@ -184,6 +184,14 @@ function extractFromScriptTag(code: string) {
   return str;
 }
 
+// removeFlowTypes checks for pragmas, we use app arguments to override and
+// strip flow annotations from all files, regardless if it contains the pragma.
+function handleFlowType(code: string, config: TraverseConfig) {
+  // note that we've patched `flow-remove-types` to strip import kinds,
+  // but not the statements
+  return removeFlowTypes(code, { all: config.flow }).toString();
+}
+
 async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
   log.info('parse %s', path);
 
@@ -196,9 +204,10 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
 
   let code = await fs.readText(path);
 
-  // removeFlowTypes checks for pragma's, use app arguments to override and
-  // strip flow annotations from all files, regardless if it contains the pragma
-  code = removeFlowTypes(code, { all: config.flow }).toString();
+  // Let's just assume that nobody is going to write flow in .ts files.
+  if (stats.extname !== '.ts' && stats.extname !== '.tsx') {
+    code = handleFlowType(code, config);
+  }
 
   if (stats.extname === '.vue') {
     code = extractFromScriptTag(code);
