@@ -243,7 +243,7 @@ cases(
         {
           name: 'script-ts.vue',
           content: `           
-            <script>
+            <script lang="ts">
               import './script-ts-imported';
             </script>
           `,
@@ -252,7 +252,7 @@ cases(
         {
           name: 'script-setup.vue',
           content: `
-            <script>
+            <script setup>
               import './script-setup-imported';
             </script>
           `,
