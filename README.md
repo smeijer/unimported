@@ -263,11 +263,13 @@ tests/**
 
 To specify custom ignore paths, add your own patterns to `.unimportedrc.json#ignorePatterns`. Note that `unimported` won't merge settings! The custom list needs to be the full list of patterns that you want to ignore.
 
-## Gotchas
+## Troubleshooting
 
-At this moment, we don't support the `export default from './x'` export syntax. Parsing files that contain those exports, will result in an error with a message like `'\';\' expected`.
+Common issues or known limitations of unimported.
 
-If you make use of that part of the [export default from proposal](https://github.com/tc39/proposal-export-default-from#exporting-a-default-as-default), you can consider a find/replace before running `unimported`.
+### Export default
+
+At this moment, we don't support the `export default from './x'` export syntax. Parsing files that contain those exports, will result in an error with a message like `'\';\' expected`. If you make use of that part of the [export default from proposal](https://github.com/tc39/proposal-export-default-from#exporting-a-default-as-default), you can consider a find/replace before running `unimported`.
 
 Please search for:
 
@@ -281,7 +283,13 @@ and replace it with
 export { default } from
 ```
 
-It ain't pretty, but it should work.
+### Unexpected results / stale cache
+
+Please try [clearing the cache](#cache) if you have unexpected results, or keep getting the same results after changing the config file.
+
+```shell
+npx unimported --clear-cache
+```
 
 ## See Also
 
