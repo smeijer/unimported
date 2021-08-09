@@ -194,9 +194,6 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
     imports: [],
   };
 
-  // this jsx check isn't bullet proof, but I have no idea how we can deal with
-  // this better. The parser will fail on generics like <T> in jsx files, if we
-  // don't specify those as being jsx.
   let code = await fs.readText(path);
 
   // removeFlowTypes checks for pragma's, use app arguments to override and
@@ -207,6 +204,9 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
     code = extractFromScriptTag(code);
   }
 
+  // this jsx check isn't bullet proof, but I have no idea how we can deal with
+  // this better. The parser will fail on generics like <T> in jsx files, if we
+  // don't specify those as being jsx.
   const ast = parseEstree(code, {
     comment: false,
     jsx: stats.extname !== '.ts',
