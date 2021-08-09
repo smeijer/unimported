@@ -191,17 +191,20 @@ export async function main(args: CliArguments): Promise<void> {
       // we can't use the third argument here, to keep feeding to traverseResult
       // as that would break the import alias overrides. A client-entry file
       // can resolve `create-api` as `create-api-client.js` while server-entry
-      // would resolve `create-api` to `create-api-server`.
-      const subResult = await traverse(path.resolve(entry.file), traverseConfig)
-        .catch((err) => {
-          if (err instanceof InvalidCacheError) {
-            purgeCache();
-          } else {
-            throw err;
-          }
-        })
-        // Retry once after invalid cache case.
-        .then(() => traverse(path.resolve(entry.file), traverseConfig));
+      // would resolve `create-api` to `create-api-server`. Sharing the subresult
+      // between the initial and retry attempt, would make it fail cache recovery
+      const subResult = await traverse(
+        path.resolve(entry.file),
+        traverseConfig,
+      ).catch((err) => {
+        if (err instanceof InvalidCacheError) {
+          purgeCache();
+          // Retry once after invalid cache case.
+          return traverse(path.resolve(entry.file), traverseConfig);
+        } else {
+          throw err;
+        }
+      });
 
       subResult.files = new Map([...subResult.files].sort());
 
