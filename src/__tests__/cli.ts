@@ -553,6 +553,27 @@ export default promise
       stdout: /1 unimported files.*bar.ts/s,
     },
     {
+      name: 'should support module directories',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        {
+          name: 'index.js',
+          content: `
+            import foo from './foo'; 
+            import bar from 'bar';
+          `,
+        },
+        { name: 'foo/index.js', content: '' },
+        { name: 'modules/bar.js', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "moduleDirectory": ["node_modules", "modules"] }',
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./s,
+    },
+    {
       name: 'should support root slash import',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },

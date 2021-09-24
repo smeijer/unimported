@@ -143,6 +143,7 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
     ),
     ignoreUnused: configFile?.ignoreUnused ?? preset?.ignoreUnused ?? [],
     ignorePatterns: configFile?.ignorePatterns ?? preset?.ignorePatterns ?? [],
+    moduleDirectory: configFile?.moduleDirectory ?? preset?.moduleDirectory,
     entryFiles: [],
     extensions: [],
   };
