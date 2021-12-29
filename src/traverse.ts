@@ -57,6 +57,16 @@ function getDependencyName(
   return null;
 }
 
+function transformPath(rawPath: string, config: TraverseConfig): string {
+  let path = rawPath;
+  if (config.pathTransforms) {
+    for (const [search, replace] of Object.entries(config.pathTransforms)) {
+      path = path.replaceAll(new RegExp(search, 'g'), replace);
+    }
+  }
+  return path;
+}
+
 export type ResolvedResult =
   | {
       type: 'node_module';
@@ -73,10 +83,11 @@ export type ResolvedResult =
     };
 
 export function resolveImport(
-  path: string,
+  rawPath: string,
   cwd: string,
   config: TraverseConfig,
 ): ResolvedResult {
+  let path = transformPath(rawPath, config);
   const dependencyName = getDependencyName(path, config);
 
   if (dependencyName) {
@@ -308,6 +319,7 @@ export interface TraverseConfig {
   flow?: boolean;
   preset?: string;
   dependencies: MapLike<string>;
+  pathTransforms?: MapLike<string>;
 }
 
 export async function traverse(

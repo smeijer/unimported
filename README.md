@@ -147,6 +147,19 @@ start looking for the aliases from:
 }
 ```
 
+**Path transformations**
+If you wish to transform paths before module resolution, there is an option `pathTransforms` to specify regex search patterns and corresponding replacement values. Search patterns will be applied with the global flag and should **_not_** be enclosed by `/` characters. Replacement values support all special replacement patterns supported by [String.prototype.replaceAll()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replaceAll#specifying_a_string_as_a_parameter).
+
+Here is an example for transforming the extension for relative imports from ".js" to ".ts" (this is useful for TypeScript projects configured to output pure ESM).
+
+```json
+{
+  "pathTransforms": {
+    "(\\..+)\\.js$": "$1.ts"
+  }
+}
+```
+
 ## Report
 
 The report will look something like [below](#example). When a particular check didn't have any positive results, it's section will be excluded from the output.

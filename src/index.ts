@@ -186,6 +186,7 @@ export async function main(args: CliArguments): Promise<void> {
         moduleDirectory,
         preset: config.preset,
         dependencies,
+        pathTransforms: config.pathTransforms,
       };
 
       // we can't use the third argument here, to keep feeding to traverseResult
