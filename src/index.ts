@@ -272,15 +272,18 @@ export async function main(args: CliArguments): Promise<void> {
       process.exit(1);
     }
   } catch (error) {
+    const errorWithPath = error as Error & { path?: string };
     // console.log is intercepted for output comparison, this helps debugging
     if (process.env.NODE_ENV === 'test') {
-      console.log(error.message);
+      console.log(errorWithPath.message);
     }
 
     spinner.stop();
     console.error(
       chalk.redBright(
-        error.path ? `\nFailed parsing ${error.path}` : error.message,
+        errorWithPath.path
+          ? `\nFailed parsing ${errorWithPath.path}`
+          : errorWithPath.message,
       ),
     );
     process.exit(1);
