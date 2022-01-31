@@ -58,6 +58,10 @@ By default, flow types are stripped from files containing the `@flow` pragma. Wh
 npx unimported --flow
 ```
 
+## CI Usage
+
+You can drop in npx unresolved into your CI. It will fail if it finds any unimported files that are not explicitly set up in the unresolved config file.
+
 ### Cache
 
 Unimported uses a caching system to speed up recurring checks. This cache can be disabled using `--no-cache`. Note that the cache should only be disabled if you are experiencing caching related problems.
