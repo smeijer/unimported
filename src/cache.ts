@@ -57,6 +57,10 @@ export class InvalidCacheError extends Error {
     this.name = 'InvalidCacheError';
     this.path = path;
   }
+
+  static wrap(e: Error, path: string): InvalidCacheError {
+    return new InvalidCacheError(e.message, path);
+  }
 }
 
 export async function resolveEntry<T>(
