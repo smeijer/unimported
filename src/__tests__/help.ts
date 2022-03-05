@@ -17,7 +17,7 @@ test('npx unimported --help', async () => {
     );
   } else {
     execResults = await execAsync(
-      `LC_ALL='en' NODE_ENV='production' ts-node src/index.ts --help`,
+      `LC_ALL='en_US' NODE_ENV='production' ts-node src/index.ts --help`,
     );
   }
 
