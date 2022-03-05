@@ -13,7 +13,12 @@ import type {
 } from '@typescript-eslint/types/dist/ast-spec';
 import resolve from 'resolve';
 import removeFlowTypes from 'flow-remove-types';
-import { invalidateEntries, invalidateEntry, resolveEntry } from './cache';
+import {
+  invalidateEntries,
+  invalidateEntry,
+  InvalidCacheError,
+  resolveEntry,
+} from './cache';
 import { log } from './log';
 import { MapLike } from 'typescript';
 
@@ -348,7 +353,7 @@ export async function traverse(
           break;
       }
     }
-  } catch (error) {
+  } catch (e) {
     if (config.cacheId) {
       invalidateEntry(path);
       invalidateEntries<FileStats>((meta) => {
@@ -357,11 +362,11 @@ export async function traverse(
       });
     }
 
-    if (error instanceof Error && !error['path']) {
-      error['path'] = path;
+    if (e instanceof Error && !(e instanceof InvalidCacheError)) {
+      throw InvalidCacheError.wrap(e, path);
     }
 
-    throw error;
+    throw e;
   }
 
   return result;
