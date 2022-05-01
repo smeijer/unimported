@@ -11,13 +11,13 @@ test('npx unimported --help', async () => {
   // note about `./` path: jest executes the tests from the root directory
   let execResults;
   if (process.platform === 'win32') {
-    // Windows won't understand LC_ALL='en'
+    // Windows won't understand LC_ALL='en_US.utf8'
     execResults = await execAsync(
-      `set LC_All='en' && set NODE_ENV='production' && ts-node src/index.ts --help`,
+      `set LC_All='en-US' && set NODE_ENV='production' && ts-node src/index.ts --help`,
     );
   } else {
     execResults = await execAsync(
-      `LC_ALL='en' NODE_ENV='production' ts-node src/index.ts --help`,
+      `LC_ALL='en_US.utf8' NODE_ENV='production' ts-node src/index.ts --help`,
     );
   }
 

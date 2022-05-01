@@ -357,8 +357,9 @@ export async function traverse(
       });
     }
 
-    if (!e.path) {
-      e.path = path;
+    const errorWithPath = e as Error & { path?: string };
+    if (!errorWithPath.path) {
+      errorWithPath.path = path;
     }
     throw e;
   }
