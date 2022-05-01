@@ -28,7 +28,7 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npm ci --ignore-scripts
+        run: npm ci --ignore-scripts && npx patch-package
 
   eslint:
     name: Eslint
