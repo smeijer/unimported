@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  NODE_VERSION: '12.x'
+  NODE_VERSION: '14.x'
 
 jobs:
   setup:
