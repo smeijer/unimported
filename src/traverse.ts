@@ -348,7 +348,7 @@ export async function traverse(
           break;
       }
     }
-  } catch (e) {
+  } catch (error) {
     if (config.cacheId) {
       invalidateEntry(path);
       invalidateEntries<FileStats>((meta) => {
@@ -357,11 +357,11 @@ export async function traverse(
       });
     }
 
-    const errorWithPath = e as Error & { path?: string };
-    if (!errorWithPath.path) {
-      errorWithPath.path = path;
+    if (error instanceof Error && !error['path']) {
+      error['path'] = path;
     }
-    throw e;
+
+    throw error;
   }
 
   return result;
