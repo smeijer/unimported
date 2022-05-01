@@ -274,21 +274,20 @@ export async function main(args: CliArguments): Promise<void> {
   } catch (error) {
     spinner.stop();
 
-    if (!(error instanceof Error)) {
-      console.error(`something weird happened: ${error}`);
-      process.exit(1);
-    }
-
     // console.log is intercepted for output comparison, this helps debugging
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'test' && error instanceof Error) {
       console.log(error.message);
     }
 
-    console.error(
-      chalk.redBright(
-        error['path'] ? `\nFailed parsing ${error['path']}` : error.message,
-      ),
-    );
+    if (error instanceof InvalidCacheError) {
+      console.error(chalk.redBright(`\nFailed parsing ${error['path']}`));
+    } else if (error instanceof Error) {
+      console.error(chalk.redBright(error.message));
+    } else {
+      // Who knows what this is, hopefully the .toString() is meaningful
+      console.error(`Unexpected value thrown: ${error}`);
+    }
+
     process.exit(1);
   }
 }
