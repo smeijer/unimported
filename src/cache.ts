@@ -32,6 +32,7 @@ function getCache(identity: string) {
   caches[identity] = fileEntryCache.create(
     identity,
     path.resolve(process.cwd(), './node_modules/.cache/unimported'),
+    true,
   );
 
   return caches[identity];
