@@ -67,7 +67,7 @@
     "@types/resolve": "^1.20.1",
     "@types/yargs": "^16.0.0",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "console-testing-library": "^0.6.0",
+    "console-testing-library": "0.6.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "husky": "^5.1.1",
