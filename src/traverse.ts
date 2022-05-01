@@ -353,7 +353,7 @@ export async function traverse(
           break;
       }
     }
-  } catch (e) {
+  } catch (error) {
     if (config.cacheId) {
       invalidateEntry(path);
       invalidateEntries<FileStats>((meta) => {
@@ -362,11 +362,11 @@ export async function traverse(
       });
     }
 
-    if (e instanceof Error && !(e instanceof InvalidCacheError)) {
-      throw InvalidCacheError.wrap(e, path);
+    if (error instanceof Error && !(error instanceof InvalidCacheError)) {
+      throw InvalidCacheError.wrap(error, path);
     }
 
-    throw e;
+    throw error;
   }
 
   return result;
