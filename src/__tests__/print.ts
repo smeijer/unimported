@@ -21,9 +21,7 @@ describe('printResults', () => {
 
   let restore: any;
   beforeEach(() => {
-    // Typings seem incorrect, looks like this was supposed to be fixed
-    // but hasn't been: https://github.com/kevin940726/console-testing-library/pull/25
-    const strippingConsole = createConsole(<any>{ stripAnsi: true });
+    const strippingConsole = createConsole({ stripAnsi: true });
     restore = mockConsole(strippingConsole);
   });
   afterEach(() => {
