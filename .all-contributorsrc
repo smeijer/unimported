@@ -232,6 +232,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "chasingmaxwell",
+      "name": "Peter Sieg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3128659?v=4",
+      "profile": "http://petersieg.me/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -343,6 +343,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://startup-cto.net/"><img src="https://avatars.githubusercontent.com/u/3396992?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel Bartholomae</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=dbartholomae" title="Documentation">📖</a></td>
     <td align="center"><a href="https://t.me/gontovnik"><img src="https://avatars.githubusercontent.com/u/3436659?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Danil Gontovnik</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=gontovnik" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/jarjee"><img src="https://avatars.githubusercontent.com/u/3888305?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Smyth</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=jarjee" title="Code">💻</a></td>
+    <td align="center"><a href="http://petersieg.me/"><img src="https://avatars.githubusercontent.com/u/3128659?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Peter Sieg</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=chasingmaxwell" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=chasingmaxwell" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
