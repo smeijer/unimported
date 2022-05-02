@@ -1,6 +1,6 @@
 {
   "name": "unimported",
-  "version": "1.19.1",
+  "version": "1.20.0",
   "description": "Scans your nodejs project folder and shows obsolete files and modules",
   "main": "./dist/index.js",
   "bin": {
