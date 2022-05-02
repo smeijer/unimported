@@ -61,7 +61,7 @@ function transformPath(rawPath: string, config: TraverseConfig): string {
   let path = rawPath;
   if (config.pathTransforms) {
     for (const [search, replace] of Object.entries(config.pathTransforms)) {
-      path = path.replaceAll(new RegExp(search, 'g'), replace);
+      path = path.replace(new RegExp(search, 'g'), replace);
     }
   }
   return path;
