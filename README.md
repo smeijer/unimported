@@ -297,6 +297,7 @@ npx unimported --clear-cache
 
 ## See Also
 
+- [depcheck](https://www.npmjs.com/depcheck)
 - [unrequired](https://npmjs.com/unrequired)
 - [trucker](https://npmjs.com/trucker)
 
