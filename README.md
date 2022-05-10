@@ -297,8 +297,12 @@ npx unimported --clear-cache
 
 ## See Also
 
+- [depcheck](https://www.npmjs.com/depcheck)
 - [unrequired](https://npmjs.com/unrequired)
 - [trucker](https://npmjs.com/trucker)
+- [ts-unused-exports](https://www.npmjs.com/ts-unused-exports)
+- [no-unused-export](https://www.npmjs.com/no-unused-export)
+- [ts-prune](https://www.npmjs.com/ts-prune)
 
 ## License
 
