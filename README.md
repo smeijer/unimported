@@ -60,7 +60,7 @@ npx unimported --flow
 
 ## CI Usage
 
-You can drop in npx unresolved into your CI. It will fail if it finds any unimported files that are not explicitly set up in the unresolved config file.
+You can drop in `npx unimported` into your CI. It will fail if it finds any unimported files that are not explicitly set up in the `unimported` config file.
 
 ### Cache
 
