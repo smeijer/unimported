@@ -320,6 +320,8 @@ export async function traverse(
     return result;
   }
 
+  path = path.replace(/\\/g, '/');
+
   // be sure to only process each file once, and not end up in recursion troubles
   if (result.files.has(path)) {
     return result;
@@ -332,8 +334,10 @@ export async function traverse(
 
   let parseResult;
   try {
+    const generator = () => parse(String(path), config);
+
     parseResult = config.cacheId
-      ? await resolveEntry(path, () => parse(path, config), config.cacheId)
+      ? await resolveEntry(path, generator, config.cacheId)
       : await parse(path, config);
     result.files.set(path, parseResult);
 
