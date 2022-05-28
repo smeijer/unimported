@@ -70,7 +70,7 @@ Unimported uses a caching system to speed up recurring checks. This cache can be
 npx unimported --no-cache
 ```
 
-If you need to clear the cache, use `--clearCache`.
+If you need to clear the cache, use `--clear-cache`.
 
 ### Clear Cache
 
