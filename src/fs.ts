@@ -35,7 +35,7 @@ export async function writeText(
   }
 }
 
-export async function readJson<T extends any>(
+export async function readJson<T>(
   path: string,
   cwd = '.',
 ): Promise<T | undefined> {
