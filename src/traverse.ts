@@ -10,7 +10,7 @@ import Traverser from 'eslint/lib/shared/traverser';
 import type {
   Identifier,
   Literal,
-} from '@typescript-eslint/types/dist/ast-spec';
+} from '@typescript-eslint/types/dist/generated/ast-spec';
 import resolve from 'resolve';
 import removeFlowTypes from 'flow-remove-types';
 import {
