@@ -111,6 +111,7 @@ jobs:
         
   release:
     needs: [test]
+    if: github.event_name == 'push' && github.repository == 'smeijer/unimported'
     runs-on: ubuntu-latest
     environment: npm
     steps:
