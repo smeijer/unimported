@@ -11,12 +11,11 @@ export function formatList(caption: string, records: string[]): string {
 
   const lines = [
     chalk.grey('─'.repeat(gutterWidth + 1) + '┬' + '─'.repeat(colWidth)),
-    chalk.grey(' '.repeat(gutterWidth + 1) + '│ ') + chalk.whiteBright(caption),
+    chalk.grey(' '.repeat(gutterWidth + 1) + '│ ') + caption,
     chalk.grey('─'.repeat(gutterWidth + 1) + '┼' + '─'.repeat(colWidth)),
     ...records.map(
       (file, idx) =>
-        chalk.grey(`${idx + 1}`.padStart(gutterWidth, ' ') + ' │ ') +
-        chalk.white(file),
+        chalk.grey(`${idx + 1}`.padStart(gutterWidth, ' ') + ' │ ') + file,
     ),
     chalk.grey('─'.repeat(gutterWidth + 1) + '┴' + '─'.repeat(colWidth)),
   ];
@@ -64,8 +63,7 @@ export function formatMetaTable(
 export function printResults(result: ProcessedResult, context: Context): void {
   if (result.clean) {
     console.log(
-      chalk.greenBright(`✓`) +
-        chalk.white(" There don't seem to be any unimported files."),
+      chalk.greenBright(`✓`) + " There don't seem to be any unimported files.",
     );
     return;
   }
