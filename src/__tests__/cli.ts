@@ -257,6 +257,14 @@ cases(
             </script>
           `,
         },
+        {
+          name: 'script-setup.vue',
+          content: `
+            <script setup lang="ts">
+              import './script-setup-imported';
+            </script>
+          `,
+        },
         { name: 'script-setup-imported.js', content: '' },
         {
           name: 'script-src.vue',
