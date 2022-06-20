@@ -108,3 +108,43 @@ jobs:
 
       - name: Test
         run: npm run test
+        
+  release:
+    needs: [test]
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.9.0
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Release
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          semantic_version: 17
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'main',
+              'next',
+              'next-major',
+              {name: 'beta', prerelease: true},
+              {name: 'alpha', prerelease: true}
+            ]
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
