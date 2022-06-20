@@ -223,6 +223,7 @@ cases(
             import './script-ts.vue'
             import './script-src.vue'
             import './script-setup.vue';
+            import './script-setup-ts.vue';
           `,
         },
         {
@@ -257,15 +258,16 @@ cases(
             </script>
           `,
         },
+        { name: 'script-setup-imported.js', content: '' },
         {
-          name: 'script-setup.vue',
+          name: 'script-setup-ts.vue',
           content: `
-            <script setup lang="ts">
-              import './script-setup-imported';
+            <script setup>
+              import './script-setup-ts-imported';
             </script>
           `,
         },
-        { name: 'script-setup-imported.js', content: '' },
+        { name: 'script-setup-ts-imported.js', content: '' },
         {
           name: 'script-src.vue',
           content: `            
