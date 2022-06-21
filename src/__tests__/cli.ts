@@ -262,7 +262,7 @@ cases(
         {
           name: 'script-setup-ts.vue',
           content: `
-            <script setup>
+            <script setup lang="ts">
               import './script-setup-ts-imported';
             </script>
           `,
