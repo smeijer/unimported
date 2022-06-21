@@ -151,7 +151,7 @@ export function resolveImport(
 }
 
 const VueScriptRegExp = new RegExp(
-  '<script(?:(\\s?(?<key>lang|setup|src))(?:=[\'"](?<value>.+)[\'"])?)?\\s?\\/?>',
+  '<script(?:(\\s?(?<key>lang|setup|src))(?:=[\'"](?<value>.+)[\'"])?)*\\s?\\/?>',
   'i',
 );
 
