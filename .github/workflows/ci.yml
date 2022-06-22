@@ -3,8 +3,13 @@ name: CI
 on:
   push:
     branches:
-      - main
-      - feature/test-ci
+      # Match SemVer major release branches, e.g. "2.x" or ".x"
+      - '[0-9]+.x'
+      - 'main'
+      - 'next'
+      - 'alpha'
+      - 'beta'
+      - '!all-contributors/**'
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -142,9 +147,8 @@ jobs:
               '+([0-9])?(.{+([0-9]),x}).x',
               'main',
               'next',
-              'next-major',
-              {name: 'beta', prerelease: true},
-              {name: 'alpha', prerelease: true}
+              { name: 'alpha', prerelease: true },
+              { name: 'beta', prerelease: true }
             ]
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
