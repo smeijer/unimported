@@ -295,6 +295,16 @@ Please try [clearing the cache](#cache) if you have unexpected results, or keep 
 npx unimported --clear-cache
 ```
 
+### TypeScript declaration files
+
+If you import declaration (`.d.ts`) files in a TypeScript project you will need to add it as an extension to `.unimportedrc.json`. Otherwise you will get "unresolved imports" warnings for imported declaration files.
+
+```json
+{
+  "extensions": [".ts", ".d.ts"]
+}
+```
+
 ## See Also
 
 - [depcheck](https://www.npmjs.com/depcheck)
