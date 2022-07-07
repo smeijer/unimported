@@ -3,7 +3,7 @@ import { Context } from './index';
 import { ensureArray } from './ensureArray';
 
 export interface ProcessedResult {
-  unresolved: string[];
+  unresolved: [string, string[]][];
   unimported: string[];
   unused: string[];
   clean: boolean;
@@ -26,7 +26,7 @@ export async function processResults(
   const ignoreUnimportedIdx = index(context.config.ignoreUnimported);
 
   const unresolved = Array.from(traverseResult.unresolved).filter(
-    (x) => !ignoreUnresolvedIdx[x],
+    ([x]) => !ignoreUnresolvedIdx[x],
   );
 
   const unused = Object.keys(context.dependencies).filter(

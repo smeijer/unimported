@@ -30,7 +30,7 @@ export interface FileStats {
 }
 
 export interface TraverseResult {
-  unresolved: Set<string>;
+  unresolved: Map<string, string[]>;
   files: Map<string, FileStats>;
   modules: Set<string>;
 }
@@ -295,7 +295,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
 }
 
 export const getResultObject = () => ({
-  unresolved: new Set<string>(),
+  unresolved: new Map<string, string[]>(),
   modules: new Set<string>(),
   files: new Map<string, FileStats>(),
 });
@@ -332,7 +332,7 @@ export async function traverse(
     return result;
   }
 
-  let parseResult;
+  let parseResult: FileStats;
   try {
     const generator = () => parse(String(path), config);
 
@@ -347,7 +347,13 @@ export async function traverse(
           result.modules.add(file.name);
           break;
         case 'unresolved':
-          result.unresolved.add(file.path);
+          if (result.unresolved.has(file.path)) {
+            result.unresolved.set(file.path, [
+              ...(result.unresolved.get(file.path) || []),
+              ...parseResult.path,
+            ]);
+          }
+          result.unresolved.set(file.path, [parseResult.path]);
           break;
         case 'source_file':
           if (result.files.has(file.path)) {

@@ -25,7 +25,11 @@ export function formatList(caption: string, records: string[]): string {
 
 export function formatMetaTable(
   caption: string,
-  data: { unresolved: string[]; unimported: string[]; unused: string[] },
+  data: {
+    unresolved: [string, string[]][];
+    unimported: string[];
+    unused: string[];
+  },
   context: Context,
 ): string {
   const entryFiles = context.config.entryFiles;
@@ -83,7 +87,14 @@ export function printResults(result: ProcessedResult, context: Context): void {
     console.log(
       formatList(
         chalk.redBright(`${unresolved.length} unresolved imports`),
-        unresolved,
+        unresolved.map(
+          ([item, source]) =>
+            `${item} ${chalk.greenBright('from')} ${source[0]}${
+              source.length > 1
+                ? chalk.greenBright(`and ${source.length - 1} others`)
+                : ''
+            }  `,
+        ),
       ),
     );
   }

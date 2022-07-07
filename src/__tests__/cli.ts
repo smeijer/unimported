@@ -183,6 +183,15 @@ cases(
       stdout: /1 unresolved imports.*.\/foo/s,
     },
     {
+      name: 'should show the source of the unresolved import',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from './foo';` },
+      ],
+      exitCode: 1,
+      stdout: /\.\/foo.*from.*\/index\.js/s,
+    },
+    {
       name: 'should ignore untracked files that are not imported',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },

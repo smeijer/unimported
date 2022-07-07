@@ -45,7 +45,7 @@ describe('printResults', () => {
 
   it('should print summary and unresolved, unimported, and unused tables populated', () => {
     const expectedProcessedResult = {
-      unresolved: ['string', 'string'],
+      unresolved: <[string, string[]][]>[['string', ['string']]],
       unimported: ['string', 'string', 'string', 'string'],
       unused: ['string', 'string', 'string'],
       clean: false,
@@ -58,16 +58,15 @@ describe('printResults', () => {
       ────────────────────────────────────────────────────────────────────────────────
              entry file          : src/client/main.js
 
-             unresolved imports  : 2
+             unresolved imports  : 1
              unused dependencies : 3
              unimported files    : 4
 
 
       ─────┬──────────────────────────────────────────────────────────────────────────
-           │ 2 unresolved imports
+           │ 1 unresolved imports
       ─────┼──────────────────────────────────────────────────────────────────────────
-         1 │ string
-         2 │ string
+         1 │ string from string  
       ─────┴──────────────────────────────────────────────────────────────────────────
 
 
