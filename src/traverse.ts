@@ -157,8 +157,8 @@ const VueScriptRegExp = new RegExp(
 
 function extractFromScriptTag(code: string) {
   const lines = code.split('\n');
-  let start = -1;
-  let end = -1;
+  const start: number[] = [];
+  const end: number[] = [];
 
   // walk the code from start to end to find the first <script> tag on it's own line
   for (let idx = 0; idx < lines.length; idx++) {
@@ -171,20 +171,31 @@ function extractFromScriptTag(code: string) {
       return `import '${matches.groups?.value.trim()}';`;
     }
 
-    start = idx;
-    break;
+    start.push(idx);
+
+    if (start.length === 2) {
+      break;
+    }
   }
 
   // walk the code in reverse to find the last </script> tag on it's own line
   for (let idx = lines.length - 1; idx >= 0; idx--) {
     if (lines[idx].trim() === '</script>') {
-      end = idx;
+      end.push(idx);
+    }
+    if (end.length === 2) {
       break;
     }
   }
 
-  const str =
-    start > -1 && end > -1 ? lines.slice(start + 1, end).join('\n') : '';
+  let str = '';
+
+  if (start.length > 0 && end.length > 0) {
+    const endReversed = end.reverse();
+    start.forEach((value, index) => {
+      str += lines.slice(value + 1, endReversed[index]).join('\n');
+    });
+  }
 
   return str;
 }
