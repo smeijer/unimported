@@ -223,7 +223,9 @@ cases(
             import './script-ts.vue'
             import './script-src.vue'
             import './script-setup.vue';
+            import './script-setup-alongside-script.vue';
             import './script-setup-ts.vue';
+            import './script-setup-ts-alongside-script';
           `,
         },
         {
@@ -260,6 +262,19 @@ cases(
         },
         { name: 'script-setup-imported.js', content: '' },
         {
+          name: 'script-setup-alongside-script.vue',
+          content: `
+            <script>
+              import './script-setup-imported';
+            </script>
+            <script setup>
+              import './script-setup2-imported';
+            </script>
+          `,
+        },
+        { name: 'script-setup-imported.js', content: '' },
+        { name: 'script-setup2-imported.js', content: '' },
+        {
           name: 'script-setup-ts.vue',
           content: `
             <script setup lang="ts">
@@ -268,6 +283,20 @@ cases(
           `,
         },
         { name: 'script-setup-ts-imported.js', content: '' },
+        {
+          name: 'script-setup-ts-alongside-script.vue',
+          content: `
+            <script lang="ts">
+              import './script-setup-ts-imported';
+            </script>
+            
+            <script setup lang="ts">
+              import './script-setup-ts2-imported';
+            </script>
+          `,
+        },
+        { name: 'script-setup-ts-imported.js', content: '' },
+        { name: 'script-setup-ts2-imported.js', content: '' },
         {
           name: 'script-src.vue',
           content: `            
