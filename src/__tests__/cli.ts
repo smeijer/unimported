@@ -834,6 +834,23 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./s,
     },
+    {
+      name: 'should evaluate pathTransforms',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        {
+          name: 'index.ts',
+          content: `import { random } from './helpers/index.js';`,
+        },
+        { name: 'helpers/index.ts', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "pathTransforms": { "(\\..+)\\.js$": "$1.ts" } }',
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
+    },
   ],
 );
 

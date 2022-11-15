@@ -41,6 +41,7 @@ export interface UnimportedConfig {
   rootDir?: string;
   extensions?: string[];
   aliases?: MapLike<string[]>;
+  pathTransforms?: MapLike<string>;
 }
 
 type PresetParams = {
@@ -68,6 +69,7 @@ export interface Config {
   moduleDirectory?: string[];
   rootDir?: string;
   extensions: string[];
+  pathTransforms?: MapLike<string>;
 }
 
 export async function expandGlob(
@@ -146,6 +148,7 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
     moduleDirectory: configFile?.moduleDirectory ?? preset?.moduleDirectory,
     entryFiles: [],
     extensions: [],
+    pathTransforms: configFile?.pathTransforms ?? preset?.pathTransforms,
   };
 
   const aliases = configFile?.aliases ?? preset?.aliases ?? {};
