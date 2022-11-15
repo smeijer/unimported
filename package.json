@@ -1,6 +1,6 @@
 {
   "name": "unimported",
-  "version": "1.20.0",
+  "version": "1.20.2",
   "description": "Scans your nodejs project folder and shows obsolete files and modules",
   "main": "./dist/index.js",
   "bin": {
@@ -40,8 +40,8 @@
     "unreferenced"
   ],
   "dependencies": {
-    "@typescript-eslint/parser": "^4.28.1",
-    "@typescript-eslint/typescript-estree": "^4.28.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "@typescript-eslint/typescript-estree": "^5.27.1",
     "chalk": "^4.1.0",
     "debug": "^4.3.2",
     "eslint": "^7.20.0",
@@ -66,7 +66,7 @@
     "@types/node": "^14.14.31",
     "@types/resolve": "^1.20.1",
     "@types/yargs": "^16.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
     "console-testing-library": "0.6.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",

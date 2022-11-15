@@ -3,7 +3,13 @@ name: CI
 on:
   push:
     branches:
-      - main
+      # Match SemVer major release branches, e.g. "2.x" or ".x"
+      - '[0-9]+.x'
+      - 'main'
+      - 'next'
+      - 'alpha'
+      - 'beta'
+      - '!all-contributors/**'
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -13,7 +19,10 @@ env:
 jobs:
   setup:
     name: Setup
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
@@ -83,7 +92,10 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     needs: [setup]
     timeout-minutes: 5
     steps:
@@ -101,3 +113,43 @@ jobs:
 
       - name: Test
         run: npm run test
+        
+  release:
+    needs: [test]
+    if: github.event_name == 'push' && github.repository == 'smeijer/unimported'
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.9.0
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Release
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          semantic_version: 17
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'main',
+              'next',
+              { name: 'alpha', prerelease: true },
+              { name: 'beta', prerelease: true }
+            ]
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

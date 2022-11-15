@@ -146,7 +146,7 @@ export async function main(args: CliArguments): Promise<void> {
       config,
       moduleDirectory,
       ...args,
-      cwd,
+      cwd: cwd.replace(/\\/g, '/'),
     };
 
     if (args.init) {

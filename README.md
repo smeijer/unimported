@@ -60,7 +60,7 @@ npx unimported --flow
 
 ## CI Usage
 
-You can drop in npx unresolved into your CI. It will fail if it finds any unimported files that are not explicitly set up in the unresolved config file.
+You can drop in `npx unimported` into your CI. It will fail if it finds any unimported files that are not explicitly set up in the `unimported` config file.
 
 ### Cache
 
@@ -70,7 +70,7 @@ Unimported uses a caching system to speed up recurring checks. This cache can be
 npx unimported --no-cache
 ```
 
-If you need to clear the cache, use `--clearCache`.
+If you need to clear the cache, use `--clear-cache`.
 
 ### Clear Cache
 
@@ -308,10 +308,24 @@ Please try [clearing the cache](#cache) if you have unexpected results, or keep 
 npx unimported --clear-cache
 ```
 
+### TypeScript declaration files
+
+If you import declaration (`.d.ts`) files in a TypeScript project you will need to add it as an extension to `.unimportedrc.json`. Otherwise you will get "unresolved imports" warnings for imported declaration files.
+
+```json
+{
+  "extensions": [".ts", ".d.ts"]
+}
+```
+
 ## See Also
 
+- [depcheck](https://www.npmjs.com/depcheck)
 - [unrequired](https://npmjs.com/unrequired)
 - [trucker](https://npmjs.com/trucker)
+- [ts-unused-exports](https://www.npmjs.com/ts-unused-exports)
+- [no-unused-export](https://www.npmjs.com/no-unused-export)
+- [ts-prune](https://www.npmjs.com/ts-prune)
 
 ## License
 

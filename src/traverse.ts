@@ -10,7 +10,7 @@ import Traverser from 'eslint/lib/shared/traverser';
 import type {
   Identifier,
   Literal,
-} from '@typescript-eslint/types/dist/ast-spec';
+} from '@typescript-eslint/types/dist/generated/ast-spec';
 import resolve from 'resolve';
 import removeFlowTypes from 'flow-remove-types';
 import {
@@ -162,14 +162,14 @@ export function resolveImport(
 }
 
 const VueScriptRegExp = new RegExp(
-  '<script(?:(\\s?(?<key>lang|setup|src))(?:=[\'"](?<value>.+)[\'"])?)?\\s?\\/?>',
+  '<script(?:(\\s?(?<key>lang|setup|src))(?:=[\'"](?<value>.+)[\'"])?)*\\s?\\/?>',
   'i',
 );
 
 function extractFromScriptTag(code: string) {
   const lines = code.split('\n');
-  let start = -1;
-  let end = -1;
+  const start: number[] = [];
+  const end: number[] = [];
 
   // walk the code from start to end to find the first <script> tag on it's own line
   for (let idx = 0; idx < lines.length; idx++) {
@@ -182,20 +182,31 @@ function extractFromScriptTag(code: string) {
       return `import '${matches.groups?.value.trim()}';`;
     }
 
-    start = idx;
-    break;
+    start.push(idx);
+
+    if (start.length === 2) {
+      break;
+    }
   }
 
   // walk the code in reverse to find the last </script> tag on it's own line
   for (let idx = lines.length - 1; idx >= 0; idx--) {
     if (lines[idx].trim() === '</script>') {
-      end = idx;
+      end.push(idx);
+    }
+    if (end.length === 2) {
       break;
     }
   }
 
-  const str =
-    start > -1 && end > -1 ? lines.slice(start + 1, end).join('\n') : '';
+  let str = '';
+
+  if (start.length > 0 && end.length > 0) {
+    const endReversed = end.reverse();
+    start.forEach((value, index) => {
+      str += lines.slice(value + 1, endReversed[index]).join('\n');
+    });
+  }
 
   return str;
 }
@@ -332,6 +343,8 @@ export async function traverse(
     return result;
   }
 
+  path = path.replace(/\\/g, '/');
+
   // be sure to only process each file once, and not end up in recursion troubles
   if (result.files.has(path)) {
     return result;
@@ -344,8 +357,10 @@ export async function traverse(
 
   let parseResult;
   try {
+    const generator = () => parse(String(path), config);
+
     parseResult = config.cacheId
-      ? await resolveEntry(path, () => parse(path, config), config.cacheId)
+      ? await resolveEntry(path, generator, config.cacheId)
       : await parse(path, config);
     result.files.set(path, parseResult);
 
