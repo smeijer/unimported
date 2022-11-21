@@ -436,7 +436,7 @@ import bar from './bar';
       stdout: /There don't seem to be any unimported files/,
     },
     {
-      name: 'should use all variants of import/export',
+      name: 'should use all variants of import/export/require',
       files: [
         {
           name: 'package.json',
@@ -452,6 +452,12 @@ import bar from './bar';
 import {b as a} from './b'
 const promise = import('./d')
 const templatePromise = import(\`./e\`)
+const promiseAwaited = await import('./f')
+const templatePromiseAwaited = await import(\`./g\`)
+const required = require('./h')
+const templateRequired = require(\`./i\`)
+const requiredAwaited = await require('./j')
+const templateRequiredAwaited = await require(\`./k\`)
 export {a}
 export {b} from './b'
 export * from './c'
@@ -462,6 +468,12 @@ export default promise
         { name: 'c.js', content: 'const c = 3; export {c}' },
         { name: 'd.js', content: 'export default 42' },
         { name: 'e.js', content: 'export default 42' },
+        { name: 'f.js', content: 'export default 42' },
+        { name: 'g.js', content: 'export default 42' },
+        { name: 'h.js', content: 'export default 42' },
+        { name: 'i.js', content: 'export default 42' },
+        { name: 'j.js', content: 'export default 42' },
+        { name: 'k.js', content: 'export default 42' },
       ],
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
