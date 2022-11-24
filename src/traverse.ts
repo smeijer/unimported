@@ -301,7 +301,19 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
             break;
           }
 
-          target = (node.arguments[0] as Literal).value;
+          const [argument] = node.arguments;
+
+          if (argument.type === 'TemplateLiteral') {
+            // Allow for constant template literals, require(`.x`)
+            if (
+              argument.expressions.length === 0 &&
+              argument.quasis.length === 1
+            ) {
+              target = argument.quasis[0].value.cooked;
+            }
+          } else {
+            target = (argument as Literal).value;
+          }
           break;
         }
       }
