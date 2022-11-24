@@ -242,6 +242,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "notjosh",
+      "name": "Joshua May",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33126?v=4",
+      "profile": "http://notjosh.com/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
