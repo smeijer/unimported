@@ -232,7 +232,9 @@ cases(
             import './script-ts.vue'
             import './script-src.vue'
             import './script-setup.vue';
+            import './script-setup-alongside-script.vue';
             import './script-setup-ts.vue';
+            import './script-setup-ts-alongside-script';
           `,
         },
         {
@@ -269,6 +271,19 @@ cases(
         },
         { name: 'script-setup-imported.js', content: '' },
         {
+          name: 'script-setup-alongside-script.vue',
+          content: `
+            <script>
+              import './script-setup-imported';
+            </script>
+            <script setup>
+              import './script-setup2-imported';
+            </script>
+          `,
+        },
+        { name: 'script-setup-imported.js', content: '' },
+        { name: 'script-setup2-imported.js', content: '' },
+        {
           name: 'script-setup-ts.vue',
           content: `
             <script setup lang="ts">
@@ -277,6 +292,20 @@ cases(
           `,
         },
         { name: 'script-setup-ts-imported.js', content: '' },
+        {
+          name: 'script-setup-ts-alongside-script.vue',
+          content: `
+            <script lang="ts">
+              import './script-setup-ts-imported';
+            </script>
+            
+            <script setup lang="ts">
+              import './script-setup-ts2-imported';
+            </script>
+          `,
+        },
+        { name: 'script-setup-ts-imported.js', content: '' },
+        { name: 'script-setup-ts2-imported.js', content: '' },
         {
           name: 'script-src.vue',
           content: `            
@@ -416,7 +445,7 @@ import bar from './bar';
       stdout: /There don't seem to be any unimported files/,
     },
     {
-      name: 'should use all variants of import/export',
+      name: 'should use all variants of import/export/require',
       files: [
         {
           name: 'package.json',
@@ -432,6 +461,12 @@ import bar from './bar';
 import {b as a} from './b'
 const promise = import('./d')
 const templatePromise = import(\`./e\`)
+const promiseAwaited = await import('./f')
+const templatePromiseAwaited = await import(\`./g\`)
+const required = require('./h')
+const templateRequired = require(\`./i\`)
+const requiredAwaited = await require('./j')
+const templateRequiredAwaited = await require(\`./k\`)
 export {a}
 export {b} from './b'
 export * from './c'
@@ -442,6 +477,12 @@ export default promise
         { name: 'c.js', content: 'const c = 3; export {c}' },
         { name: 'd.js', content: 'export default 42' },
         { name: 'e.js', content: 'export default 42' },
+        { name: 'f.js', content: 'export default 42' },
+        { name: 'g.js', content: 'export default 42' },
+        { name: 'h.js', content: 'export default 42' },
+        { name: 'i.js', content: 'export default 42' },
+        { name: 'j.js', content: 'export default 42' },
+        { name: 'k.js', content: 'export default 42' },
       ],
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
@@ -813,6 +854,23 @@ export default promise
       ],
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./s,
+    },
+    {
+      name: 'should evaluate pathTransforms',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        {
+          name: 'index.ts',
+          content: `import { random } from './helpers/index.js';`,
+        },
+        { name: 'helpers/index.ts', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "pathTransforms": { "(\\..+)\\.js$": "$1.ts" } }',
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
     },
   ],
 );
