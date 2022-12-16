@@ -3,10 +3,9 @@ import { dirname, extname } from 'path';
 import {
   AST_NODE_TYPES,
   parse as parseEstree,
-  TSESTree,
+  simpleTraverse,
 } from '@typescript-eslint/typescript-estree';
 import * as fs from './fs';
-import Traverser from 'eslint/lib/shared/traverser';
 import type {
   Identifier,
   Literal,
@@ -248,25 +247,25 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
     jsx: stats.extname !== '.ts',
   });
 
-  Traverser.traverse(ast, {
-    enter(node: TSESTree.Node) {
-      let target;
+  simpleTraverse(ast, {
+    enter(node) {
+      let target: string | undefined;
 
       switch (node.type) {
         // import x from './x';
         case AST_NODE_TYPES.ImportDeclaration:
-          if (!node.source || !(node.source as Literal).value) {
+          if (!node.source.value) {
             break;
           }
-          target = (node.source as Literal).value as string;
+          target = node.source.value;
           break;
 
         // export { x } from './x';
         case AST_NODE_TYPES.ExportNamedDeclaration:
-          if (!node.source || !(node.source as Literal).value) {
+          if (!node.source?.value) {
             break;
           }
-          target = (node.source as Literal).value as string;
+          target = node.source.value;
           break;
 
         // export * from './x';
@@ -275,7 +274,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
             break;
           }
 
-          target = (node.source as Literal).value as string;
+          target = node.source.value;
           break;
 
         // import('.x') || await import('.x')
@@ -291,7 +290,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
               target = source.quasis[0].value.cooked;
             }
           } else {
-            target = (source as Literal).value;
+            target = (source as Literal).value as string;
           }
           break;
 
@@ -312,7 +311,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
               target = argument.quasis[0].value.cooked;
             }
           } else {
-            target = (argument as Literal).value;
+            target = (argument as Literal).value as string;
           }
           break;
         }
