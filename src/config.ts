@@ -128,7 +128,10 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
     return cachedConfig;
   }
 
-  const configFile = await readJson<Partial<UnimportedConfig>>(CONFIG_FILE);
+  const configFile = await readJson<Partial<UnimportedConfig>>(
+    args?.config || CONFIG_FILE,
+  );
+
   const unimportedPkg = await readPkgUp({ cwd: __dirname });
 
   const preset = await getPreset(configFile?.preset);
