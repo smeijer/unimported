@@ -143,9 +143,9 @@ export async function main(args: CliArguments): Promise<void> {
     const context: Context = {
       dependencies,
       peerDependencies,
-      config,
       moduleDirectory,
       ...args,
+      config,
       cwd: cwd.replace(/\\/g, '/'),
     };
 
@@ -303,6 +303,7 @@ export interface CliArguments {
   cwd?: string;
   showConfig: boolean;
   showPreset?: string;
+  config?: string;
 }
 
 if (process.env.NODE_ENV !== 'test') {
@@ -362,6 +363,11 @@ if (process.env.NODE_ENV !== 'test') {
           alias: 'u',
           type: 'boolean',
           describe: 'Update the ignore-lists stored in .unimportedrc.json.',
+        });
+
+        yargs.option('config', {
+          type: 'string',
+          describe: 'The path to the config file.',
         });
       },
       function (argv: Arguments<CliArguments>) {
