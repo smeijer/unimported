@@ -1,9 +1,15 @@
-import * as fs from './fs';
 import path, { join } from 'path';
-import { MapLike } from 'typescript';
-import { ensureArray } from './ensureArray';
-import { Context, JsConfig, PackageJson, TsConfig } from './index';
+import {
+  findConfigFile,
+  MapLike,
+  parseJsonConfigFileContent,
+  readConfigFile,
+  sys,
+} from 'typescript';
 import { EntryConfig, getConfig } from './config';
+import { ensureArray } from './ensureArray';
+import * as fs from './fs';
+import { Context, JsConfig, PackageJson } from './index';
 import { log } from './log';
 
 interface Aliases {
@@ -24,15 +30,39 @@ export function typedBoolean<T>(
   return Boolean(value);
 }
 
+export const readTsconfig = () => {
+  const resolvedPathname = findConfigFile(
+    process.cwd(),
+    sys.fileExists,
+    'tsconfig.json',
+  );
+
+  if (!resolvedPathname) {
+    return undefined;
+  }
+
+  const { config } = readConfigFile(resolvedPathname, sys.readFile);
+
+  if (!config) {
+    return undefined;
+  }
+
+  const { options } = parseJsonConfigFileContent(config, sys, process.cwd());
+
+  return {
+    compilerOptions: options,
+  };
+};
+
 export async function getAliases(
   entryFile: EntryConfig,
 ): Promise<MapLike<string[]>> {
-  const [packageJson, tsconfig, jsconfig] = await Promise.all([
+  const [packageJson, jsconfig] = await Promise.all([
     fs.readJson<PackageJson>('package.json'),
-    fs.readJson<TsConfig>('tsconfig.json'),
     fs.readJson<JsConfig>('jsconfig.json'),
   ]);
 
+  const tsconfig = readTsconfig();
   const config = await getConfig();
 
   let aliases: Aliases = {};
