@@ -24,7 +24,7 @@ test('npx unimported --help', async () => {
   const { stdout, stderr } = execResults;
 
   expect(stderr).toBe('');
-  console.log(stdout.trim());
+
   expect(stdout.trim()).toMatchInlineSnapshot(`
   "unimported [cwd]
 
