@@ -68,6 +68,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     return;
   }
 
+  const { showUnresolved, showUnused, showUnimported } = chooseResults(context);
   const { unresolved, unused, unimported } = result;
 
   // render
@@ -79,7 +80,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     ),
   );
 
-  if (unresolved.length > 0) {
+  if (showUnresolved && unresolved.length > 0) {
     console.log(
       formatList(
         chalk.redBright(`${unresolved.length} unresolved imports`),
@@ -88,7 +89,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     );
   }
 
-  if (unused.length > 0) {
+  if (showUnused && unused.length > 0) {
     console.log(
       formatList(
         chalk.blueBright(`${unused.length} unused dependencies`),
@@ -97,7 +98,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     );
   }
 
-  if (unimported.length > 0) {
+  if (showUnimported && unimported.length > 0) {
     console.log(
       formatList(
         chalk.cyanBright(`${unimported.length} unimported files`),
@@ -111,4 +112,24 @@ export function printResults(result: ProcessedResult, context: Context): void {
       'npx unimported -u',
     )} to update ignore lists`,
   );
+}
+
+function chooseResults(context: Context) {
+  const { showUnresolvedImports, showUnusedDeps, showUnusedFiles } = context;
+  const showAllResults =
+    // when all three flags are used
+    (showUnresolvedImports && showUnusedDeps && showUnusedFiles) ||
+    // when none flag is used
+    (!showUnresolvedImports && !showUnusedDeps && !showUnusedFiles);
+
+  const showUnresolved = showUnresolvedImports || showAllResults;
+  const showUnused = showUnusedDeps || showAllResults;
+  const showUnimported = showUnusedFiles || showAllResults;
+
+  return {
+    showAllResults,
+    showUnresolved,
+    showUnused,
+    showUnimported,
+  };
 }
