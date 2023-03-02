@@ -44,6 +44,9 @@ async function exec(
     cache = true,
     clearCache = false,
     showConfig = false,
+    showUnresolvedImports = false,
+    showUnusedFiles = false,
+    showUnusedDeps = false,
   }: Partial<CliArguments> = {},
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
   const originalExit = process.exit;
@@ -86,6 +89,9 @@ async function exec(
       cache,
       clearCache,
       showConfig,
+      showUnresolvedImports,
+      showUnusedFiles,
+      showUnusedDeps,
     });
 
     return { exitCode: exitCode ?? 0, stdout, stderr };

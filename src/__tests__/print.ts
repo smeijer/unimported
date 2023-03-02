@@ -17,6 +17,9 @@ describe('printResults', () => {
       ignoreUnused: [],
       ignoreUnresolved: [],
     },
+    showUnresolvedImports: false,
+    showUnusedDeps: false,
+    showUnusedFiles: false,
   } as Context;
 
   let restore: any;

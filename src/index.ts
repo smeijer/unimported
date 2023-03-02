@@ -65,6 +65,9 @@ export interface Context {
   config: Config;
   moduleDirectory: string[];
   cacheId?: string;
+  showUnusedFiles: boolean;
+  showUnusedDeps: boolean;
+  showUnresolvedImports: boolean;
 }
 
 const oraStub = {
@@ -304,6 +307,9 @@ export interface CliArguments {
   showConfig: boolean;
   showPreset?: string;
   config?: string;
+  showUnusedFiles: boolean;
+  showUnusedDeps: boolean;
+  showUnresolvedImports: boolean;
 }
 
 if (process.env.NODE_ENV !== 'test') {
@@ -368,6 +374,21 @@ if (process.env.NODE_ENV !== 'test') {
         yargs.option('config', {
           type: 'string',
           describe: 'The path to the config file.',
+        });
+
+        yargs.option('show-unused-files', {
+          type: 'boolean',
+          describe: 'formats and only prints unimported files',
+        });
+
+        yargs.option('show-unused-deps', {
+          type: 'boolean',
+          describe: 'formats and only prints unused dependencies',
+        });
+
+        yargs.option('show-unresolved-imports', {
+          type: 'boolean',
+          describe: 'formats and only prints unresolved imports',
         });
       },
       function (argv: Arguments<CliArguments>) {
