@@ -5,7 +5,7 @@ import readPkgUp from 'read-pkg-up';
 
 import path, { join } from 'path';
 import ora from 'ora';
-import { printDeletedFiles, printResults } from './print';
+import { printDeletedFiles, printRemovedDeps, printResults } from './print';
 import * as meta from './meta';
 import { getResultObject, traverse, TraverseConfig } from './traverse';
 import chalk from 'chalk';
@@ -27,7 +27,7 @@ import {
 } from './cache';
 import { log } from './log';
 import { presets } from './presets';
-import { deleteUnimportedFiles } from './delete';
+import { deleteUnimportedFiles, removeUnusedDeps } from './delete';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -263,16 +263,36 @@ export async function main(args: CliArguments): Promise<void> {
       storeCache();
     }
 
-    if (args.deleteUnimportedFiles) {
-      const { error, deletedFiles } = await deleteUnimportedFiles(
-        result,
-        context,
-      );
+    if (args.deleteUnimportedFiles && args.removeUnusedDeps) {
+      const deleteFilesResult = await deleteUnimportedFiles(result, context);
+      const removeUnusedDepsResult = await removeUnusedDeps(result, context);
+      const error = deleteFilesResult.error || removeUnusedDepsResult.error;
       if (error) {
         console.log(chalk.redBright(`✕`) + ` ${error}`);
         process.exit(1);
       }
-      printDeletedFiles(deletedFiles);
+      printDeletedFiles(deleteFilesResult.deletedFiles);
+      printRemovedDeps(removeUnusedDepsResult.removedDeps);
+      process.exit(0);
+    }
+    if (args.deleteUnimportedFiles) {
+      const deleteFilesResult = await deleteUnimportedFiles(result, context);
+      const error = deleteFilesResult.error;
+      if (error) {
+        console.log(chalk.redBright(`✕`) + ` ${error}`);
+        process.exit(1);
+      }
+      printDeletedFiles(deleteFilesResult.deletedFiles);
+      process.exit(0);
+    }
+    if (args.removeUnusedDeps) {
+      const removedDepsResult = await removeUnusedDeps(result, context);
+      const error = removedDepsResult.error;
+      if (error) {
+        console.log(chalk.redBright(`✕`) + ` ${error}`);
+        process.exit(1);
+      }
+      printDeletedFiles(removedDepsResult.removedDeps);
       process.exit(0);
     }
 
@@ -322,6 +342,7 @@ export interface CliArguments {
   showConfig: boolean;
   showPreset?: string;
   config?: string;
+  removeUnusedDeps: boolean;
   showUnusedFiles: boolean;
   showUnusedDeps: boolean;
   showUnresolvedImports: boolean;
@@ -352,6 +373,12 @@ if (process.env.NODE_ENV !== 'test') {
           type: 'boolean',
           describe:
             'Delete unimported files. This is a destructive operation, use with caution.',
+          default: false,
+        });
+        yargs.option('remove-unused-deps', {
+          type: 'boolean',
+          describe:
+            'Removes unused dependencies. This is a destructive operation, use with caution.',
           default: false,
         });
 

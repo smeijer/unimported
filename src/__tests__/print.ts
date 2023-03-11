@@ -1,6 +1,6 @@
 import { createConsole, getLog, mockConsole } from 'console-testing-library';
 import { Context } from '../index';
-import { printResults } from '../print';
+import { printDeletedFiles, printRemovedDeps, printResults } from '../print';
 
 describe('printResults', () => {
   const expectedContext = {
@@ -44,6 +44,31 @@ describe('printResults', () => {
     expect(getLog().log).toMatchInlineSnapshot(
       `"✓ There don't seem to be any unimported files."`,
     );
+  });
+
+  it('should print summary of removed packages', () => {
+    printRemovedDeps(['unused-package']);
+    expect(getLog().log).toMatchInlineSnapshot(`
+      "
+      ─────┬──────────────────────────────────────────────────────────────────────────
+           │ 1 unused dependencies removed
+      ─────┼──────────────────────────────────────────────────────────────────────────
+         1 │ unused-package
+      ─────┴──────────────────────────────────────────────────────────────────────────
+      "
+    `);
+  });
+  it('should print summary of deleted files', () => {
+    printDeletedFiles(['file.text']);
+    expect(getLog().log).toMatchInlineSnapshot(`
+      "
+      ─────┬──────────────────────────────────────────────────────────────────────────
+           │ 1 unimported files deleted
+      ─────┼──────────────────────────────────────────────────────────────────────────
+         1 │ file.text
+      ─────┴──────────────────────────────────────────────────────────────────────────
+      "
+    `);
   });
 
   it('should print summary and unresolved, unimported, and unused tables populated', () => {

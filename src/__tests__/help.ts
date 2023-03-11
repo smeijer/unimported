@@ -41,6 +41,9 @@ test('npx unimported --help', async () => {
           --delete-unimported-files  Delete unimported files. This is a destructive
                                      operation, use with caution.
                                                           [boolean] [default: false]
+          --remove-unused-deps       Removes unused dependencies. This is a
+                                     destructive operation, use with caution.
+                                                          [boolean] [default: false]
           --clear-cache              Clears the cache file and then exits. [boolean]
       -f, --flow                     Whether to strip flow types, regardless of
                                      @flow pragma.                         [boolean]

@@ -74,6 +74,20 @@ export function printDeletedFiles(deletedFiles: string[]): void {
   );
 }
 
+export function printRemovedDeps(removedDeps: string[]): void {
+  if (removedDeps.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unimported files.');
+    return;
+  }
+
+  console.log(
+    formatList(
+      chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+      removedDeps,
+    ),
+  );
+}
+
 export function printResults(result: ProcessedResult, context: Context): void {
   if (result.clean) {
     console.log(
