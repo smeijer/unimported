@@ -15,6 +15,10 @@ export async function exists(path: string, cwd = ''): Promise<boolean> {
   return await existsAsync(join(cwd, path));
 }
 
+export async function deleteFile(path: string, cwd = ''): Promise<void> {
+  return util.promisify(fs.rm)(join(cwd, path));
+}
+
 export async function readText(path: string, cwd = ''): Promise<string> {
   try {
     return await readFileAsync(join(cwd, path), { encoding: 'utf8' });
