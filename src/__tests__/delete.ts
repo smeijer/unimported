@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { removeUnusedFiles, removeUnusedDeps } from '../delete';
+import { removeUnused } from '../delete';
 import { ProcessedResult } from '../process';
 import { Context, PackageJson } from '../index';
 import { readJson, writeText } from '../fs';
@@ -14,7 +14,10 @@ afterEach(() => {
   fs.rmSync(testSpaceDir, { recursive: true });
 });
 
-describe('removeUnusedDeps', () => {
+describe('removeUnused', () => {
+  const testFileName1 = 'testFile1.txt';
+  const testFileName2 = 'testFile2.txt';
+  const unusedFiles = [testFileName1, testFileName2];
   const packageJson: PackageJson = {
     name: '',
     version: '',
@@ -25,19 +28,23 @@ describe('removeUnusedDeps', () => {
   };
   const result: ProcessedResult = {
     clean: false,
-    unimported: [],
+    unimported: unusedFiles,
     unresolved: [],
     unused: ['unused-package'],
   };
+  const context = {
+    cwd: testSpaceDir,
+  } as Context;
   beforeEach(async () => {
     await writeText('package.json', JSON.stringify(packageJson), testSpaceDir);
+    await writeText(testFileName1, '', testSpaceDir);
+    await writeText(testFileName2, '', testSpaceDir);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should remove unused packages from package.json', async () => {
-    const context = {
-      cwd: testSpaceDir,
-    } as Context;
-    const { removedDeps, error } = await removeUnusedDeps(result, context);
+    const { removedDeps, error } = await removeUnused(result, context);
     expect(error).toBeUndefined();
     const updatedPackageJson = await readJson<PackageJson>(
       'package.json',
@@ -48,53 +55,10 @@ describe('removeUnusedDeps', () => {
       'used-package': '1.0.0',
     });
   });
-  it('does not remove packages if there are unresolved imports', async () => {
-    const context = {
-      cwd: testSpaceDir,
-    } as Context;
-    const { removedDeps, error } = await removeUnusedDeps(
-      { ...result, unresolved: ['anything.txt'] },
-      context,
-    );
-    expect(error).toContain('Unable to safely delete');
-    expect(removedDeps).toEqual([]);
-    const updatedPackageJson = await readJson<PackageJson>(
-      'package.json',
-      testSpaceDir,
-    );
-    expect(updatedPackageJson?.dependencies).toEqual({
-      'unused-package': '1.0.0',
-      'used-package': '1.0.0',
-    });
-  });
-});
-
-describe('deleteUnimportedFiles', () => {
-  const testFileName1 = 'testFile1.txt';
-  const testFileName2 = 'testFile2.txt';
-  const unusedFiles = [testFileName1, testFileName2];
-  const result: ProcessedResult = {
-    clean: false,
-    unimported: unusedFiles,
-    unresolved: [],
-    unused: [],
-  };
-
-  const context = {
-    cwd: testSpaceDir,
-  } as Context;
-
-  beforeEach(async () => {
-    await writeText(testFileName1, '', testSpaceDir);
-    await writeText(testFileName2, '', testSpaceDir);
-  });
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-  it('should call fs.rm for each unused file', async () => {
+  it('should remove unused files', async () => {
     const rm = jest.spyOn(fs, 'rm');
 
-    const { deletedFiles } = await removeUnusedFiles(result, context);
+    const { deletedFiles } = await removeUnused(result, context);
 
     expect(rm).toHaveBeenCalledTimes(unusedFiles.length);
     unusedFiles.forEach((file) => {
@@ -105,16 +69,54 @@ describe('deleteUnimportedFiles', () => {
     });
     expect(deletedFiles).toEqual(unusedFiles);
   });
-  it('does not delete files if there are unresolved imports', async () => {
+  it('should not remove anything if there are unresolved imports', async () => {
     const rm = jest.spyOn(fs, 'rm');
 
-    const { deletedFiles, error } = await removeUnusedFiles(
-      { ...result, unresolved: ['somefile.txt'] },
+    const { removedDeps, deletedFiles, error } = await removeUnused(
+      { ...result, unresolved: ['unused-package'] },
       context,
     );
 
-    expect(deletedFiles.length).toBe(0);
+    expect(error).toContain('Unable to safely');
+    expect(removedDeps).toEqual([]);
+    expect(deletedFiles).toEqual([]);
     expect(rm).toHaveBeenCalledTimes(0);
-    expect(error).toContain('Unable to safely delete files');
+    const updatedPackageJson = await readJson<PackageJson>(
+      'package.json',
+      testSpaceDir,
+    );
+    expect(updatedPackageJson?.dependencies).toEqual({
+      'unused-package': '1.0.0',
+      'used-package': '1.0.0',
+    });
+  });
+  it('should not remove anything if package.json is missing', async () => {
+    fs.rmSync(`${testSpaceDir}/package.json`);
+    const rm = jest.spyOn(fs, 'rm');
+
+    const { removedDeps, deletedFiles, error } = await removeUnused(
+      result,
+      context,
+    );
+
+    expect(error).toContain('Unable to read');
+    expect(removedDeps).toEqual([]);
+    expect(deletedFiles).toEqual([]);
+    expect(rm).toHaveBeenCalledTimes(0);
+  });
+  it('should handle package.json without dependencies array', async () => {
+    const packageJson = { name: '', version: '' };
+    await writeText('package.json', JSON.stringify(packageJson), testSpaceDir);
+    const rm = jest.spyOn(fs, 'rm');
+
+    const { removedDeps, deletedFiles, error } = await removeUnused(
+      result,
+      context,
+    );
+
+    expect(error).toBe(undefined);
+    expect(removedDeps).toEqual([]);
+    expect(deletedFiles).toEqual(['testFile1.txt', 'testFile2.txt']);
+    expect(rm).toHaveBeenCalledTimes(2);
   });
 });

@@ -38,11 +38,8 @@ test('npx unimported --help', async () => {
           --help                     Show help                             [boolean]
           --cache                    Whether to use the cache. Disable the cache
                                      using --no-cache.     [boolean] [default: true]
-          --remove-unused-files      Removes unused files. This is a destructive
-                                     operation, use with caution.
-                                                          [boolean] [default: false]
-          --remove-unused-deps       Removes unused dependencies. This is a
-                                     destructive operation, use with caution.
+          --fix                      Removes unused files and dependencies. This is
+                                     a destructive operation, use with caution.
                                                           [boolean] [default: false]
           --clear-cache              Clears the cache file and then exits. [boolean]
       -f, --flow                     Whether to strip flow types, regardless of

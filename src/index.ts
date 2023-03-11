@@ -5,7 +5,7 @@ import readPkgUp from 'read-pkg-up';
 
 import path, { join } from 'path';
 import ora from 'ora';
-import { printDeletedFiles, printRemovedDeps, printResults } from './print';
+import { printDeleteResult, printResults } from './print';
 import * as meta from './meta';
 import { getResultObject, traverse, TraverseConfig } from './traverse';
 import chalk from 'chalk';
@@ -27,7 +27,7 @@ import {
 } from './cache';
 import { log } from './log';
 import { presets } from './presets';
-import { removeUnusedFiles, removeUnusedDeps } from './delete';
+import { removeUnused } from './delete';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -263,36 +263,13 @@ export async function main(args: CliArguments): Promise<void> {
       storeCache();
     }
 
-    if (args.removeUnusedFiles && args.removeUnusedDeps) {
-      const deleteFilesResult = await removeUnusedFiles(result, context);
-      const removeUnusedDepsResult = await removeUnusedDeps(result, context);
-      const error = deleteFilesResult.error || removeUnusedDepsResult.error;
-      if (error) {
-        console.log(chalk.redBright(`✕`) + ` ${error}`);
+    if (args.fix) {
+      const deleteResult = await removeUnused(result, context);
+      if (deleteResult.error) {
+        console.log(chalk.redBright(`✕`) + ` ${deleteResult.error}`);
         process.exit(1);
       }
-      printDeletedFiles(deleteFilesResult.deletedFiles);
-      printRemovedDeps(removeUnusedDepsResult.removedDeps);
-      process.exit(0);
-    }
-    if (args.removeUnusedFiles) {
-      const deleteFilesResult = await removeUnusedFiles(result, context);
-      const error = deleteFilesResult.error;
-      if (error) {
-        console.log(chalk.redBright(`✕`) + ` ${error}`);
-        process.exit(1);
-      }
-      printDeletedFiles(deleteFilesResult.deletedFiles);
-      process.exit(0);
-    }
-    if (args.removeUnusedDeps) {
-      const removedDepsResult = await removeUnusedDeps(result, context);
-      const error = removedDepsResult.error;
-      if (error) {
-        console.log(chalk.redBright(`✕`) + ` ${error}`);
-        process.exit(1);
-      }
-      printDeletedFiles(removedDepsResult.removedDeps);
+      printDeleteResult(deleteResult);
       process.exit(0);
     }
 
@@ -331,7 +308,7 @@ export async function main(args: CliArguments): Promise<void> {
 }
 
 export interface CliArguments {
-  removeUnusedFiles: boolean;
+  fix: boolean;
   flow: boolean;
   update: boolean;
   init: boolean;
@@ -342,7 +319,6 @@ export interface CliArguments {
   showConfig: boolean;
   showPreset?: string;
   config?: string;
-  removeUnusedDeps: boolean;
   showUnusedFiles: boolean;
   showUnusedDeps: boolean;
   showUnresolvedImports: boolean;
@@ -369,16 +345,10 @@ if (process.env.NODE_ENV !== 'test') {
           default: true,
         });
 
-        yargs.option('remove-unused-files', {
+        yargs.option('fix', {
           type: 'boolean',
           describe:
-            'Removes unused files. This is a destructive operation, use with caution.',
-          default: false,
-        });
-        yargs.option('remove-unused-deps', {
-          type: 'boolean',
-          describe:
-            'Removes unused dependencies. This is a destructive operation, use with caution.',
+            'Removes unused files and dependencies. This is a destructive operation, use with caution.',
           default: false,
         });
 
