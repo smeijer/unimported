@@ -15,28 +15,32 @@ afterEach(() => {
 });
 
 describe('deleteUnimportedFiles', () => {
-  it('should call fs.rm for each unused file', async () => {
-    const testFileName1 = 'testFile1.txt';
-    const testFileName2 = 'testFile2.txt';
+  const testFileName1 = 'testFile1.txt';
+  const testFileName2 = 'testFile2.txt';
+  const unusedFiles = [testFileName1, testFileName2];
+  const result: ProcessedResult = {
+    clean: false,
+    unimported: unusedFiles,
+    unresolved: [],
+    unused: [],
+  };
+
+  const context = {
+    cwd: testSpaceDir,
+  } as Context;
+
+  beforeEach(async () => {
     await writeText(testFileName1, '', testSpaceDir);
     await writeText(testFileName2, '', testSpaceDir);
-    const unusedFiles = [testFileName1, testFileName2];
-
-    const result: ProcessedResult = {
-      clean: false,
-      unimported: unusedFiles,
-      unresolved: [],
-      unused: [],
-    };
-    const expectedContext = {
-      cwd: testSpaceDir,
-    } as Context;
-
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  it('should call fs.rm for each unused file', async () => {
     const rm = jest.spyOn(fs, 'rm');
-    const { numFilesDeleted } = await deleteUnimportedFiles(
-      result,
-      expectedContext,
-    );
+
+    const { numFilesDeleted } = await deleteUnimportedFiles(result, context);
+
     expect(rm).toHaveBeenCalledTimes(unusedFiles.length);
     unusedFiles.forEach((file) => {
       expect(rm).toHaveBeenCalledWith(
@@ -45,5 +49,17 @@ describe('deleteUnimportedFiles', () => {
       );
     });
     expect(numFilesDeleted).toBe(unusedFiles.length);
+  });
+  it('does not delete files if there are unresolved imports', async () => {
+    const rm = jest.spyOn(fs, 'rm');
+
+    const { numFilesDeleted, error } = await deleteUnimportedFiles(
+      { ...result, unresolved: ['somefile.txt'] },
+      context,
+    );
+
+    expect(numFilesDeleted).toBe(0);
+    expect(rm).toHaveBeenCalledTimes(0);
+    expect(error).toContain('Unable to safely delete files');
   });
 });
