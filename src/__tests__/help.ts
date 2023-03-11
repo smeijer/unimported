@@ -26,35 +26,38 @@ test('npx unimported --help', async () => {
   expect(stderr).toBe('');
 
   expect(stdout.trim()).toMatchInlineSnapshot(`
-  "unimported [cwd]
+    "unimported [cwd]
 
-  scan your project for dead files
-  
-  Positionals:
-    cwd  The root directory that unimported should run from.              [string]
-  
-  Options:
-        --version                  Show version number                   [boolean]
-        --help                     Show help                             [boolean]
-        --cache                    Whether to use the cache. Disable the cache
-                                   using --no-cache.     [boolean] [default: true]
-        --clear-cache              Clears the cache file and then exits. [boolean]
-    -f, --flow                     Whether to strip flow types, regardless of
-                                   @flow pragma.                         [boolean]
-        --ignore-untracked         Ignore files that are not currently tracked by
-                                   git.                                  [boolean]
-    -i, --init                     Dump default settings to .unimportedrc.json.
-                                                                         [boolean]
-        --show-config              Show config and then exists.          [boolean]
-        --show-preset              Show preset and then exists.           [string]
-    -u, --update                   Update the ignore-lists stored in
-                                   .unimportedrc.json.                   [boolean]
-        --config                   The path to the config file.           [string]
-        --show-unused-files        formats and only prints unimported files
-                                                                         [boolean]
-        --show-unused-deps         formats and only prints unused dependencies
-                                                                         [boolean]
-        --show-unresolved-imports  formats and only prints unresolved imports
-                                                                         [boolean]"
-`);
+    scan your project for dead files
+
+    Positionals:
+      cwd  The root directory that unimported should run from.              [string]
+
+    Options:
+          --version                  Show version number                   [boolean]
+          --help                     Show help                             [boolean]
+          --cache                    Whether to use the cache. Disable the cache
+                                     using --no-cache.     [boolean] [default: true]
+          --delete-unimported-files  Delete unimported files. This is a destructive
+                                     operation, use with caution.
+                                                          [boolean] [default: false]
+          --clear-cache              Clears the cache file and then exits. [boolean]
+      -f, --flow                     Whether to strip flow types, regardless of
+                                     @flow pragma.                         [boolean]
+          --ignore-untracked         Ignore files that are not currently tracked by
+                                     git.                                  [boolean]
+      -i, --init                     Dump default settings to .unimportedrc.json.
+                                                                           [boolean]
+          --show-config              Show config and then exists.          [boolean]
+          --show-preset              Show preset and then exists.           [string]
+      -u, --update                   Update the ignore-lists stored in
+                                     .unimportedrc.json.                   [boolean]
+          --config                   The path to the config file.           [string]
+          --show-unused-files        formats and only prints unimported files
+                                                                           [boolean]
+          --show-unused-deps         formats and only prints unused dependencies
+                                                                           [boolean]
+          --show-unresolved-imports  formats and only prints unresolved imports
+                                                                           [boolean]"
+  `);
 });

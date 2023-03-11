@@ -60,6 +60,20 @@ export function formatMetaTable(
   return `\n${lines.join('\n')}\n`;
 }
 
+export function printDeletedFiles(deletedFiles: string[]): void {
+  if (deletedFiles.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unimported files.');
+    return;
+  }
+
+  console.log(
+    formatList(
+      chalk.redBright(`${deletedFiles.length} unimported files deleted`),
+      deletedFiles,
+    ),
+  );
+}
+
 export function printResults(result: ProcessedResult, context: Context): void {
   if (result.clean) {
     console.log(
