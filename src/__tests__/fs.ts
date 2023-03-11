@@ -1,6 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import { exists, readText, writeText, readJson, writeJson, list } from '../fs';
+import {
+  exists,
+  readText,
+  writeText,
+  readJson,
+  writeJson,
+  list,
+  deleteFile,
+} from '../fs';
 
 const testSpaceDir = '.test-space/fs-test';
 
@@ -185,4 +193,22 @@ test('should list files matching single extension', async () => {
   );
 
   expect(cleanedFiles).toEqual(['./testFile2.js']);
+});
+
+describe('deleteFile', () => {
+  it('should call fs.rm with correct arguments', async () => {
+    const rm = jest.spyOn(fs, 'rm');
+    const testFileName = 'testFile.txt';
+    await writeText(testFileName, '', testSpaceDir);
+
+    await deleteFile(testFileName, testSpaceDir);
+
+    expect(rm).toHaveBeenCalledTimes(1);
+    expect(rm).toHaveBeenCalledWith(
+      `${testSpaceDir}/${testFileName}`,
+      expect.any(Function),
+    );
+    const files = await list('**/*', testSpaceDir, { extensions: ['js'] });
+    expect(files.length).toBe(0);
+  });
 });
