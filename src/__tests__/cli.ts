@@ -47,6 +47,7 @@ async function exec(
     showUnresolvedImports = false,
     showUnusedFiles = false,
     showUnusedDeps = false,
+    deleteUnimportedFiles = false,
   }: Partial<CliArguments> = {},
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
   const originalExit = process.exit;
@@ -92,6 +93,7 @@ async function exec(
       showUnresolvedImports,
       showUnusedFiles,
       showUnusedDeps,
+      deleteUnimportedFiles,
     });
 
     return { exitCode: exitCode ?? 0, stdout, stderr };

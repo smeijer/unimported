@@ -5,7 +5,7 @@ import readPkgUp from 'read-pkg-up';
 
 import path, { join } from 'path';
 import ora from 'ora';
-import { printResults } from './print';
+import { printDeletedFiles, printResults } from './print';
 import * as meta from './meta';
 import { getResultObject, traverse, TraverseConfig } from './traverse';
 import chalk from 'chalk';
@@ -27,6 +27,7 @@ import {
 } from './cache';
 import { log } from './log';
 import { presets } from './presets';
+import { deleteUnimportedFiles } from './delete';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -262,6 +263,19 @@ export async function main(args: CliArguments): Promise<void> {
       storeCache();
     }
 
+    if (args.deleteUnimportedFiles) {
+      const { error, deletedFiles } = await deleteUnimportedFiles(
+        result,
+        context,
+      );
+      if (error) {
+        console.log(chalk.redBright(`✕`) + ` ${error}`);
+        process.exit(1);
+      }
+      printDeletedFiles(deletedFiles);
+      process.exit(0);
+    }
+
     if (args.update) {
       await updateAllowLists(result, context);
       // doesn't make sense here to return a error code
@@ -297,6 +311,7 @@ export async function main(args: CliArguments): Promise<void> {
 }
 
 export interface CliArguments {
+  deleteUnimportedFiles: boolean;
   flow: boolean;
   update: boolean;
   init: boolean;
@@ -331,6 +346,13 @@ if (process.env.NODE_ENV !== 'test') {
           describe:
             'Whether to use the cache. Disable the cache using --no-cache.',
           default: true,
+        });
+
+        yargs.option('delete-unimported-files', {
+          type: 'boolean',
+          describe:
+            'Delete unimported files. This is a destructive operation, use with caution.',
+          default: false,
         });
 
         yargs.option('clear-cache', {
