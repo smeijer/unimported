@@ -3,7 +3,7 @@ import { Context, PackageJson } from './index';
 import { deleteFile } from './fs';
 import * as fs from './fs';
 
-export async function deleteUnimportedFiles(
+export async function removeUnusedFiles(
   result: ProcessedResult,
   context: Context,
 ): Promise<{ deletedFiles: string[]; error?: string }> {

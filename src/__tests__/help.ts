@@ -38,7 +38,7 @@ test('npx unimported --help', async () => {
           --help                     Show help                             [boolean]
           --cache                    Whether to use the cache. Disable the cache
                                      using --no-cache.     [boolean] [default: true]
-          --delete-unimported-files  Delete unimported files. This is a destructive
+          --remove-unused-files      Removes unused files. This is a destructive
                                      operation, use with caution.
                                                           [boolean] [default: false]
           --remove-unused-deps       Removes unused dependencies. This is a

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { deleteUnimportedFiles, removeUnusedDeps } from '../delete';
+import { removeUnusedFiles, removeUnusedDeps } from '../delete';
 import { ProcessedResult } from '../process';
 import { Context, PackageJson } from '../index';
 import { readJson, writeText } from '../fs';
@@ -94,7 +94,7 @@ describe('deleteUnimportedFiles', () => {
   it('should call fs.rm for each unused file', async () => {
     const rm = jest.spyOn(fs, 'rm');
 
-    const { deletedFiles } = await deleteUnimportedFiles(result, context);
+    const { deletedFiles } = await removeUnusedFiles(result, context);
 
     expect(rm).toHaveBeenCalledTimes(unusedFiles.length);
     unusedFiles.forEach((file) => {
@@ -108,7 +108,7 @@ describe('deleteUnimportedFiles', () => {
   it('does not delete files if there are unresolved imports', async () => {
     const rm = jest.spyOn(fs, 'rm');
 
-    const { deletedFiles, error } = await deleteUnimportedFiles(
+    const { deletedFiles, error } = await removeUnusedFiles(
       { ...result, unresolved: ['somefile.txt'] },
       context,
     );

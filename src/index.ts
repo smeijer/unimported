@@ -27,7 +27,7 @@ import {
 } from './cache';
 import { log } from './log';
 import { presets } from './presets';
-import { deleteUnimportedFiles, removeUnusedDeps } from './delete';
+import { removeUnusedFiles, removeUnusedDeps } from './delete';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -263,8 +263,8 @@ export async function main(args: CliArguments): Promise<void> {
       storeCache();
     }
 
-    if (args.deleteUnimportedFiles && args.removeUnusedDeps) {
-      const deleteFilesResult = await deleteUnimportedFiles(result, context);
+    if (args.removeUnusedFiles && args.removeUnusedDeps) {
+      const deleteFilesResult = await removeUnusedFiles(result, context);
       const removeUnusedDepsResult = await removeUnusedDeps(result, context);
       const error = deleteFilesResult.error || removeUnusedDepsResult.error;
       if (error) {
@@ -275,8 +275,8 @@ export async function main(args: CliArguments): Promise<void> {
       printRemovedDeps(removeUnusedDepsResult.removedDeps);
       process.exit(0);
     }
-    if (args.deleteUnimportedFiles) {
-      const deleteFilesResult = await deleteUnimportedFiles(result, context);
+    if (args.removeUnusedFiles) {
+      const deleteFilesResult = await removeUnusedFiles(result, context);
       const error = deleteFilesResult.error;
       if (error) {
         console.log(chalk.redBright(`✕`) + ` ${error}`);
@@ -331,7 +331,7 @@ export async function main(args: CliArguments): Promise<void> {
 }
 
 export interface CliArguments {
-  deleteUnimportedFiles: boolean;
+  removeUnusedFiles: boolean;
   flow: boolean;
   update: boolean;
   init: boolean;
@@ -369,10 +369,10 @@ if (process.env.NODE_ENV !== 'test') {
           default: true,
         });
 
-        yargs.option('delete-unimported-files', {
+        yargs.option('remove-unused-files', {
           type: 'boolean',
           describe:
-            'Delete unimported files. This is a destructive operation, use with caution.',
+            'Removes unused files. This is a destructive operation, use with caution.',
           default: false,
         });
         yargs.option('remove-unused-deps', {
