@@ -39,7 +39,7 @@ describe('deleteUnimportedFiles', () => {
   it('should call fs.rm for each unused file', async () => {
     const rm = jest.spyOn(fs, 'rm');
 
-    const { numFilesDeleted } = await deleteUnimportedFiles(result, context);
+    const { deletedFiles } = await deleteUnimportedFiles(result, context);
 
     expect(rm).toHaveBeenCalledTimes(unusedFiles.length);
     unusedFiles.forEach((file) => {
@@ -48,17 +48,17 @@ describe('deleteUnimportedFiles', () => {
         expect.any(Function),
       );
     });
-    expect(numFilesDeleted).toBe(unusedFiles.length);
+    expect(deletedFiles).toEqual(unusedFiles);
   });
   it('does not delete files if there are unresolved imports', async () => {
     const rm = jest.spyOn(fs, 'rm');
 
-    const { numFilesDeleted, error } = await deleteUnimportedFiles(
+    const { deletedFiles, error } = await deleteUnimportedFiles(
       { ...result, unresolved: ['somefile.txt'] },
       context,
     );
 
-    expect(numFilesDeleted).toBe(0);
+    expect(deletedFiles.length).toBe(0);
     expect(rm).toHaveBeenCalledTimes(0);
     expect(error).toContain('Unable to safely delete files');
   });
