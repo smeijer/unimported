@@ -205,7 +205,7 @@ describe('deleteFile', () => {
 
     expect(rm).toHaveBeenCalledTimes(1);
     expect(rm).toHaveBeenCalledWith(
-      `${testSpaceDir}/${testFileName}`,
+      path.join(testSpaceDir, testFileName),
       expect.any(Function),
     );
     const files = await list('**/*', testSpaceDir, { extensions: ['js'] });

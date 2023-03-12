@@ -3,6 +3,7 @@ import { removeUnused } from '../delete';
 import { ProcessedResult } from '../process';
 import { Context, PackageJson } from '../index';
 import { readJson, writeText } from '../fs';
+import path from 'path';
 
 const testSpaceDir = '.test-space/delete-test';
 
@@ -63,7 +64,7 @@ describe('removeUnused', () => {
     expect(rm).toHaveBeenCalledTimes(unusedFiles.length);
     unusedFiles.forEach((file) => {
       expect(rm).toHaveBeenCalledWith(
-        `${testSpaceDir}/${file}`,
+        path.join(testSpaceDir, file),
         expect.any(Function),
       );
     });
@@ -91,7 +92,7 @@ describe('removeUnused', () => {
     });
   });
   it('should not remove anything if package.json is missing', async () => {
-    fs.rmSync(`${testSpaceDir}/package.json`);
+    fs.rmSync(path.join(testSpaceDir, 'package.json'));
     const rm = jest.spyOn(fs, 'rm');
 
     const { removedDeps, deletedFiles, error } = await removeUnused(
