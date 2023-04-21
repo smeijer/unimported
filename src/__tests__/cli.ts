@@ -189,7 +189,7 @@ cases(
         { name: 'index.js', content: `import foo from './foo';` },
       ],
       exitCode: 1,
-      stdout: /\.\/foo.*from.*\/index\.js/s,
+      stdout: /\.\/foo.*at index\.js/s,
     },
     {
       name: 'should ignore untracked files that are not imported',

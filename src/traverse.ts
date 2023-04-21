@@ -1,4 +1,4 @@
-import { dirname, extname } from 'path';
+import { dirname, extname, relative } from 'path';
 
 import {
   AST_NODE_TYPES,
@@ -343,6 +343,7 @@ export interface TraverseConfig {
   preset?: string;
   dependencies: MapLike<string>;
   pathTransforms?: MapLike<string>;
+  root: string;
 }
 
 export async function traverse(
@@ -382,13 +383,10 @@ export async function traverse(
           result.modules.add(file.name);
           break;
         case 'unresolved':
-          if (result.unresolved.has(file.path)) {
-            result.unresolved.set(file.path, [
-              ...(result.unresolved.get(file.path) || []),
-              ...parseResult.path,
-            ]);
-          }
-          result.unresolved.set(file.path, [parseResult.path]);
+          const current = result.unresolved.get(file.path) || [];
+          const path = relative(config.root, parseResult.path);
+          const next = current.includes(path) ? current : [...current, path];
+          result.unresolved.set(file.path, next);
           break;
         case 'source_file':
           if (result.files.has(file.path)) {
