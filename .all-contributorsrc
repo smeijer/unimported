@@ -361,6 +361,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "xibman",
+      "name": "Georget Julien",
+      "avatar_url": "https://avatars.githubusercontent.com/u/623141?v=4",
+      "profile": "https://github.com/xibman",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

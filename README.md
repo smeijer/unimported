@@ -397,6 +397,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://adityavandan.github.io/"><img src="https://avatars.githubusercontent.com/u/35309453?v=4?s=100" width="100px;" alt="Aditya Vandan Sharma"/><br /><sub><b>Aditya Vandan Sharma</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=AdityaVandan" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Dogdriip"><img src="https://avatars.githubusercontent.com/u/6940439?v=4?s=100" width="100px;" alt="Aru Hyunseung Jeon"/><br /><sub><b>Aru Hyunseung Jeon</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Dogdriip" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.ericcornelissen.dev/"><img src="https://avatars.githubusercontent.com/u/3742559?v=4?s=100" width="100px;" alt="Eric Cornelissen"/><br /><sub><b>Eric Cornelissen</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=ericcornelissen" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/xibman"><img src="https://avatars.githubusercontent.com/u/623141?v=4?s=100" width="100px;" alt="Georget Julien"/><br /><sub><b>Georget Julien</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=xibman" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
