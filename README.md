@@ -390,6 +390,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/valeriobelli"><img src="https://avatars.githubusercontent.com/u/56547421?v=4?s=100" width="100px;" alt="Valerio Belli"/><br /><sub><b>Valerio Belli</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=valeriobelli" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://uloco.github.io/"><img src="https://avatars.githubusercontent.com/u/8818340?v=4?s=100" width="100px;" alt="Umut Topuzoğlu"/><br /><sub><b>Umut Topuzoğlu</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=uloco" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://recollectr.io/"><img src="https://avatars.githubusercontent.com/u/6835891?v=4?s=100" width="100px;" alt="slapbox"/><br /><sub><b>slapbox</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Slapbox" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Michael-372"><img src="https://avatars.githubusercontent.com/u/5233503?v=4?s=100" width="100px;" alt="Michael"/><br /><sub><b>Michael</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Michael-372" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
