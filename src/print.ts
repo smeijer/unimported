@@ -87,14 +87,10 @@ export function printResults(result: ProcessedResult, context: Context): void {
     console.log(
       formatList(
         chalk.redBright(`${unresolved.length} unresolved imports`),
-        unresolved.map(
-          ([item, source]) =>
-            `${item} ${chalk.greenBright('from')} ${source[0]}${
-              source.length > 1
-                ? chalk.greenBright(`and ${source.length - 1} others`)
-                : ''
-            }  `,
-        ),
+        unresolved.map(([item, sources]) => {
+
+          return `${item} ${chalk.gray(`at ${sources.join(', ')}`)}`;
+        }),
       ),
     );
   }
