@@ -325,6 +325,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "karlhorky",
+      "name": "Karl Horky",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1935696?v=4",
+      "profile": "https://upleveled.io/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
