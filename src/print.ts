@@ -2,6 +2,7 @@ import termSize from 'term-size';
 import chalk from 'chalk';
 import { Context } from './index';
 import { ProcessedResult } from './process';
+import { DeleteResult } from './delete';
 
 const { columns } = termSize();
 
@@ -58,6 +59,50 @@ export function formatMetaTable(
   ];
 
   return `\n${lines.join('\n')}\n`;
+}
+
+export function printDeleteResult({
+  removedDeps,
+  deletedFiles,
+}: DeleteResult): void {
+  if (removedDeps.length === 0 && deletedFiles.length === 0) {
+    console.log(
+      chalk.greenBright(`✓`) + ' There are no unused files or dependencies.',
+    );
+    return;
+  }
+  if (removedDeps.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unused dependencies.');
+    console.log(
+      formatList(
+        chalk.redBright(`${deletedFiles.length} unused files removed`),
+        deletedFiles,
+      ),
+    );
+    return;
+  }
+  if (deletedFiles.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unused files.');
+    console.log(
+      formatList(
+        chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+        removedDeps,
+      ),
+    );
+    return;
+  }
+  console.log(
+    formatList(
+      chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+      removedDeps,
+    ),
+  );
+  console.log(
+    formatList(
+      chalk.redBright(`${deletedFiles.length} unused files removed`),
+      deletedFiles,
+    ),
+  );
 }
 
 export function printResults(result: ProcessedResult, context: Context): void {
