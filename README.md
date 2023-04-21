@@ -393,6 +393,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Michael-372"><img src="https://avatars.githubusercontent.com/u/5233503?v=4?s=100" width="100px;" alt="Michael"/><br /><sub><b>Michael</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Michael-372" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://upleveled.io/"><img src="https://avatars.githubusercontent.com/u/1935696?v=4?s=100" width="100px;" alt="Karl Horky"/><br /><sub><b>Karl Horky</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=karlhorky" title="Documentation">📖</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://adityavandan.github.io/"><img src="https://avatars.githubusercontent.com/u/35309453?v=4?s=100" width="100px;" alt="Aditya Vandan Sharma"/><br /><sub><b>Aditya Vandan Sharma</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=AdityaVandan" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
