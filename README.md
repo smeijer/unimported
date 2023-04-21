@@ -386,6 +386,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://medium.com/@tbhesswebber"><img src="https://avatars.githubusercontent.com/u/28069638?v=4?s=100" width="100px;" alt="Tanner B. Hess Webber"/><br /><sub><b>Tanner B. Hess Webber</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Tbhesswebber" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://webutvikling.org/"><img src="https://avatars.githubusercontent.com/u/1502702?v=4?s=100" width="100px;" alt="Tomas Fagerbekk"/><br /><sub><b>Tomas Fagerbekk</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=tomfa" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

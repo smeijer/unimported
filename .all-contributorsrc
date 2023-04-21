@@ -279,6 +279,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tomfa",
+      "name": "Tomas Fagerbekk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1502702?v=4",
+      "profile": "http://webutvikling.org/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
