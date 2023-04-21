@@ -50,6 +50,14 @@ Update, will write the current results to the ignore lists in `.unimportedrc.jso
 npx unimported --update
 ```
 
+### Fix
+
+Running with the `--fix` argument will automatically remove unimported files from your project. This is a destructive action, so make sure that any changes you find important, are committed to your repo.
+
+```shell
+npx unimported --fix
+```
+
 ### Flow Type
 
 By default, flow types are stripped from files containing the `@flow` pragma. When the `--flow` argument is provided, types will be stripped from all files, regardless of the pragma. This flag defaults to false, but when `flow-bin` is detected in one of the dependency lists in `package.json`.
