@@ -298,6 +298,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "uloco",
+      "name": "Umut Topuzoğlu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8818340?v=4",
+      "profile": "https://uloco.github.io/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
