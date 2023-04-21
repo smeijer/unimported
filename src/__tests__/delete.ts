@@ -74,7 +74,7 @@ describe('removeUnused', () => {
     const rm = jest.spyOn(fs, 'rm');
 
     const { removedDeps, deletedFiles, error } = await removeUnused(
-      { ...result, unresolved: ['unused-package'] },
+      { ...result, unresolved: [['unused-package', []]] },
       context,
     );
 

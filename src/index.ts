@@ -191,6 +191,7 @@ export async function main(args: CliArguments): Promise<void> {
         preset: config.preset,
         dependencies,
         pathTransforms: config.pathTransforms,
+        root: context.cwd,
       };
 
       // we can't use the third argument here, to keep feeding to traverseResult
@@ -217,8 +218,8 @@ export async function main(args: CliArguments): Promise<void> {
       subResult.modules.forEach((module) => {
         traverseResult.modules.add(module);
       });
-      subResult.unresolved.forEach((unresolved) => {
-        traverseResult.unresolved.add(unresolved);
+      subResult.unresolved.forEach((unresolved, key) => {
+        traverseResult.unresolved.set(key, unresolved);
       });
 
       for (const [key, stat] of subResult.files) {

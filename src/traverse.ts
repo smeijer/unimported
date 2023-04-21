@@ -1,4 +1,4 @@
-import { dirname, extname } from 'path';
+import { dirname, extname, relative } from 'path';
 
 import {
   AST_NODE_TYPES,
@@ -29,7 +29,7 @@ export interface FileStats {
 }
 
 export interface TraverseResult {
-  unresolved: Set<string>;
+  unresolved: Map<string, string[]>;
   files: Map<string, FileStats>;
   modules: Set<string>;
 }
@@ -328,7 +328,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
 }
 
 export const getResultObject = () => ({
-  unresolved: new Set<string>(),
+  unresolved: new Map<string, string[]>(),
   modules: new Set<string>(),
   files: new Map<string, FileStats>(),
 });
@@ -342,6 +342,7 @@ export interface TraverseConfig {
   preset?: string;
   dependencies: MapLike<string>;
   pathTransforms?: MapLike<string>;
+  root: string;
 }
 
 export async function traverse(
@@ -366,7 +367,7 @@ export async function traverse(
     return result;
   }
 
-  let parseResult;
+  let parseResult: FileStats;
   try {
     const generator = () => parse(String(path), config);
 
@@ -381,7 +382,10 @@ export async function traverse(
           result.modules.add(file.name);
           break;
         case 'unresolved':
-          result.unresolved.add(file.path);
+          const current = result.unresolved.get(file.path) || [];
+          const path = relative(config.root, parseResult.path);
+          const next = current.includes(path) ? current : [...current, path];
+          result.unresolved.set(file.path, next);
           break;
         case 'source_file':
           if (result.files.has(file.path)) {
