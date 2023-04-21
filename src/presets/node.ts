@@ -10,12 +10,15 @@ const preset: Preset = {
   getConfig: ({ packageJson, hasPackage }) => {
     const hasFlow = hasPackage('flow-bin');
     const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+    const sourceFiles = Array.isArray(packageJson.source)
+      ? packageJson.source
+      : [packageJson.source];
 
     const entry = Array.from(
       new Set(
         resolveFilesSync(
           [
-            packageJson.source,
+            ...sourceFiles,
             './src/index',
             './src/main',
             './index',

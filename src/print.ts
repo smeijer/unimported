@@ -2,6 +2,7 @@ import termSize from 'term-size';
 import chalk from 'chalk';
 import { Context } from './index';
 import { ProcessedResult } from './process';
+import { DeleteResult } from './delete';
 
 const { columns } = termSize();
 
@@ -64,6 +65,50 @@ export function formatMetaTable(
   return `\n${lines.join('\n')}\n`;
 }
 
+export function printDeleteResult({
+  removedDeps,
+  deletedFiles,
+}: DeleteResult): void {
+  if (removedDeps.length === 0 && deletedFiles.length === 0) {
+    console.log(
+      chalk.greenBright(`✓`) + ' There are no unused files or dependencies.',
+    );
+    return;
+  }
+  if (removedDeps.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unused dependencies.');
+    console.log(
+      formatList(
+        chalk.redBright(`${deletedFiles.length} unused files removed`),
+        deletedFiles,
+      ),
+    );
+    return;
+  }
+  if (deletedFiles.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unused files.');
+    console.log(
+      formatList(
+        chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+        removedDeps,
+      ),
+    );
+    return;
+  }
+  console.log(
+    formatList(
+      chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+      removedDeps,
+    ),
+  );
+  console.log(
+    formatList(
+      chalk.redBright(`${deletedFiles.length} unused files removed`),
+      deletedFiles,
+    ),
+  );
+}
+
 export function printResults(result: ProcessedResult, context: Context): void {
   if (result.clean) {
     console.log(
@@ -72,6 +117,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     return;
   }
 
+  const { showUnresolved, showUnused, showUnimported } = chooseResults(context);
   const { unresolved, unused, unimported } = result;
 
   // render
@@ -83,7 +129,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     ),
   );
 
-  if (unresolved.length > 0) {
+  if (showUnresolved && unresolved.length > 0) {
     console.log(
       formatList(
         chalk.redBright(`${unresolved.length} unresolved imports`),
@@ -95,7 +141,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     );
   }
 
-  if (unused.length > 0) {
+  if (showUnused && unused.length > 0) {
     console.log(
       formatList(
         chalk.blueBright(`${unused.length} unused dependencies`),
@@ -104,7 +150,7 @@ export function printResults(result: ProcessedResult, context: Context): void {
     );
   }
 
-  if (unimported.length > 0) {
+  if (showUnimported && unimported.length > 0) {
     console.log(
       formatList(
         chalk.cyanBright(`${unimported.length} unimported files`),
@@ -118,4 +164,24 @@ export function printResults(result: ProcessedResult, context: Context): void {
       'npx unimported -u',
     )} to update ignore lists`,
   );
+}
+
+function chooseResults(context: Context) {
+  const { showUnresolvedImports, showUnusedDeps, showUnusedFiles } = context;
+  const showAllResults =
+    // when all three flags are used
+    (showUnresolvedImports && showUnusedDeps && showUnusedFiles) ||
+    // when none flag is used
+    (!showUnresolvedImports && !showUnusedDeps && !showUnusedFiles);
+
+  const showUnresolved = showUnresolvedImports || showAllResults;
+  const showUnused = showUnusedDeps || showAllResults;
+  const showUnimported = showUnusedFiles || showAllResults;
+
+  return {
+    showAllResults,
+    showUnresolved,
+    showUnused,
+    showUnimported,
+  };
 }

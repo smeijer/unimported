@@ -252,6 +252,24 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "nweber-gh",
+      "name": "Nathan Weber",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52676728?v=4",
+      "profile": "https://github.com/nweber-gh",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "wladiston",
+      "name": "Wlad Paiva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1843792?v=4",
+      "profile": "https://eatingdots.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
