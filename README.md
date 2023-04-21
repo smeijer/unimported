@@ -384,6 +384,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nweber-gh"><img src="https://avatars.githubusercontent.com/u/52676728?v=4?s=100" width="100px;" alt="Nathan Weber"/><br /><sub><b>Nathan Weber</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=nweber-gh" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://eatingdots.com"><img src="https://avatars.githubusercontent.com/u/1843792?v=4?s=100" width="100px;" alt="Wlad Paiva"/><br /><sub><b>Wlad Paiva</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=wladiston" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://medium.com/@tbhesswebber"><img src="https://avatars.githubusercontent.com/u/28069638?v=4?s=100" width="100px;" alt="Tanner B. Hess Webber"/><br /><sub><b>Tanner B. Hess Webber</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=Tbhesswebber" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
