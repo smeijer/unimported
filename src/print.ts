@@ -134,7 +134,6 @@ export function printResults(result: ProcessedResult, context: Context): void {
       formatList(
         chalk.redBright(`${unresolved.length} unresolved imports`),
         unresolved.map(([item, sources]) => {
-
           return `${item} ${chalk.gray(`at ${sources.join(', ')}`)}`;
         }),
       ),
