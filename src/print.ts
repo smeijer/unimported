@@ -2,6 +2,7 @@ import termSize from 'term-size';
 import chalk from 'chalk';
 import { Context } from './index';
 import { ProcessedResult } from './process';
+import { DeleteResult } from './delete';
 
 const { columns } = termSize();
 
@@ -25,7 +26,11 @@ export function formatList(caption: string, records: string[]): string {
 
 export function formatMetaTable(
   caption: string,
-  data: { unresolved: string[]; unimported: string[]; unused: string[] },
+  data: {
+    unresolved: [string, string[]][];
+    unimported: string[];
+    unused: string[];
+  },
   context: Context,
 ): string {
   const entryFiles = context.config.entryFiles;
@@ -60,6 +65,50 @@ export function formatMetaTable(
   return `\n${lines.join('\n')}\n`;
 }
 
+export function printDeleteResult({
+  removedDeps,
+  deletedFiles,
+}: DeleteResult): void {
+  if (removedDeps.length === 0 && deletedFiles.length === 0) {
+    console.log(
+      chalk.greenBright(`✓`) + ' There are no unused files or dependencies.',
+    );
+    return;
+  }
+  if (removedDeps.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unused dependencies.');
+    console.log(
+      formatList(
+        chalk.redBright(`${deletedFiles.length} unused files removed`),
+        deletedFiles,
+      ),
+    );
+    return;
+  }
+  if (deletedFiles.length === 0) {
+    console.log(chalk.greenBright(`✓`) + ' There are no unused files.');
+    console.log(
+      formatList(
+        chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+        removedDeps,
+      ),
+    );
+    return;
+  }
+  console.log(
+    formatList(
+      chalk.redBright(`${removedDeps.length} unused dependencies removed`),
+      removedDeps,
+    ),
+  );
+  console.log(
+    formatList(
+      chalk.redBright(`${deletedFiles.length} unused files removed`),
+      deletedFiles,
+    ),
+  );
+}
+
 export function printResults(result: ProcessedResult, context: Context): void {
   if (result.clean) {
     console.log(
@@ -84,7 +133,9 @@ export function printResults(result: ProcessedResult, context: Context): void {
     console.log(
       formatList(
         chalk.redBright(`${unresolved.length} unresolved imports`),
-        unresolved,
+        unresolved.map(([item, sources]) => {
+          return `${item} ${chalk.gray(`at ${sources.join(', ')}`)}`;
+        }),
       ),
     );
   }

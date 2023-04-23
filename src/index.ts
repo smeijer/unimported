@@ -5,7 +5,7 @@ import readPkgUp from 'read-pkg-up';
 
 import path, { join } from 'path';
 import ora from 'ora';
-import { printResults } from './print';
+import { printDeleteResult, printResults } from './print';
 import * as meta from './meta';
 import { getResultObject, traverse, TraverseConfig } from './traverse';
 import chalk from 'chalk';
@@ -27,6 +27,7 @@ import {
 } from './cache';
 import { log } from './log';
 import { presets } from './presets';
+import { removeUnused } from './delete';
 
 export interface TsConfig {
   compilerOptions: CompilerOptions;
@@ -190,6 +191,7 @@ export async function main(args: CliArguments): Promise<void> {
         preset: config.preset,
         dependencies,
         pathTransforms: config.pathTransforms,
+        root: context.cwd,
       };
 
       // we can't use the third argument here, to keep feeding to traverseResult
@@ -216,8 +218,8 @@ export async function main(args: CliArguments): Promise<void> {
       subResult.modules.forEach((module) => {
         traverseResult.modules.add(module);
       });
-      subResult.unresolved.forEach((unresolved) => {
-        traverseResult.unresolved.add(unresolved);
+      subResult.unresolved.forEach((unresolved, key) => {
+        traverseResult.unresolved.set(key, unresolved);
       });
 
       for (const [key, stat] of subResult.files) {
@@ -262,6 +264,16 @@ export async function main(args: CliArguments): Promise<void> {
       storeCache();
     }
 
+    if (args.fix) {
+      const deleteResult = await removeUnused(result, context);
+      if (deleteResult.error) {
+        console.log(chalk.redBright(`✕`) + ` ${deleteResult.error}`);
+        process.exit(1);
+      }
+      printDeleteResult(deleteResult);
+      process.exit(0);
+    }
+
     if (args.update) {
       await updateAllowLists(result, context);
       // doesn't make sense here to return a error code
@@ -297,6 +309,7 @@ export async function main(args: CliArguments): Promise<void> {
 }
 
 export interface CliArguments {
+  fix: boolean;
   flow: boolean;
   update: boolean;
   init: boolean;
@@ -331,6 +344,13 @@ if (process.env.NODE_ENV !== 'test') {
           describe:
             'Whether to use the cache. Disable the cache using --no-cache.',
           default: true,
+        });
+
+        yargs.option('fix', {
+          type: 'boolean',
+          describe:
+            'Removes unused files and dependencies. This is a destructive operation, use with caution.',
+          default: false,
         });
 
         yargs.option('clear-cache', {
