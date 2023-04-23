@@ -370,6 +370,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "yyamanoi1222",
+      "name": "yu-yamanoi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17104096?v=4",
+      "profile": "https://github.com/yyamanoi1222",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
