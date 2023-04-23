@@ -9,6 +9,11 @@ export interface ProcessedResult {
   clean: boolean;
 }
 
+type FormatTypes = keyof Pick<
+  Context,
+  'showUnusedFiles' | 'showUnusedDeps' | 'showUnresolvedImports'
+>;
+
 function index(array: string | string[]): { [key: string]: boolean } {
   return ensureArray(array).reduce((acc, str) => {
     acc[str] = true;
@@ -41,10 +46,22 @@ export async function processResults(
     .map((x) => x.replace(context.cwd + '/', ''))
     .filter((x) => !ignoreUnimportedIdx[x]);
 
+  const formatTypeResultMap: { [P in FormatTypes]: boolean } = {
+    showUnusedFiles: !unimported.length,
+    showUnusedDeps: !unused.length,
+    showUnresolvedImports: !unresolved.length,
+  };
+
+  const isClean = Object.keys(formatTypeResultMap).some((key) => context[key])
+    ? Object.keys(formatTypeResultMap).every((key) =>
+        context[key] ? formatTypeResultMap[key] : true,
+      )
+    : Object.values(formatTypeResultMap).every((v) => v);
+
   return {
     unresolved,
     unused,
     unimported,
-    clean: !unresolved.length && !unused.length && !unimported.length,
+    clean: isClean,
   };
 }
