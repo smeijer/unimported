@@ -1,12 +1,12 @@
 import { processResults, ProcessedResult } from '../process';
 import { Context } from '../index';
-import { FileStats } from '../traverse';
+import { FileStats, TraverseResult } from '../traverse';
 
 describe('processResults', () => {
   it('returns clean result when all format types are disabled', async () => {
     const files = ['src/index.ts'];
-    const traverseResult = {
-      unresolved: new Set<string>(['foo']),
+    const traverseResult: TraverseResult = {
+      unresolved: new Map<string, string[]>([['foo', ['bar']]]),
       modules: new Set<string>(),
       files: new Map<string, FileStats>(),
     };
@@ -32,7 +32,7 @@ describe('processResults', () => {
     const result = await processResults(files, traverseResult, context);
 
     const expected: ProcessedResult = {
-      unresolved: ['foo'],
+      unresolved: [['foo', ['bar']]],
       unused: [],
       unimported: ['src/index.ts'],
       clean: false,
@@ -42,8 +42,8 @@ describe('processResults', () => {
   });
   it('returns unresolved imports when showUnresolvedImports is true', async () => {
     const files = ['src/index.ts'];
-    const traverseResult = {
-      unresolved: new Set<string>(),
+    const traverseResult: TraverseResult = {
+      unresolved: new Map<string, string[]>(),
       modules: new Set<string>(),
       files: new Map<string, FileStats>(),
     };
@@ -81,8 +81,8 @@ describe('processResults', () => {
   });
   it('returns unused dependencies when showUnusedDeps is true', async () => {
     const files = ['src/index.ts'];
-    const traverseResult = {
-      unresolved: new Set<string>(),
+    const traverseResult: TraverseResult = {
+      unresolved: new Map<string, string[]>(),
       modules: new Set<string>(),
       files: new Map<string, FileStats>(),
     };
@@ -120,8 +120,8 @@ describe('processResults', () => {
   });
   it('returns unimported files when showUnusedFiles is true', async () => {
     const files = ['src/index.ts'];
-    const traverseResult = {
-      unresolved: new Set<string>(['foo']),
+    const traverseResult: TraverseResult = {
+      unresolved: new Map<string, string[]>([['foo', ['bar']]]),
       modules: new Set<string>(),
       files: new Map<string, FileStats>([
         [
@@ -159,7 +159,7 @@ describe('processResults', () => {
     const result = await processResults(files, traverseResult, context);
 
     const expected: ProcessedResult = {
-      unresolved: ['foo'],
+      unresolved: [['foo', ['bar']]],
       unused: [],
       unimported: [],
       clean: true,
