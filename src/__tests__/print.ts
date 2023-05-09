@@ -12,6 +12,7 @@ describe('printResults', () => {
       version: '1.0.0',
       entryFiles: [{ file: 'src/client/main.js', aliases: {}, extensions: [] }],
       extensions: [],
+      assetsExtensions: [],
       ignorePatterns: [],
       ignoreUnimported: [],
       ignoreUnused: [],

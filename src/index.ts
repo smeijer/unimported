@@ -183,6 +183,7 @@ export async function main(args: CliArguments): Promise<void> {
 
       const traverseConfig: TraverseConfig = {
         extensions: entry.extensions,
+        assetsExtensions: config.assetsExtensions,
         // resolve full path of aliases
         aliases: await meta.getAliases(entry),
         cacheId: args.cache ? getCacheIdentity(entry) : undefined,
@@ -245,7 +246,7 @@ export async function main(args: CliArguments): Promise<void> {
     spinner.text = 'traverse the file system';
     const baseUrl = (await fs.exists('src', cwd)) ? join(cwd, 'src') : cwd;
     const files = await fs.list('**/*', baseUrl, {
-      extensions: config.extensions,
+      extensions: [...config.extensions, ...config.assetsExtensions],
       ignore: config.ignorePatterns,
     });
 
