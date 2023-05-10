@@ -880,6 +880,41 @@ export default promise
       exitCode: 0,
       stdout: /There don't seem to be any unimported files./,
     },
+    {
+      name: 'should evaluate assetExtensions',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        {
+          name: 'index.ts',
+          content: `import { random } from './image.jpeg';`,
+        },
+        { name: 'image.jpeg', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "assetExtensions": [".jpeg"] }',
+        },
+      ],
+      exitCode: 0,
+      stdout: /There don't seem to be any unimported files./,
+    },
+    {
+      name: 'should detect unimported assets',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.ts" }' },
+        {
+          name: 'index.ts',
+          content: `import { random } from './image.jpeg';`,
+        },
+        { name: 'image.jpeg', content: '' },
+        { name: 'unimported.jpeg', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "assetExtensions": [".jpeg"] }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /unimported\.jpeg/s,
+    },
   ],
 );
 

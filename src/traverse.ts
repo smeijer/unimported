@@ -336,6 +336,7 @@ export const getResultObject = () => ({
 export interface TraverseConfig {
   aliases: MapLike<string[]>;
   extensions: string[];
+  assetExtensions: string[];
   moduleDirectory: string[];
   cacheId?: string;
   flow?: boolean;
@@ -363,7 +364,16 @@ export async function traverse(
   }
 
   // only process code files, no json or css
-  if (!config.extensions.includes(extname(path))) {
+  const ext = extname(path);
+  if (!config.extensions.includes(ext)) {
+    if (config.assetExtensions.includes(ext)) {
+      result.files.set(path, {
+        path,
+        extname: extname(path),
+        dirname: dirname(path),
+        imports: [],
+      });
+    }
     return result;
   }
 

@@ -40,6 +40,7 @@ export interface UnimportedConfig {
   moduleDirectory?: string[];
   rootDir?: string;
   extensions?: string[];
+  assetExtensions?: string[];
   aliases?: MapLike<string[]>;
   pathTransforms?: MapLike<string>;
 }
@@ -69,6 +70,7 @@ export interface Config {
   moduleDirectory?: string[];
   rootDir?: string;
   extensions: string[];
+  assetExtensions: string[];
   pathTransforms?: MapLike<string>;
 }
 
@@ -151,6 +153,7 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
     moduleDirectory: configFile?.moduleDirectory ?? preset?.moduleDirectory,
     entryFiles: [],
     extensions: [],
+    assetExtensions: configFile?.assetExtensions ?? [],
     pathTransforms: configFile?.pathTransforms ?? preset?.pathTransforms,
   };
 
