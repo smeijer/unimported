@@ -881,7 +881,7 @@ export default promise
       stdout: /There don't seem to be any unimported files./,
     },
     {
-      name: 'should evaluate assetsExtensions',
+      name: 'should evaluate assetExtensions',
       files: [
         { name: 'package.json', content: '{ "main": "index.ts" }' },
         {
@@ -891,7 +891,7 @@ export default promise
         { name: 'image.jpeg', content: '' },
         {
           name: '.unimportedrc.json',
-          content: '{ "assetsExtensions": [".jpeg"] }',
+          content: '{ "assetExtensions": [".jpeg"] }',
         },
       ],
       exitCode: 0,
@@ -909,7 +909,7 @@ export default promise
         { name: 'unimported.jpeg', content: '' },
         {
           name: '.unimportedrc.json',
-          content: '{ "assetsExtensions": [".jpeg"] }',
+          content: '{ "assetExtensions": [".jpeg"] }',
         },
       ],
       exitCode: 1,

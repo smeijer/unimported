@@ -336,7 +336,7 @@ export const getResultObject = () => ({
 export interface TraverseConfig {
   aliases: MapLike<string[]>;
   extensions: string[];
-  assetsExtensions: string[];
+  assetExtensions: string[];
   moduleDirectory: string[];
   cacheId?: string;
   flow?: boolean;
@@ -366,7 +366,7 @@ export async function traverse(
   // only process code files, no json or css
   const ext = extname(path);
   if (!config.extensions.includes(ext)) {
-    if (config.assetsExtensions.includes(ext)) {
+    if (config.assetExtensions.includes(ext)) {
       result.files.set(path, {
         path,
         extname: extname(path),
