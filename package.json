@@ -1,6 +1,6 @@
 {
   "name": "unimported",
-  "version": "1.20.2",
+  "version": "1.20.3",
   "description": "Scans your nodejs project folder and shows obsolete files and modules",
   "main": "./dist/index.js",
   "bin": {
@@ -51,7 +51,7 @@
     "ora": "^5.3.0",
     "read-pkg-up": "^7.0.1",
     "resolve": "^1.20.0",
-    "simple-git": "^3.7.1",
+    "simple-git": "^3.18.0",
     "term-size": "^2.2.1",
     "typescript": "^4.3.5",
     "yargs": "^16.2.0"
