@@ -5,13 +5,16 @@ import fileEntryCache, {
 import { Cache } from 'flat-cache';
 import { log } from './log';
 import path from 'path';
-import { rmSync } from 'fs';
+import { readFileSync, rmSync } from 'fs';
 import { EntryConfig } from './config';
 
 type CacheMeta<T> = FileDescriptor['meta'] & { data: T };
 
 // we keep cache groups per entry file, to keep the cache free from override conflicts
 const caches: Record<string, FileEntryCache> = {};
+const packageVersion = JSON.parse(
+  readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'),
+).version;
 
 export function getCacheIdentity(entry: EntryConfig): string {
   // don't use just the file name, the entry file can be the same, while the
@@ -19,6 +22,7 @@ export function getCacheIdentity(entry: EntryConfig): string {
   const value = JSON.stringify({
     ...entry,
     filepath: path.resolve(entry.file),
+    packageVersion,
   });
 
   return hash(value);
