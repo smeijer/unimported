@@ -13,7 +13,7 @@ type CacheMeta<T> = FileDescriptor['meta'] & { data: T };
 // we keep cache groups per entry file, to keep the cache free from override conflicts
 const caches: Record<string, FileEntryCache> = {};
 const packageVersion = JSON.parse(
-  readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'),
+  readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf8'),
 ).version;
 
 export function getCacheIdentity(entry: EntryConfig): string {
@@ -25,6 +25,7 @@ export function getCacheIdentity(entry: EntryConfig): string {
     packageVersion,
   });
 
+  console.log('val', value);
   return hash(value);
 }
 
