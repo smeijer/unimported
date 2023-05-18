@@ -389,6 +389,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "LukaszGrela",
+      "name": "Lukasz Grela",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7643591?v=4",
+      "profile": "https://github.com/LukaszGrela",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
