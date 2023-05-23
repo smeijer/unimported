@@ -25,7 +25,6 @@ export function getCacheIdentity(entry: EntryConfig): string {
     packageVersion,
   });
 
-  console.log('val', value);
   return hash(value);
 }
 
