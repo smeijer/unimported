@@ -33,11 +33,9 @@
     "bin"
   ],
   "keywords": [
-    "unrequired",
-    "redundant",
-    "obsolete",
-    "unimported",
-    "unreferenced"
+    "nodejs",
+    "cli",
+    "analysis"
   ],
   "dependencies": {
     "@typescript-eslint/parser": "^5.27.1",
