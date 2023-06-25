@@ -1,7 +1,7 @@
 import simpleGit from 'simple-git';
 
 import * as fs from './fs';
-import readPkgUp from 'read-pkg-up';
+import { readPackageUpAsync as readPkgUp } from 'read-pkg-up';
 
 import path, { join } from 'path';
 import ora from 'ora';

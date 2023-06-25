@@ -7,7 +7,7 @@ import { ensureArray } from './ensureArray';
 import { MapLike } from 'typescript';
 import { hasPackage } from './meta';
 import { presets } from './presets';
-import readPkgUp from 'read-pkg-up';
+import { readPackageUpAsync as readPkgUp } from 'read-pkg-up';
 
 const globAsync = promisify(glob);
 
