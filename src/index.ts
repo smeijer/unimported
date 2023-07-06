@@ -255,11 +255,11 @@ export async function main(args: CliArguments): Promise<void> {
       });
     });
 
-    const files: string[] = [];
+    let files: string[] = [];
     await Promise.all(scanningPromises).then((ret) => {
       ret.map((value) => {
         if (Array.isArray(value)) {
-          files.push(...value);
+          files = files.concat(...value);
         }
       });
     });
