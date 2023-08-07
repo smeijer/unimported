@@ -244,7 +244,8 @@ export async function main(args: CliArguments): Promise<void> {
 
     // traverse the file system and get system data
     spinner.text = 'traverse the file system';
-    const baseUrl = (await fs.exists('src', cwd)) ? join(cwd, 'src') : cwd;
+    const parent = args.cwd ?? cwd;
+    const baseUrl = (await fs.exists('src', parent)) ? join(parent, 'src') : parent;
     const files = await fs.list('**/*', baseUrl, {
       extensions: [...config.extensions, ...config.assetExtensions],
       ignore: config.ignorePatterns,
