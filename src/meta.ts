@@ -30,9 +30,9 @@ export function typedBoolean<T>(
   return Boolean(value);
 }
 
-export const readTsconfig = () => {
+export const readTsconfig = (cwd: string) => {
   const resolvedPathname = findConfigFile(
-    process.cwd(),
+    cwd,
     sys.fileExists,
     'tsconfig.json',
   );
@@ -47,7 +47,7 @@ export const readTsconfig = () => {
     return undefined;
   }
 
-  const { options } = parseJsonConfigFileContent(config, sys, process.cwd());
+  const { options } = parseJsonConfigFileContent(config, sys, cwd);
 
   return {
     compilerOptions: options,
@@ -56,13 +56,14 @@ export const readTsconfig = () => {
 
 export async function getAliases(
   entryFile: EntryConfig,
+  cwd: string,
 ): Promise<MapLike<string[]>> {
   const [packageJson, jsconfig] = await Promise.all([
-    fs.readJson<PackageJson>('package.json'),
-    fs.readJson<JsConfig>('jsconfig.json'),
+    fs.readJson<PackageJson>('package.json', cwd),
+    fs.readJson<JsConfig>('jsconfig.json', cwd),
   ]);
 
-  const tsconfig = readTsconfig();
+  const tsconfig = readTsconfig(cwd);
   const config = await getConfig();
 
   let aliases: Aliases = {};

@@ -185,7 +185,7 @@ export async function main(args: CliArguments): Promise<void> {
         extensions: entry.extensions,
         assetExtensions: config.assetExtensions,
         // resolve full path of aliases
-        aliases: await meta.getAliases(entry),
+        aliases: await meta.getAliases(entry, args.cwd ?? cwd),
         cacheId: args.cache ? getCacheIdentity(entry) : undefined,
         flow: config.flow,
         moduleDirectory,
