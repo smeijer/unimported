@@ -398,8 +398,19 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ryanwilsonperkin",
+      "name": "Ryan Wilson-Perkin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3004111?v=4",
+      "profile": "https://ryanwilsonperkin.com",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "skipCi": true
+  "skipCi": true,
+  "commitType": "docs"
 }
