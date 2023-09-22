@@ -244,13 +244,29 @@ export async function main(args: CliArguments): Promise<void> {
 
     // traverse the file system and get system data
     spinner.text = 'traverse the file system';
-    const baseUrl = (await fs.exists('src', cwd)) ? join(cwd, 'src') : cwd;
-    const files = await fs.list('**/*', baseUrl, {
-      extensions: [...config.extensions, ...config.assetExtensions],
-      ignore: config.ignorePatterns,
+    const scannedDirs = Array.from(
+      new Set(['./src', ...(config.scannedDirs ?? [])]),
+    );
+    const scanningPromises = scannedDirs.map(async (dir) => {
+      const baseUrl = (await fs.exists(dir, cwd)) ? join(cwd, dir) : cwd;
+      return await fs.list('**/*', baseUrl, {
+        extensions: [...config.extensions, ...config.assetExtensions],
+        ignore: config.ignorePatterns,
+      });
     });
 
-    const normalizedFiles = files.map((path) => path.replace(/\\/g, '/'));
+    let files: string[] = [];
+    await Promise.all(scanningPromises).then((ret) => {
+      ret.map((value) => {
+        if (Array.isArray(value)) {
+          files = files.concat(...value);
+        }
+      });
+    });
+
+    const normalizedFiles = files.map((path: string) =>
+      path.replace(/\\/g, '/'),
+    );
 
     spinner.text = 'process results';
     spinner.stop();

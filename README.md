@@ -121,7 +121,8 @@ Save the file as `.unimportedrc.json` in the root of your project (next to `pack
   "ignorePatterns": ["**/node_modules/**", "private/**"],
   "ignoreUnresolved": ["some-npm-dependency"],
   "ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
-  "ignoreUnused": ["bcrypt", "create-emotion"]
+  "ignoreUnused": ["bcrypt", "create-emotion"],
+  "scannedDirs": ["./modules"]
 }
 ```
 
@@ -165,6 +166,15 @@ Here is an example for transforming the extension for relative imports from ".js
   "pathTransforms": {
     "(\\..+)\\.js$": "$1.ts"
   }
+}
+```
+
+**Scanned dirs**
+By default the unimported files are only scanned from dir `./src`. If you also wish to scan files outside `./src`, add other dirs in the option `scannedDirs`:
+
+```json
+{
+  "scannedDirs": ["./modules", "./lib"]
 }
 ```
 
@@ -401,6 +411,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/yyamanoi1222"><img src="https://avatars.githubusercontent.com/u/17104096?v=4?s=100" width="100px;" alt="yu-yamanoi"/><br /><sub><b>yu-yamanoi</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=yyamanoi1222" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=yyamanoi1222" title="Tests">⚠️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vimutti77"><img src="https://avatars.githubusercontent.com/u/27840664?v=4?s=100" width="100px;" alt="Vantroy"/><br /><sub><b>Vantroy</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=vimutti77" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/LukaszGrela"><img src="https://avatars.githubusercontent.com/u/7643591?v=4?s=100" width="100px;" alt="Lukasz Grela"/><br /><sub><b>Lukasz Grela</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=LukaszGrela" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://ryanwilsonperkin.com"><img src="https://avatars.githubusercontent.com/u/3004111?v=4?s=100" width="100px;" alt="Ryan Wilson-Perkin"/><br /><sub><b>Ryan Wilson-Perkin</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=ryanwilsonperkin" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=ryanwilsonperkin" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ritingliudd01"><img src="https://avatars.githubusercontent.com/u/47513914?v=4?s=100" width="100px;" alt="Riting LIU"/><br /><sub><b>Riting LIU</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=ritingliudd01" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=ritingliudd01" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>

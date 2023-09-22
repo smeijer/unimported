@@ -683,6 +683,25 @@ export default promise
       stdout: /1 unimported files.*bar.ts/s,
     },
     {
+      name: 'should support scannedDirs config',
+      files: [
+        { name: 'package.json', content: '{ "main": "src/index.ts" }' },
+        { name: 'src/index.ts', content: `import './nested';` },
+        {
+          name: 'src/nested/index.ts',
+          content: `import foo from './foo';`,
+        },
+        { name: 'src/nested/foo.ts', content: '' },
+        { name: 'non-src/nested/bar.ts', content: '' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "scannedDirs": ["./non-src"] }',
+        },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.ts/s,
+    },
+    {
       name: 'should support module directories',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },

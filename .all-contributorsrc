@@ -398,8 +398,29 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ryanwilsonperkin",
+      "name": "Ryan Wilson-Perkin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3004111?v=4",
+      "profile": "https://ryanwilsonperkin.com",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "ritingliudd01",
+      "name": "Riting LIU",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47513914?v=4",
+      "profile": "https://github.com/ritingliudd01",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "skipCi": true
+  "skipCi": true,
+  "commitType": "docs"
 }
