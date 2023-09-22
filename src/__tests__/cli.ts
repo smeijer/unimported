@@ -936,7 +936,7 @@ export default promise
         { name: 'helpers/index.ts', content: '' },
         {
           name: '.unimportedrc.json',
-          content: '{ "pathTransforms": { "(\\..+)\\.js$": "$1.ts" } }',
+          content: '{ "pathTransforms": { "(\..+)\.js$": "$1.ts" } }',
         },
       ],
       exitCode: 0,
