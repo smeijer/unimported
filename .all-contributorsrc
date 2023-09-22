@@ -408,6 +408,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "ritingliudd01",
+      "name": "Riting LIU",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47513914?v=4",
+      "profile": "https://github.com/ritingliudd01",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,

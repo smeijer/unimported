@@ -414,6 +414,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://ryanwilsonperkin.com"><img src="https://avatars.githubusercontent.com/u/3004111?v=4?s=100" width="100px;" alt="Ryan Wilson-Perkin"/><br /><sub><b>Ryan Wilson-Perkin</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=ryanwilsonperkin" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=ryanwilsonperkin" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ritingliudd01"><img src="https://avatars.githubusercontent.com/u/47513914?v=4?s=100" width="100px;" alt="Riting LIU"/><br /><sub><b>Riting LIU</b></sub></a><br /><a href="https://github.com/smeijer/unimported/commits?author=ritingliudd01" title="Code">💻</a> <a href="https://github.com/smeijer/unimported/commits?author=ritingliudd01" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>
