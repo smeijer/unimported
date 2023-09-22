@@ -1,3 +1,4 @@
+import { cosmiconfig } from 'cosmiconfig';
 import { ProcessedResult } from './process';
 import { readJson, writeJson } from './fs';
 import { CliArguments, Context, PackageJson } from './index';
@@ -135,9 +136,8 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
     return cachedConfig;
   }
 
-  const configFile = await readJson<Partial<UnimportedConfig>>(
-    args?.config || CONFIG_FILE,
-  );
+  const cosmiconfigResult = await cosmiconfig('unimported').search();
+  const configFile = (cosmiconfigResult?.config ?? {}) as Partial<UnimportedConfig>;
 
   const unimportedPkg = await readPkgUp({ cwd: __dirname });
 
