@@ -41,6 +41,7 @@
     "@typescript-eslint/parser": "^5.27.1",
     "@typescript-eslint/typescript-estree": "^5.27.1",
     "chalk": "^4.1.0",
+    "cosmiconfig": "^8.3.6",
     "debug": "^4.3.2",
     "file-entry-cache": "^6.0.1",
     "flow-remove-types": "2.156.0",

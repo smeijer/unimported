@@ -182,6 +182,68 @@ cases(
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      name: 'should support JSON config',
+      files: [
+        { name: 'package.json', content: '{}' },
+        {
+          name: '.unimportedrc.json',
+          content: '{ "entry": ["entry.js"] }',
+        },
+        { name: 'entry.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
+      name: 'should support JS config',
+      files: [
+        { name: 'package.json', content: '{}' },
+        {
+          name: '.unimportedrc.js',
+          content: 'module.exports = { entry: ["entry.js"] }',
+        },
+        { name: 'entry.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
+      name: 'should support YML config',
+      files: [
+        { name: 'package.json', content: '{}' },
+        {
+          name: '.unimportedrc.yml',
+          content: `
+entry:
+  - entry.js
+          `,
+        },
+        { name: 'entry.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
+      name: 'should support package.json config',
+      files: [
+        {
+          name: 'package.json',
+          content: '{ "unimported": { "entry": ["entry.js"] } }',
+        },
+        { name: 'entry.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
       name: 'should identify unresolved imports',
       files: [
         { name: 'package.json', content: '{ "main": "index.js" }' },
@@ -893,7 +955,7 @@ export default promise
         { name: 'helpers/index.ts', content: '' },
         {
           name: '.unimportedrc.json',
-          content: '{ "pathTransforms": { "(\\..+)\\.js$": "$1.ts" } }',
+          content: '{ "pathTransforms": { "(..+).js$": "$1.ts" } }',
         },
       ],
       exitCode: 0,
