@@ -11,5 +11,5 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
     curly: ['error', 'all'],
-  }
+  },
 };

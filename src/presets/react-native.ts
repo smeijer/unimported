@@ -1,6 +1,6 @@
 import { Preset } from '../config';
 import nodePreset from './node';
-import { list, resolveFilesSync } from '../fs';
+import { resolveFilesSync } from '../fs';
 import { typedBoolean } from '../meta';
 
 function getEntry(target: string, rootExtensions: string[]) {

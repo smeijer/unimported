@@ -6,10 +6,6 @@ import {
   simpleTraverse,
 } from '@typescript-eslint/typescript-estree';
 import * as fs from './fs';
-import type {
-  Identifier,
-  Literal,
-} from '@typescript-eslint/types/dist/generated/ast-spec';
 import resolve from 'resolve';
 import removeFlowTypes from 'flow-remove-types';
 import {
@@ -290,13 +286,13 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
               target = source.quasis[0].value.cooked;
             }
           } else {
-            target = (source as Literal).value as string;
+            target = (source as any).value as string;
           }
           break;
 
         // require('./x') || await require('./x')
         case AST_NODE_TYPES.CallExpression: {
-          if ((node.callee as Identifier)?.name !== 'require') {
+          if ((node.callee as any)?.name !== 'require') {
             break;
           }
 
@@ -311,7 +307,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
               target = argument.quasis[0].value.cooked;
             }
           } else {
-            target = (argument as Literal).value as string;
+            target = (argument as any).value as string;
           }
           break;
         }

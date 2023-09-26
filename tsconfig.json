@@ -1,18 +1,21 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "lib": [
+      "ESNext",
+    ],
     "rootDir": "src",
     "target": "ES2015",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "./dist",
     "isolatedModules": true,
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "declaration": true
+    "declaration": true,
   },
-  "include": ["src", "typings"],
+  "include": ["src", "typings", "node_modules/@typescript-eslint/types/dist/generated/*"],
   "exclude": ["node_modules", "**/__tests__/**", "**/__mocks__/**"]
 }
