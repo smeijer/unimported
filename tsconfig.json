@@ -16,6 +16,6 @@
     "noImplicitAny": false,
     "declaration": true,
   },
-  "include": ["src", "typings", "node_modules/@typescript-eslint/types/dist/generated/*"],
+  "include": ["src", "typings"],
   "exclude": ["node_modules", "**/__tests__/**", "**/__mocks__/**"]
 }
