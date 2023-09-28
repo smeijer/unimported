@@ -14,7 +14,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "declaration": true,
+    "declaration": true
   },
   "include": ["src", "typings"],
   "exclude": ["node_modules", "**/__tests__/**", "**/__mocks__/**"]
