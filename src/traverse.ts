@@ -16,6 +16,7 @@ import {
 } from './cache';
 import { log } from './log';
 import { MapLike } from 'typescript';
+import type { TSESTree } from '@typescript-eslint/types';
 
 export interface FileStats {
   path: string;
@@ -286,13 +287,13 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
               target = source.quasis[0].value.cooked;
             }
           } else {
-            target = (source as any).value as string;
+            target = (source as TSESTree.Literal).value as string;
           }
           break;
 
         // require('./x') || await require('./x')
         case AST_NODE_TYPES.CallExpression: {
-          if ((node.callee as any)?.name !== 'require') {
+          if ((node.callee as TSESTree.Identifier)?.name !== 'require') {
             break;
           }
 
@@ -307,7 +308,7 @@ async function parse(path: string, config: TraverseConfig): Promise<FileStats> {
               target = argument.quasis[0].value.cooked;
             }
           } else {
-            target = (argument as any).value as string;
+            target = (argument as TSESTree.Literal).value as string;
           }
           break;
         }
