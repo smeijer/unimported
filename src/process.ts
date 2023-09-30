@@ -1,6 +1,9 @@
+import ignore from 'ignore';
 import { TraverseResult } from './traverse';
 import { Context } from './index';
 import { ensureArray } from './ensureArray';
+import path from 'path';
+import { exists, readText } from './fs';
 
 export interface ProcessedResult {
   unresolved: [string, string[]][];
@@ -41,10 +44,22 @@ export async function processResults(
       !ignoreUnusedIdx[x],
   );
 
-  const unimported = files
+  let unimported = files
     .filter((x) => !traverseResult.files.has(x))
     .map((x) => x.replace(context.cwd + '/', ''))
     .filter((x) => !ignoreUnimportedIdx[x]);
+
+  if (context.config.respectGitignore && (await exists('.gitignore'))) {
+    const gitignore = (await readText('.gitignore')).split('\n');
+    const ig = ignore().add(gitignore);
+    unimported = ig
+      .filter(
+        unimported.map((x) =>
+          path.relative(context.cwd, path.resolve(context.cwd, x)),
+        ),
+      )
+      .map((x) => path.join(context.cwd, x));
+  }
 
   const formatTypeResultMap: { [P in FormatTypes]: boolean } = {
     showUnusedFiles: !unimported.length,

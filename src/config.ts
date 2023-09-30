@@ -39,6 +39,7 @@ export interface UnimportedConfig {
   ignoreUnresolved: string[];
   ignoreUnimported: string[];
   ignoreUnused: string[];
+  respectGitignore?: boolean;
   moduleDirectory?: string[];
   rootDir?: string;
   extensions?: string[];
@@ -70,6 +71,7 @@ export interface Config {
   ignoreUnresolved: string[];
   ignoreUnimported: string[];
   ignoreUnused: string[];
+  respectGitignore: boolean;
   moduleDirectory?: string[];
   rootDir?: string;
   extensions: string[];
@@ -157,6 +159,7 @@ export async function getConfig(args?: CliArguments): Promise<Config> {
     ),
     ignoreUnused: configFile?.ignoreUnused ?? preset?.ignoreUnused ?? [],
     ignorePatterns: configFile?.ignorePatterns ?? preset?.ignorePatterns ?? [],
+    respectGitignore: configFile?.respectGitignore ?? true,
     moduleDirectory: configFile?.moduleDirectory ?? preset?.moduleDirectory,
     entryFiles: [],
     extensions: [],

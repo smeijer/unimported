@@ -854,7 +854,8 @@ export default promise
             "ignoreUnresolved": [],
             "ignoreUnimported": ["src/setup{Proxy,Tests}.js"],
             "ignoreUnused": [],
-            "ignorePatterns": ["**/node_modules/**", "**/*.d.ts"]
+            "ignorePatterns": ["**/node_modules/**", "**/*.d.ts"],
+            "respectGitignore": true
           }`,
         },
         { name: 'src/index.tsx', content: `import './imported';` },
@@ -1118,6 +1119,7 @@ cases(
         ignoreUnresolved: [],
         ignoreUnimported: [],
         ignoreUnused: [],
+        respectGitignore: true,
       },
     },
     {
@@ -1151,6 +1153,7 @@ cases(
         ignoreUnresolved: [],
         ignoreUnimported: [],
         ignoreUnused: ['@babel/runtime', 'meteor-node-stubs'],
+        respectGitignore: true,
       },
     },
   ],
