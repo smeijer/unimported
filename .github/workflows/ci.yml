@@ -14,13 +14,14 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  NODE_VERSION: '18.x'
+  DEFAULT_NODE_VERSION: 18.x
 
 jobs:
   setup:
     name: Setup
     strategy:
       matrix:
+        node_version: [18.x, 20.x]
         os: [ ubuntu-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
@@ -29,14 +30,14 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '${{ env.NODE_VERSION }}'
+          node-version: '${{ matrix.node_version }}'
 
       - name: Cache node modules
         id: cache
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-${{matrix.node_version}}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
@@ -45,6 +46,9 @@ jobs:
   eslint:
     name: Eslint
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: [18.x, 20.x]
     needs: [setup]
     timeout-minutes: 5
     steps:
@@ -54,7 +58,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '${{ env.NODE_VERSION }}'
+          node-version: '${{ matrix.node_version }}'
 
       - name: Fetch all branches
         run: |
@@ -64,7 +68,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-${{matrix.node_version}}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: ESLint
         run: npm run ci:lint -- $(git diff --diff-filter d --name-only origin/${{ github.base_ref }}...HEAD -- '*.js' '*.ts' '*.tsx')
@@ -72,6 +76,9 @@ jobs:
   typescript:
     name: Typescript
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: [18.x, 20.x]
     needs: [setup]
     timeout-minutes: 5
     steps:
@@ -79,13 +86,13 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '${{ env.NODE_VERSION }}'
+          node-version: '${{ matrix.node_version }}'
 
       - name: Cache node modules
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-${{matrix.node_version}}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Typescript
         run: npm run ci:tsc
@@ -94,6 +101,7 @@ jobs:
     name: Test
     strategy:
       matrix:
+        node_version: [18.x, 20.x]
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     needs: [setup]
@@ -103,13 +111,13 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '${{ env.NODE_VERSION }}'
+          node-version: '${{ matrix.node_version }}'
 
       - name: Cache node modules
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-${{matrix.node_version}}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Test
         run: npm run test
@@ -127,13 +135,13 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '${{ env.NODE_VERSION }}'
+          node-version: '${{ env.DEFAULT_NODE_VERSION }}'
 
       - name: Cache node modules
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-${{env.DEFAULT_NODE_VERSION}}-node_modules-${{ hashFiles('package-lock.json') }}
 
       - name: Build
         run: npm run build
