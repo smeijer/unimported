@@ -1,6 +1,5 @@
-import { expandGlob, Preset } from '../config';
+import { Preset } from '../config';
 import nodePreset from './node';
-import { exists } from '../fs';
 
 const preset: Preset = {
   name: 'next',

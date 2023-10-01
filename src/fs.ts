@@ -3,7 +3,6 @@ import { join, relative } from 'path';
 import glob, { IOptions as GlobOptions } from 'glob';
 import util from 'util';
 import json5 from 'json5';
-import { typedBoolean } from './meta';
 import resolve from 'resolve';
 
 const globAsync = util.promisify(glob);
