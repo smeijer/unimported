@@ -24,6 +24,27 @@ function getEntry(target: string, rootExtensions: string[]) {
     },
   };
 }
+
+function getExpo(options, rootExtensions: string[]) {
+  const expoEntry = options.packageJson.main;
+
+  if (!expoEntry) {
+    return;
+  }
+
+  const [file] = resolveFilesSync([expoEntry], rootExtensions);
+
+  if (!file) {
+    return;
+  }
+  return {
+    file,
+    label: 'expo',
+    extend: {
+      extensions: rootExtensions,
+    },
+  };
+}
 const preset: Preset = {
   name: 'react-native',
   isMatch: ({ hasPackage }) => hasPackage('react-native'),
@@ -31,9 +52,12 @@ const preset: Preset = {
     const base = await nodePreset.getConfig(options);
     const extensions = base.extensions as string[];
 
+    const hasExpo = options.hasPackage('expo');
+
     const entry = [
       getEntry('android', extensions),
       getEntry('ios', extensions),
+      hasExpo ? getExpo(options, extensions) : undefined,
     ].filter(typedBoolean);
 
     return {
