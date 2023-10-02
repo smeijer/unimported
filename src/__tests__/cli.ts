@@ -1249,7 +1249,7 @@ import bar from './bar';
           ([filePath]) => path.basename(filePath),
         ),
       ).toMatchInlineSnapshot(`
-        Array [
+        [
           "bar.js",
           "bar.js",
           "index.js",
@@ -1289,7 +1289,7 @@ import bar from './bar';
           ([filePath]) => path.basename(filePath),
         ),
       ).toMatchInlineSnapshot(`
-        Array [
+        [
           "bar.js",
           "bar.js",
           "index.js",

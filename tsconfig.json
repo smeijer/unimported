@@ -1,10 +1,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "lib": [
+      "ESNext",
+    ],
     "rootDir": "src",
     "target": "ES2015",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "./dist",
     "isolatedModules": true,
     "strict": true,

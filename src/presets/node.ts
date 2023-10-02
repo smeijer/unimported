@@ -1,6 +1,4 @@
-import { Preset, UnimportedConfig } from '../config';
-import path from 'path';
-import resolve from 'resolve';
+import { Preset } from '../config';
 import { typedBoolean } from '../meta';
 import { resolveFilesSync } from '../fs';
 
