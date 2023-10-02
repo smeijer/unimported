@@ -182,6 +182,19 @@ cases(
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      name: 'should ignore unimported file matching `.gitignore`',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+        { name: 'ignore.js', content: '' },
+        { name: '.gitignore', content: '**/ignore*' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
       name: 'should support JSON config',
       files: [
         { name: 'package.json', content: '{}' },
@@ -854,7 +867,8 @@ export default promise
             "ignoreUnresolved": [],
             "ignoreUnimported": ["src/setup{Proxy,Tests}.js"],
             "ignoreUnused": [],
-            "ignorePatterns": ["**/node_modules/**", "**/*.d.ts"]
+            "ignorePatterns": ["**/node_modules/**", "**/*.d.ts"],
+            "respectGitignore": true
           }`,
         },
         { name: 'src/index.tsx', content: `import './imported';` },
@@ -1118,6 +1132,7 @@ cases(
         ignoreUnresolved: [],
         ignoreUnimported: [],
         ignoreUnused: [],
+        respectGitignore: true,
       },
     },
     {
@@ -1151,6 +1166,7 @@ cases(
         ignoreUnresolved: [],
         ignoreUnimported: [],
         ignoreUnused: ['@babel/runtime', 'meteor-node-stubs'],
+        respectGitignore: true,
       },
     },
   ],

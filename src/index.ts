@@ -159,6 +159,7 @@ export async function main(args: CliArguments): Promise<void> {
         ignoreUnimported: config.ignoreUnimported,
         ignoreUnused: config.ignoreUnused,
         ignoreUnresolved: config.ignoreUnresolved,
+        respectGitignore: config.respectGitignore,
       });
 
       spinner.stop();

@@ -17,6 +17,7 @@ describe('printResults', () => {
       ignoreUnimported: [],
       ignoreUnused: [],
       ignoreUnresolved: [],
+      respectGitignore: false,
     },
     showUnresolvedImports: false,
     showUnusedDeps: false,
