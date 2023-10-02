@@ -182,6 +182,19 @@ cases(
       stdout: /1 unimported files.*bar.js/s,
     },
     {
+      name: 'should ignore unimported file matching `.gitignore`',
+      files: [
+        { name: 'package.json', content: '{ "main": "index.js" }' },
+        { name: 'index.js', content: `import foo from './foo';` },
+        { name: 'foo.js', content: '' },
+        { name: 'bar.js', content: '' },
+        { name: 'ignore.js', content: '' },
+        { name: '.gitignore', content: '**/ignore*' },
+      ],
+      exitCode: 1,
+      stdout: /1 unimported files.*bar.js/s,
+    },
+    {
       name: 'should support JSON config',
       files: [
         { name: 'package.json', content: '{}' },
