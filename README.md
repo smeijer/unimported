@@ -122,6 +122,7 @@ Save the file as `.unimportedrc.json` in the root of your project (next to `pack
   "ignoreUnresolved": ["some-npm-dependency"],
   "ignoreUnimported": ["src/i18n/locales/en.ts", "src/i18n/locales/nl.ts"],
   "ignoreUnused": ["bcrypt", "create-emotion"],
+  "respectGitignore": true,
   "scannedDirs": ["./modules"]
 }
 ```
@@ -297,6 +298,14 @@ tests/**
 ```
 
 To specify custom ignore paths, add your own patterns to `.unimportedrc.json#ignorePatterns`. Note that `unimported` won't merge settings! The custom list needs to be the full list of patterns that you want to ignore.
+
+In addition `unimported` will also ignore files that match your `.gitignore` patterns. To disable this behavior, set `respectGitignore` to `false` in your `.unimportedrc.json` file.
+
+```json
+{
+  "respectGitignore": false
+}
+```
 
 ## Troubleshooting
 
