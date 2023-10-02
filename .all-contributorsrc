@@ -418,6 +418,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "Fritsch-Tech",
+      "name": "Lukas Fritsch",
+      "avatar_url": "https://avatars.githubusercontent.com/u/111692684?v=4",
+      "profile": "https://fritsch.tech/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
