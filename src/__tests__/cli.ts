@@ -839,7 +839,7 @@ export default promise
         { name: 'index.js', content: `import foo from './foo';` },
         {
           name: '.unimportedrc.json',
-          content: '{"ignoreUnresolved": ["./foo"]}',
+          content: '{"ignoreUnresolved": [["./foo", ["index.js"]]]}',
         },
       ],
       exitCode: 0,
