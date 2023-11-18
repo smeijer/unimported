@@ -34,7 +34,7 @@ export async function processResults(
   const ignoreUnimportedIdx = index(context.config.ignoreUnimported);
 
   const unresolved = Array.from(traverseResult.unresolved).filter(
-    ([x]) => !ignoreUnresolvedIdx[x],
+    (entry) => !ignoreUnresolvedIdx[entry.toString()],
   );
 
   const unused = Object.keys(context.dependencies).filter(
