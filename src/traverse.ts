@@ -150,6 +150,23 @@ export function resolveImport(
     };
   } catch (e) {}
 
+   // Try to resolve the path relative to the root
+   for (const rootAlias of config.aliases["/"]) {
+    try {
+        return {
+            type: 'source_file',
+            path: resolve
+                .sync(`${rootAlias}/${path}`, {
+                    basedir: cwd,
+                    extensions: config.extensions,
+                    moduleDirectory: config.moduleDirectory,
+                })
+                .replace(/\\/g, '/'),
+        };
+    }
+    catch (e) { }
+  }
+
   // if nothing else works out :(
   return {
     type: 'unresolved',
