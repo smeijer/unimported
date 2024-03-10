@@ -1,3 +1,10 @@
+# Archived
+
+> [!IMPORTANT]
+> This project is no longer maintained. There's a project called [knip](https://knip.dev/explanations/comparison-and-migration#unimported) which has more features, and is actively maintained by [Lars Kappert](https://x.com/webprolific). Thank you for using unimported over the years! Enjoy knip, and [say hi to me on Twitter/X](https://meijer.ws/twitter). 
+
+---
+
 # unimported
 
 **Find unused source files in javascript / typescript projects.**
